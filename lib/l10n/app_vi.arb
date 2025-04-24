@@ -1,0 +1,80 @@
+{
+  "appTitle": "Cờ Tướng",
+
+  "menu": "Menu",
+  "openMenu": "Mở Menu",
+  "flipBoard": "Lật Bàn Cờ",
+  "copyCode": "Sao Chép Mã Cờ",
+  "parseCode": "Phân Tích Mã Cờ",
+  "editCode": "Chỉnh Sửa Cờ",
+  "newGame": "Ván Mới",
+  "loadManual": "Tải Bản Ghi Cờ",
+  "saveManual": "Lưu Bản Ghi Cờ",
+  "setting": "Cài Đặt",
+  "featureNotAvailable": "Tính năng chưa khả dụng",
+
+  "modeRobot": "Chế Độ Máy",
+  "modeOnline": "Chế Độ Trực Tuyến",
+  "modeFree": "Chế Độ Tự Do",
+
+  "clearAll": "Xóa Tất Cả",
+  "save": "Áp Dụng",
+
+  "trusteeshipToRobots": "Giao Cho Máy",
+  "cancelRobots": "Hủy Giao Cho Máy",
+  "thinking": "Đang Suy Nghĩ...",
+  "currentInfo": "Hiện Tại",
+  "manual": "Hướng Dẫn",
+  "theEvent": "Sự Kiện: ",
+  "theSite": "Địa Điểm: ",
+  "theDate": "Ngày: ",
+  "theRound": "Vòng: ",
+  "theRed": "Đỏ: ",
+  "theBlack": "Đen: ",
+
+  "stepStart": "==Bắt Đầu==",
+
+  "exitNow": "Thoát Ngay?",
+  "dontExit": "Chờ Một Chút",
+  "yesExit": "Thoát",
+  "clickAgainToExit": "Nhấn Lần Nữa Để Thoát",
+
+  "apply": "Áp Dụng",
+  "situationCode": "Mã Cờ",
+  "invalidCode": "Mã Cờ Không Hợp Lệ",
+  "copySuccess": "Sao Chép Thành Công",
+  "saveSuccess": "Lưu Thành Công",
+  "selectDirectorySave": "Chọn Thư Mục Để Lưu",
+  "saveFilename": "Tên Tệp Để Lưu",
+  "selectPgnFile": "Chọn Tệp .PGN",
+
+  "recommendMove": "Nước Đi Đề Xuất",
+  "remark": "Ghi Chú",
+  "noRemark": "Không Có Ghi Chú",
+
+  "check": "Chiếu",
+  "checkmate": "Chiếu Bí",
+  "longRecheckLoose": "Cùng Nước Đi 3 Vòng Sẽ Thua",
+  "noEatToDraw": "60 Vòng Không Ăn Quân Sẽ Hòa",
+  "trapped": "Chiếu Bí",
+  "redLoose": "Thua",
+  "redWin": "Thắng",
+  "redDraw": "Hòa",
+
+  "requestDraw": "Đề Nghị Hòa",
+  "agreeToDraw": "Đồng Ý Hòa",
+  "requestRetract": "Đề Nghị Đi Lại",
+  "agreeRetract": "Đồng Ý Đi Lại",
+  "disagreeRetract": "Từ Chối Đi Lại",
+  "cantSendCheck": "Bạn Không Thể Tự Chiếu",
+  "plsParryCheck": "Hãy Chống Chiếu",
+  "oneMoreGame": "Ván Mới",
+  "letMeSee": "Để Sau",
+
+  "settingTitle": "Cài Đặt",
+  
+  "language": "Ngôn Ngữ",
+  "languageEnglish": "Tiếng Anh",
+  "languageChinese": "Tiếng Trung",
+  "languageVietnamese": "Tiếng Việt"
+}

@@ -1,0 +1,80 @@
+{
+  "appTitle": "Chinese Chess",
+
+  "menu": "Menu",
+  "openMenu": "Open Menu",
+  "flipBoard": "Flip Board",
+  "copyCode": "Copy Chess Code",
+  "parseCode": "Parse Chess Code",
+  "editCode": "Edit Chess",
+  "newGame": "New Game",
+  "loadManual": "Load Chess Manual",
+  "saveManual": "Save Chess Manual",
+  "setting": "Setting",
+  "featureNotAvailable": "Feature is not available",
+
+  "modeRobot": "Robot Mode",
+  "modeOnline": "Online Mode",
+  "modeFree": "Free Mode",
+
+  "clearAll": "Clear All",
+  "save": "Apply",
+
+  "trusteeshipToRobots": "Trusteeship to Robots",
+  "cancelRobots": "Cancel Trusteeship",
+  "thinking": "Thinking...",
+  "currentInfo": "Current",
+  "manual": "Manual",
+  "theEvent": "Event: ",
+  "theSite": "Site: ",
+  "theDate": "Date: ",
+  "theRound": "Round: ",
+  "theRed": "Red: ",
+  "theBlack": "Black: ",
+
+  "stepStart": "==Start==",
+
+  "exitNow": "Exit Now ?",
+  "dontExit": "Wait a moment",
+  "yesExit": "Yes exit",
+  "clickAgainToExit": "Click again to Exit",
+
+  "apply": "Apply",
+  "situationCode": "Chess Code",
+  "invalidCode": "Invalid Chess Code",
+  "copySuccess": "Copy Success",
+  "saveSuccess": "Save Success",
+  "selectDirectorySave": "Select a Directory to Save",
+  "saveFilename": "Filename to Save",
+  "selectPgnFile": "Select .PGN file",
+
+  "recommendMove": "Recommend Move",
+  "remark": "Remark",
+  "noRemark": "No remark",
+
+  "check": "Check",
+  "checkmate": "Checkmate",
+  "longRecheckLoose": "The same move 3 round to Lose",
+  "noEatToDraw": "60 round with no eat to Draw",
+  "trapped": "Checkmate",
+  "redLoose": "Loose",
+  "redWin": "Win",
+  "redDraw": "Draw",
+
+  "requestDraw": "Asked for a draw",
+  "agreeToDraw": "Agree to draw",
+  "requestRetract": "Asked for a Retract",
+  "agreeRetract": "Agree to retract",
+  "disagreeRetract": "Disagree to retract",
+  "cantSendCheck": "You can't send Check",
+  "plsParryCheck": "Please parry the Check",
+  "oneMoreGame": "New Game",
+  "letMeSee": "Not now",
+
+  "settingTitle": "Settings",
+
+  "language": "Language",
+  "languageEnglish": "English",
+  "languageChinese": "Chinese",
+  "languageVietnamese": "Vietnamese"
+}
