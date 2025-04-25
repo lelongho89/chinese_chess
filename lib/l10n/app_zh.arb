@@ -58,7 +58,7 @@
   "noEatToDraw": "60回合无吃子判和",
   "trapped": "困毙",
   "redLoose": "先负",
-  "redWin": "先负",
+  "redWin": "先胜",
   "redDraw": "先和",
 
   "requestDraw": "对方请求和棋",
@@ -72,6 +72,15 @@
   "letMeSee": "再看看",
 
   "settingTitle": "系统设置",
+
+  "aiType": "AI类型",
+  "builtInEngine": "内置引擎",
+  "aiLevel": "AI级别",
+  "beginner": "初级",
+  "intermediate": "中级",
+  "master": "大师",
+  "gameSound": "游戏音效",
+  "soundVolume": "音量",
 
   "language": "语言",
   "languageEnglish": "英语",

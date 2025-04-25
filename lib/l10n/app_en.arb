@@ -73,6 +73,15 @@
 
   "settingTitle": "Settings",
 
+  "aiType": "AI Type",
+  "builtInEngine": "Built-in Engine",
+  "aiLevel": "AI Level",
+  "beginner": "Beginner",
+  "intermediate": "Intermediate",
+  "master": "Master",
+  "gameSound": "Game Sound",
+  "soundVolume": "Sound Volume",
+
   "language": "Language",
   "languageEnglish": "English",
   "languageChinese": "Chinese",

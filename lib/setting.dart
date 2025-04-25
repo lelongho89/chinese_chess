@@ -37,6 +37,9 @@ class _SettingPageState extends State<SettingPage> {
       width = MediaQuery.of(context).size.width;
     }
 
+    // Ensure the width is not too small
+    width = width < 300 ? 300 : width;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(context.l10n.settingTitle),
@@ -65,66 +68,72 @@ class _SettingPageState extends State<SettingPage> {
                   child: ListBody(
                     children: [
                       ListTile(
-                        title: const Text('AI Type'),
-                        trailing: CupertinoSegmentedControl(
-                          onValueChanged: (value) {
-                            if (value == null) return;
-                            setState(() {
-                              setting!.info = value as EngineInfo;
-                            });
-                          },
-                          groupValue: setting!.info,
-                          children: {
-                            builtInEngine: const Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 10,
-                              ),
-                              child: Text('Built-in Engine'),
-                            ),
-                            for (var engine in Engine().getSupportedEngines())
-                              engine: Padding(
+                        title: Text(context.l10n.aiType),
+                        trailing: SizedBox(
+                          width: width * 0.6,
+                          child: CupertinoSegmentedControl(
+                            onValueChanged: (value) {
+                              if (value == null) return;
+                              setState(() {
+                                setting!.info = value as EngineInfo;
+                              });
+                            },
+                            groupValue: setting!.info,
+                            children: {
+                              builtInEngine: Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 10,
                                 ),
-                                child: Text(engine.name),
+                                child: Text(context.l10n.builtInEngine),
                               ),
-                          },
+                              for (var engine in Engine().getSupportedEngines())
+                                engine: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  child: Text(engine.name),
+                                ),
+                            },
+                          ),
                         ),
                       ),
                       ListTile(
-                        title: const Text('AI Level'),
-                        trailing: CupertinoSegmentedControl(
-                          onValueChanged: (value) {
-                            if (value == null) return;
-                            setState(() {
-                              setting!.engineLevel = value as int;
-                            });
-                          },
-                          groupValue: setting!.engineLevel,
-                          children: const {
-                            10: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 10,
+                        title: Text(context.l10n.aiLevel),
+                        trailing: SizedBox(
+                          width: width * 0.6,
+                          child: CupertinoSegmentedControl(
+                            onValueChanged: (value) {
+                              if (value == null) return;
+                              setState(() {
+                                setting!.engineLevel = value as int;
+                              });
+                            },
+                            groupValue: setting!.engineLevel,
+                            children: {
+                              10: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                                child: Text(context.l10n.beginner),
                               ),
-                              child: Text('Beginner'),
-                            ),
-                            11: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 11,
+                              11: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                                child: Text(context.l10n.intermediate),
                               ),
-                              child: Text('Intermediate'),
-                            ),
-                            12: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12,
+                              12: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                                child: Text(context.l10n.master),
                               ),
-                              child: Text('Master'),
-                            ),
-                          },
+                            },
+                          ),
                         ),
                       ),
                       ListTile(
-                        title: const Text('Game Sound'),
+                        title: Text(context.l10n.gameSound),
                         trailing: CupertinoSwitch(
                           value: setting!.sound,
                           onChanged: (v) {
@@ -135,55 +144,61 @@ class _SettingPageState extends State<SettingPage> {
                         ),
                       ),
                       ListTile(
-                        title: const Text('Sound Volume'),
-                        trailing: CupertinoSlider(
-                          value: setting!.soundVolume,
-                          min: 0,
-                          max: 1,
-                          onChanged: (v) {
-                            setState(() {
-                              setting!.soundVolume = v;
-                            });
-                          },
+                        title: Text(context.l10n.soundVolume),
+                        trailing: SizedBox(
+                          width: width * 0.5,
+                          child: CupertinoSlider(
+                            value: setting!.soundVolume,
+                            min: 0,
+                            max: 1,
+                            onChanged: (v) {
+                              setState(() {
+                                setting!.soundVolume = v;
+                              });
+                            },
+                          ),
                         ),
                       ),
                       ListTile(
                         title: Text(context.l10n.language),
-                        trailing: CupertinoSegmentedControl(
-                          onValueChanged: (value) {
-                            if (value == null) return;
-                            final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
-                            setState(() {
-                              setting!.locale = value as String;
-                              // Update the locale provider
-                              localeProvider.setLocale(value);
-                              // Save settings
-                              setting!.save().then((_) {
-                                print("Language saved: ${setting!.locale}");
+                        trailing: SizedBox(
+                          width: width * 0.6,
+                          child: CupertinoSegmentedControl(
+                            onValueChanged: (value) {
+                              if (value == null) return;
+                              final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+                              setState(() {
+                                setting!.locale = value as String;
+                                // Update the locale provider
+                                localeProvider.setLocale(value);
+                                // Save settings
+                                setting!.save().then((_) {
+                                  print("Language saved: ${setting!.locale}");
+                                });
                               });
-                            });
-                          },
-                          groupValue: setting!.locale,
-                          children: {
-                            'en': Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
+                            },
+                            groupValue: setting!.locale,
+                            children: {
+                              'en': Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                                child: Text(context.l10n.languageEnglish),
                               ),
-                              child: Text(context.l10n.languageEnglish),
-                            ),
-                            'zh': Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
+                              'zh': Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                                child: Text(context.l10n.languageChinese),
                               ),
-                              child: Text(context.l10n.languageChinese),
-                            ),
-                            'vi': Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
+                              'vi': Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                                child: Text(context.l10n.languageVietnamese),
                               ),
-                              child: Text(context.l10n.languageVietnamese),
-                            ),
-                          },
+                            },
+                          ),
                         ),
                       ),
                     ],

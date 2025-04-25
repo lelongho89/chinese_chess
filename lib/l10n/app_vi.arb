@@ -72,7 +72,16 @@
   "letMeSee": "Để Sau",
 
   "settingTitle": "Cài Đặt",
-  
+
+  "aiType": "Loại AI",
+  "builtInEngine": "Máy Tích Hợp",
+  "aiLevel": "Cấp Độ AI",
+  "beginner": "Người Mới",
+  "intermediate": "Trung Cấp",
+  "master": "Cao Thủ",
+  "gameSound": "Âm Thanh",
+  "soundVolume": "Âm Lượng",
+
   "language": "Ngôn Ngữ",
   "languageEnglish": "Tiếng Anh",
   "languageChinese": "Tiếng Trung",
