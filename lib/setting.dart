@@ -1,5 +1,4 @@
 import 'package:engine/engine.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shirne_dialog/shirne_dialog.dart';
@@ -44,17 +43,15 @@ class _SettingPageState extends State<SettingPage> {
       appBar: AppBar(
         title: Text(context.l10n.settingTitle),
         actions: [
-          TextButton(
+          TextButton.icon(
             onPressed: () {
               setting?.save().then((v) {
                 Navigator.pop(context);
                 MyDialog.toast(context.l10n.saveSuccess, iconType: IconType.success);
               });
             },
-            child: Text(
-              context.l10n.save,
-              style: const TextStyle(color: Colors.white),
-            ),
+            icon: const Icon(Icons.save),
+            label: Text(context.l10n.save),
           ),
         ],
       ),
@@ -63,78 +60,91 @@ class _SettingPageState extends State<SettingPage> {
             ? const CircularProgressIndicator()
             : Container(
                 width: width,
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 child: SingleChildScrollView(
-                  child: ListBody(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      ListTile(
-                        title: Text(context.l10n.aiType),
-                        trailing: SizedBox(
-                          width: width * 0.6,
-                          child: CupertinoSegmentedControl(
-                            onValueChanged: (value) {
-                              if (value == null) return;
-                              setState(() {
-                                setting!.info = value as EngineInfo;
-                              });
-                            },
-                            groupValue: setting!.info,
-                            children: {
-                              builtInEngine: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                ),
-                                child: Text(context.l10n.builtInEngine),
+                      Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                context.l10n.aiType,
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
-                              for (var engine in Engine().getSupportedEngines())
-                                engine: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
+                              const SizedBox(height: 12),
+                              SegmentedButton<EngineInfo>(
+                                segments: [
+                                  ButtonSegment<EngineInfo>(
+                                    value: builtInEngine,
+                                    label: Text(context.l10n.builtInEngine),
                                   ),
-                                  child: Text(engine.name),
-                                ),
-                            },
+                                  ...Engine().getSupportedEngines().map(
+                                    (engine) => ButtonSegment<EngineInfo>(
+                                      value: engine,
+                                      label: Text(engine.name),
+                                    ),
+                                  ),
+                                ],
+                                selected: {setting!.info},
+                                onSelectionChanged: (Set<EngineInfo> selected) {
+                                  if (selected.isEmpty) return;
+                                  setState(() {
+                                    setting!.info = selected.first;
+                                  });
+                                },
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                      ListTile(
-                        title: Text(context.l10n.aiLevel),
-                        trailing: SizedBox(
-                          width: width * 0.6,
-                          child: CupertinoSegmentedControl(
-                            onValueChanged: (value) {
-                              if (value == null) return;
-                              setState(() {
-                                setting!.engineLevel = value as int;
-                              });
-                            },
-                            groupValue: setting!.engineLevel,
-                            children: {
-                              10: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                ),
-                                child: Text(context.l10n.beginner),
+                      Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                context.l10n.aiLevel,
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
-                              11: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                ),
-                                child: Text(context.l10n.intermediate),
+                              const SizedBox(height: 12),
+                              SegmentedButton<int>(
+                                segments: [
+                                  ButtonSegment<int>(
+                                    value: 10,
+                                    label: Text(context.l10n.beginner),
+                                  ),
+                                  ButtonSegment<int>(
+                                    value: 11,
+                                    label: Text(context.l10n.intermediate),
+                                  ),
+                                  ButtonSegment<int>(
+                                    value: 12,
+                                    label: Text(context.l10n.master),
+                                  ),
+                                ],
+                                selected: {setting!.engineLevel},
+                                onSelectionChanged: (Set<int> selected) {
+                                  if (selected.isEmpty) return;
+                                  setState(() {
+                                    setting!.engineLevel = selected.first;
+                                  });
+                                },
                               ),
-                              12: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                ),
-                                child: Text(context.l10n.master),
-                              ),
-                            },
+                            ],
                           ),
                         ),
                       ),
-                      ListTile(
-                        title: Text(context.l10n.gameSound),
-                        trailing: CupertinoSwitch(
+                      Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: SwitchListTile(
+                          title: Text(context.l10n.gameSound),
                           value: setting!.sound,
                           onChanged: (v) {
                             setState(() {
@@ -143,61 +153,76 @@ class _SettingPageState extends State<SettingPage> {
                           },
                         ),
                       ),
-                      ListTile(
-                        title: Text(context.l10n.soundVolume),
-                        trailing: SizedBox(
-                          width: width * 0.5,
-                          child: CupertinoSlider(
-                            value: setting!.soundVolume,
-                            min: 0,
-                            max: 1,
-                            onChanged: (v) {
-                              setState(() {
-                                setting!.soundVolume = v;
-                              });
-                            },
+                      Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                context.l10n.soundVolume,
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              Slider(
+                                value: setting!.soundVolume,
+                                min: 0,
+                                max: 1,
+                                divisions: 10,
+                                label: (setting!.soundVolume * 100).toInt().toString(),
+                                onChanged: (v) {
+                                  setState(() {
+                                    setting!.soundVolume = v;
+                                  });
+                                },
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                      ListTile(
-                        title: Text(context.l10n.language),
-                        trailing: SizedBox(
-                          width: width * 0.6,
-                          child: CupertinoSegmentedControl(
-                            onValueChanged: (value) {
-                              if (value == null) return;
-                              final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
-                              setState(() {
-                                setting!.locale = value as String;
-                                // Update the locale provider
-                                localeProvider.setLocale(value);
-                                // Save settings
-                                setting!.save().then((_) {
-                                  print("Language saved: ${setting!.locale}");
-                                });
-                              });
-                            },
-                            groupValue: setting!.locale,
-                            children: {
-                              'en': Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                ),
-                                child: Text(context.l10n.languageEnglish),
+                      Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                context.l10n.language,
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
-                              'zh': Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                ),
-                                child: Text(context.l10n.languageChinese),
+                              const SizedBox(height: 12),
+                              SegmentedButton<String>(
+                                segments: [
+                                  ButtonSegment<String>(
+                                    value: 'en',
+                                    label: Text(context.l10n.languageEnglish),
+                                  ),
+                                  ButtonSegment<String>(
+                                    value: 'zh',
+                                    label: Text(context.l10n.languageChinese),
+                                  ),
+                                  ButtonSegment<String>(
+                                    value: 'vi',
+                                    label: Text(context.l10n.languageVietnamese),
+                                  ),
+                                ],
+                                selected: {setting!.locale},
+                                onSelectionChanged: (Set<String> selected) {
+                                  if (selected.isEmpty) return;
+                                  final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+                                  setState(() {
+                                    setting!.locale = selected.first;
+                                    // Update the locale provider
+                                    localeProvider.setLocale(selected.first);
+                                    // Save settings
+                                    setting!.save().then((_) {
+                                      print("Language saved: ${setting!.locale}");
+                                    });
+                                  });
+                                },
                               ),
-                              'vi': Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                ),
-                                child: Text(context.l10n.languageVietnamese),
-                              ),
-                            },
+                            ],
                           ),
                         ),
                       ),

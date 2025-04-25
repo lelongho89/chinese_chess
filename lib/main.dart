@@ -67,6 +67,9 @@ class _MainAppState extends State<MainApp> {
         isDark: true,
         isHighContrast: true,
       ),
+      // Material 3 specific configurations
+      themeMode: ThemeMode.system, // Follow system theme
+      debugShowCheckedModeBanner: false, // Remove debug banner
       home: const GameWrapper(
         isMain: true,
         child: GameBoard(),
