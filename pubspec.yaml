@@ -70,5 +70,6 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/skins/woods/
+    - assets/skins/stones/
     - assets/images/
     - assets/sounds/

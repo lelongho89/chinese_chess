@@ -85,5 +85,12 @@
   "language": "语言",
   "languageEnglish": "英语",
   "languageChinese": "中文",
-  "languageVietnamese": "越南语"
+  "languageVietnamese": "越南语",
+
+  "chessSkin": "棋子皮肤",
+  "skinWoods": "木质",
+  "skinStones": "石质",
+
+  "quit": "退出",
+  "quitGame": "退出游戏"
 }

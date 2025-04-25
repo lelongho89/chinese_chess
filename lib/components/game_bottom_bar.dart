@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shirne_dialog/shirne_dialog.dart';
 
+import '../global.dart';
+import '../game_board.dart';
 import '../models/game_manager.dart';
 import '../models/play_mode.dart';
 import 'play_step.dart';
@@ -22,7 +24,7 @@ class GameBottomBarState extends State<GameBottomBar> {
     if (widget.mode == PlayMode.modeRobot) {
       return robotBottomBar();
     }
-    if (widget.mode == PlayMode.modeRobot) {
+    if (widget.mode == PlayMode.modeOnline) {
       return onlineBottomBar();
     }
 
@@ -60,6 +62,31 @@ class GameBottomBarState extends State<GameBottomBar> {
     setState(() {});
   }
 
+  void _quitGame() {
+    MyDialog.confirm(
+      context.l10n.exitNow,
+      buttonText: context.l10n.yesExit,
+      cancelText: context.l10n.dontExit,
+    ).then((confirmed) {
+      if (confirmed ?? false) {
+        // Stop the current game
+        gamer.stop();
+
+        // Find the GameBoard's state to reset the mode
+        final gameBoardState = context.findAncestorStateOfType<GameBoardState>();
+        if (gameBoardState != null) {
+          // Reset the mode to null to show the mode selection screen
+          gameBoardState.setState(() {
+            gameBoardState.mode = null;
+          });
+        } else {
+          // If we can't find the GameBoard state, try to navigate back
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
+      }
+    });
+  }
+
   Widget freeBottomBar() {
     return BottomAppBar(
       child: Row(
@@ -72,6 +99,11 @@ class GameBottomBarState extends State<GameBottomBar> {
             onPressed: _goPrev,
           ),
           IconButton(icon: const Icon(Icons.navigate_next), onPressed: _goNext),
+          IconButton(
+            icon: const Icon(Icons.exit_to_app),
+            tooltip: context.l10n.quitGame,
+            onPressed: _quitGame,
+          ),
         ],
       ),
     );
@@ -89,6 +121,11 @@ class GameBottomBarState extends State<GameBottomBar> {
             onPressed: _goPrev,
           ),
           IconButton(icon: const Icon(Icons.navigate_next), onPressed: _goNext),
+          IconButton(
+            icon: const Icon(Icons.exit_to_app),
+            tooltip: context.l10n.quitGame,
+            onPressed: _quitGame,
+          ),
         ],
       ),
     );
@@ -106,6 +143,11 @@ class GameBottomBarState extends State<GameBottomBar> {
             onPressed: _goPrev,
           ),
           IconButton(icon: const Icon(Icons.navigate_next), onPressed: _goNext),
+          IconButton(
+            icon: const Icon(Icons.exit_to_app),
+            tooltip: context.l10n.quitGame,
+            onPressed: _quitGame,
+          ),
         ],
       ),
     );

@@ -85,5 +85,12 @@
   "language": "Ngôn Ngữ",
   "languageEnglish": "Tiếng Anh",
   "languageChinese": "Tiếng Trung",
-  "languageVietnamese": "Tiếng Việt"
+  "languageVietnamese": "Tiếng Việt",
+
+  "chessSkin": "Giao Diện Quân Cờ",
+  "skinWoods": "Gỗ",
+  "skinStones": "Đá",
+
+  "quit": "Thoát",
+  "quitGame": "Thoát Trò Chơi"
 }

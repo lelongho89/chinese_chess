@@ -4,6 +4,7 @@ import 'package:engine/engine.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../global.dart';
+import 'game_manager.dart';
 
 const builtInEngine = EngineInfo(name: 'builtIn', data: '');
 
@@ -18,6 +19,7 @@ class GameSetting {
   bool sound = true;
   double soundVolume = 1;
   String locale = 'en';
+  String skin = 'woods';
 
   GameSetting({
     this.info = builtInEngine,
@@ -25,6 +27,7 @@ class GameSetting {
     this.sound = true,
     this.soundVolume = 1,
     this.locale = 'en',
+    this.skin = 'woods',
   });
 
   GameSetting.fromJson(String? jsonStr) {
@@ -51,6 +54,9 @@ class GameSetting {
     if (json.containsKey('locale')) {
       locale = json['locale'];
     }
+    if (json.containsKey('skin')) {
+      skin = json['skin'];
+    }
   }
 
   static Future<GameSetting> getInstance() async {
@@ -67,6 +73,23 @@ class GameSetting {
       logger.warning(e);
     }
     String? json = storage?.getString(cacheKey);
+
+    // Set up the onSettingsChanged callback to update the skin in GameManager
+    // We'll set this after GameManager is initialized to avoid circular dependency
+    if (onSettingsChanged == null) {
+      Future.delayed(Duration.zero, () {
+        onSettingsChanged = () {
+          if (_instance != null) {
+            logger.info("Settings changed, updating skin to: ${_instance!.skin}");
+            // Only update if GameManager is already initialized
+            if (GameManager.instance.skin.folder != _instance!.skin) {
+              GameManager.instance.updateSkin(_instance!.skin);
+            }
+          }
+        };
+      });
+    }
+
     return GameSetting.fromJson(json);
   }
 
@@ -87,5 +110,6 @@ class GameSetting {
         'sound': sound,
         'sound_volume': soundVolume,
         'locale': locale,
+        'skin': skin,
       });
 }

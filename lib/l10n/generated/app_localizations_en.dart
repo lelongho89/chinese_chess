@@ -195,6 +195,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingTitle => 'Settings';
 
   @override
+  String get aiType => 'AI Type';
+
+  @override
+  String get builtInEngine => 'Built-in Engine';
+
+  @override
+  String get aiLevel => 'AI Level';
+
+  @override
+  String get beginner => 'Beginner';
+
+  @override
+  String get intermediate => 'Intermediate';
+
+  @override
+  String get master => 'Master';
+
+  @override
+  String get gameSound => 'Game Sound';
+
+  @override
+  String get soundVolume => 'Sound Volume';
+
+  @override
   String get language => 'Language';
 
   @override
@@ -205,4 +229,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageVietnamese => 'Vietnamese';
+
+  @override
+  String get chessSkin => 'Chess Skin';
+
+  @override
+  String get skinWoods => 'Woods';
+
+  @override
+  String get skinStones => 'Stones';
+
+  @override
+  String get quit => 'Quit';
+
+  @override
+  String get quitGame => 'Quit Game';
 }

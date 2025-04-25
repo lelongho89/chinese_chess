@@ -93,7 +93,7 @@ class GameManager {
     curHand = 0;
     // map = ChessMap.fromFen(ChessManual.startFen);
 
-    skin = ChessSkin("woods", this);
+    skin = ChessSkin(setting.skin, this);
     skin.readyNotifier.addListener(() {
       add(GameLoadEvent(0));
     });
@@ -500,6 +500,19 @@ class GameManager {
     engine.stop();
     engine.quit();
     hands.map((e) => e.dispose());
+  }
+
+  /// Update the skin when it changes in settings
+  void updateSkin(String skinName) {
+    if (skin.folder != skinName) {
+      logger.info('Updating skin from ${skin.folder} to $skinName');
+      skin = ChessSkin(skinName, this);
+      skin.readyNotifier.addListener(() {
+        logger.info('Skin loaded, notifying listeners');
+        // Force a reload of the game to update all components
+        add(GameLoadEvent(0));
+      });
+    }
   }
 
   void switchPlayer() {

@@ -195,6 +195,30 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingTitle => 'Cài Đặt';
 
   @override
+  String get aiType => 'Loại AI';
+
+  @override
+  String get builtInEngine => 'Máy Tích Hợp';
+
+  @override
+  String get aiLevel => 'Cấp Độ AI';
+
+  @override
+  String get beginner => 'Người Mới';
+
+  @override
+  String get intermediate => 'Trung Cấp';
+
+  @override
+  String get master => 'Cao Thủ';
+
+  @override
+  String get gameSound => 'Âm Thanh';
+
+  @override
+  String get soundVolume => 'Âm Lượng';
+
+  @override
   String get language => 'Ngôn Ngữ';
 
   @override
@@ -205,4 +229,19 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get languageVietnamese => 'Tiếng Việt';
+
+  @override
+  String get chessSkin => 'Giao Diện Quân Cờ';
+
+  @override
+  String get skinWoods => 'Gỗ';
+
+  @override
+  String get skinStones => 'Đá';
+
+  @override
+  String get quit => 'Thoát';
+
+  @override
+  String get quitGame => 'Thoát Trò Chơi';
 }

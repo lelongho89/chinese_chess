@@ -1,0 +1,28 @@
+{
+  "width": 521,
+  "height": 577,
+  "size": 57,
+  "offset": {
+    "dx": 4,
+    "dy": 3
+  },
+  "board": "board.jpg",
+  "red": {
+    "K": "red_general.png",
+    "A": "red_advisor.png",
+    "B": "red_elephant.png",
+    "C": "red_cannon.png",
+    "N": "red_horse.png",
+    "R": "red_chariot.png",
+    "P": "red_soldier.png"
+  },
+  "black": {
+    "k": "black_general.png",
+    "a": "black_advisor.png",
+    "b": "black_elephant.png",
+    "c": "black_cannon.png",
+    "n": "black_horse.png",
+    "r": "black_chariot.png",
+    "p": "black_soldier.png"
+  }
+}

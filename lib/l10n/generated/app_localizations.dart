@@ -469,6 +469,54 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settingTitle;
 
+  /// No description provided for @aiType.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Type'**
+  String get aiType;
+
+  /// No description provided for @builtInEngine.
+  ///
+  /// In en, this message translates to:
+  /// **'Built-in Engine'**
+  String get builtInEngine;
+
+  /// No description provided for @aiLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Level'**
+  String get aiLevel;
+
+  /// No description provided for @beginner.
+  ///
+  /// In en, this message translates to:
+  /// **'Beginner'**
+  String get beginner;
+
+  /// No description provided for @intermediate.
+  ///
+  /// In en, this message translates to:
+  /// **'Intermediate'**
+  String get intermediate;
+
+  /// No description provided for @master.
+  ///
+  /// In en, this message translates to:
+  /// **'Master'**
+  String get master;
+
+  /// No description provided for @gameSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Game Sound'**
+  String get gameSound;
+
+  /// No description provided for @soundVolume.
+  ///
+  /// In en, this message translates to:
+  /// **'Sound Volume'**
+  String get soundVolume;
+
   /// No description provided for @language.
   ///
   /// In en, this message translates to:
@@ -492,6 +540,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Vietnamese'**
   String get languageVietnamese;
+
+  /// No description provided for @chessSkin.
+  ///
+  /// In en, this message translates to:
+  /// **'Chess Skin'**
+  String get chessSkin;
+
+  /// No description provided for @skinWoods.
+  ///
+  /// In en, this message translates to:
+  /// **'Woods'**
+  String get skinWoods;
+
+  /// No description provided for @skinStones.
+  ///
+  /// In en, this message translates to:
+  /// **'Stones'**
+  String get skinStones;
+
+  /// No description provided for @quit.
+  ///
+  /// In en, this message translates to:
+  /// **'Quit'**
+  String get quit;
+
+  /// No description provided for @quitGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Quit Game'**
+  String get quitGame;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

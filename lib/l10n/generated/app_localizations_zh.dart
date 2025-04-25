@@ -159,7 +159,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get redLoose => '先负';
 
   @override
-  String get redWin => '先负';
+  String get redWin => '先胜';
 
   @override
   String get redDraw => '先和';
@@ -195,6 +195,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingTitle => '系统设置';
 
   @override
+  String get aiType => 'AI类型';
+
+  @override
+  String get builtInEngine => '内置引擎';
+
+  @override
+  String get aiLevel => 'AI级别';
+
+  @override
+  String get beginner => '初级';
+
+  @override
+  String get intermediate => '中级';
+
+  @override
+  String get master => '大师';
+
+  @override
+  String get gameSound => '游戏音效';
+
+  @override
+  String get soundVolume => '音量';
+
+  @override
   String get language => '语言';
 
   @override
@@ -205,4 +229,19 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get languageVietnamese => '越南语';
+
+  @override
+  String get chessSkin => '棋子皮肤';
+
+  @override
+  String get skinWoods => '木质';
+
+  @override
+  String get skinStones => '石质';
+
+  @override
+  String get quit => '退出';
+
+  @override
+  String get quitGame => '退出游戏';
 }

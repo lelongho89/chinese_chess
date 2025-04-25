@@ -23,10 +23,11 @@ class GameBoard extends StatefulWidget {
   const GameBoard({super.key});
 
   @override
-  State<GameBoard> createState() => _GameBoardState();
+  State<GameBoard> createState() => GameBoardState();
 }
 
-class _GameBoardState extends State<GameBoard> {
+// Make the state class public so it can be accessed from other files
+class GameBoardState extends State<GameBoard> {
   GameManager gamer = GameManager.instance;
   PlayMode? mode;
 

@@ -5,6 +5,7 @@ import 'package:shirne_dialog/shirne_dialog.dart';
 
 import 'global.dart';
 import 'l10n/generated/app_localizations.dart';
+import 'models/game_manager.dart';
 import 'models/game_setting.dart';
 import 'models/locale_provider.dart';
 
@@ -218,6 +219,47 @@ class _SettingPageState extends State<SettingPage> {
                                     // Save settings
                                     setting!.save().then((_) {
                                       print("Language saved: ${setting!.locale}");
+                                    });
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                context.l10n.chessSkin,
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              const SizedBox(height: 12),
+                              SegmentedButton<String>(
+                                segments: [
+                                  ButtonSegment<String>(
+                                    value: 'woods',
+                                    label: Text(context.l10n.skinWoods),
+                                  ),
+                                  ButtonSegment<String>(
+                                    value: 'stones',
+                                    label: Text(context.l10n.skinStones),
+                                  ),
+                                ],
+                                selected: {setting!.skin},
+                                onSelectionChanged: (Set<String> selected) {
+                                  if (selected.isEmpty) return;
+                                  setState(() {
+                                    setting!.skin = selected.first;
+                                    // Update the skin in GameManager immediately
+                                    GameManager.instance.updateSkin(selected.first);
+                                    // Save settings
+                                    setting!.save().then((_) {
+                                      logger.info("Skin saved: ${setting!.skin}");
                                     });
                                   });
                                 },

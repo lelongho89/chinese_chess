@@ -85,5 +85,12 @@
   "language": "Language",
   "languageEnglish": "English",
   "languageChinese": "Chinese",
-  "languageVietnamese": "Vietnamese"
+  "languageVietnamese": "Vietnamese",
+
+  "chessSkin": "Chess Skin",
+  "skinWoods": "Woods",
+  "skinStones": "Stones",
+
+  "quit": "Quit",
+  "quitGame": "Quit Game"
 }
