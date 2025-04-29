@@ -1,5 +1,5 @@
-# Uncomment this line to define a global platform for your project
-# platform :ios, '12.0'
+# Define a global platform for your project
+platform :ios, '13.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -27,6 +27,19 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 
 flutter_ios_podfile_setup
 
+# Override the dependency versions to ensure compatibility
+def override_dependency(installer, pod_name, dependency_name, version)
+  installer.pod_targets.each do |pod|
+    if pod.name.eql?(pod_name) || pod.name.start_with?("#{pod_name}/")
+      pod.specs.each do |spec|
+        if spec.dependencies.key?(dependency_name)
+          spec.dependencies[dependency_name] = version
+        end
+      end
+    end
+  end
+end
+
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
@@ -34,8 +47,73 @@ target 'Runner' do
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 end
 
+# This pre_install hook modifies the dependencies before they are resolved
+pre_install do |installer|
+  # Force GoogleSignIn to use the same GoogleUtilities version as Firebase
+  installer.pod_targets.each do |pod|
+    if pod.name.start_with?('GoogleSignIn')
+      pod.specs.each do |spec|
+        if spec.dependencies.key?('GoogleUtilities')
+          spec.dependencies['GoogleUtilities'] = ['~> 7.12.0']
+        end
+        if spec.dependencies.key?('GTMAppAuth')
+          spec.dependencies['GTMAppAuth'] = ['~> 1.3.1']
+        end
+      end
+    end
+
+    # Force Firebase to use specific versions
+    if pod.name.start_with?('Firebase')
+      pod.specs.each do |spec|
+        if spec.dependencies.key?('GoogleUtilities')
+          spec.dependencies['GoogleUtilities'] = ['~> 7.12.0']
+        end
+      end
+    end
+  end
+end
+
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+
+    # Fix for Xcode 15 build issues
+    target.build_configurations.each do |config|
+      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
+        '$(inherited)',
+        'PERMISSION_EVENTS=0',
+        'PERMISSION_REMINDERS=0',
+        'PERMISSION_CONTACTS=0',
+        'PERMISSION_CAMERA=0',
+        'PERMISSION_MICROPHONE=0',
+        'PERMISSION_SPEECH_RECOGNIZER=0',
+        'PERMISSION_PHOTOS=0',
+        'PERMISSION_NOTIFICATIONS=0',
+        'PERMISSION_MEDIA_LIBRARY=0',
+        'PERMISSION_SENSORS=0',
+        'PERMISSION_BLUETOOTH=0'
+      ]
+
+      # Required for compatibility with GoogleUtilities
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+
+      # Disable bitcode as it's deprecated in Xcode 14+
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+
+      # Ensure all pods use the same Swift version
+      if config.build_settings['SWIFT_VERSION'].nil?
+        config.build_settings['SWIFT_VERSION'] = '5.0'
+      end
+    end
+  end
+
+  # After installation, modify the Pods.xcodeproj to ensure compatibility
+  installer.pods_project.targets.each do |target|
+    if target.name == 'GoogleSignIn'
+      target.build_configurations.each do |config|
+        # Force GoogleSignIn to use the same deployment target
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      end
+    end
   end
 end

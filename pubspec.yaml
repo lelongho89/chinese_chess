@@ -30,11 +30,25 @@ dependencies:
 
   audioplayers: ^6.4.0
 
+  # Firebase
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.15.3
+  cloud_firestore: ^4.13.6
+  firebase_analytics: ^10.7.4
+
+  # Social Login
+  google_sign_in: ^6.0.2  # Using a version compatible with Firebase
+  flutter_facebook_auth: ^6.0.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
   icons_launcher: ^3.0.1
   flutter_lints: ^3.0.1
+  mockito: ^5.4.4
+  build_runner: ^2.4.8
 
 # flutter pub run icons_launcher:create
 icons_launcher:
