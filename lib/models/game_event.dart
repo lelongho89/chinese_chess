@@ -9,6 +9,8 @@ enum GameEventType {
   lock,
   step,
   flip,
+  timer,
+  timeExpired,
 }
 
 abstract class GameEvent<T> {
@@ -37,6 +39,10 @@ abstract class GameEvent<T> {
         return GameEventType.step;
       case GameFlipEvent:
         return GameEventType.flip;
+      case GameTimerEvent:
+        return GameEventType.timer;
+      case GameTimeExpiredEvent:
+        return GameEventType.timeExpired;
     }
     return null;
   }
@@ -72,4 +78,12 @@ class GameStepEvent extends GameEvent<String> {
 
 class GameFlipEvent extends GameEvent<bool> {
   GameFlipEvent(bool isFlip) : super(GameEventType.flip, isFlip);
+}
+
+class GameTimerEvent extends GameEvent<Map<String, dynamic>> {
+  GameTimerEvent(Map<String, dynamic> timerData) : super(GameEventType.timer, timerData);
+}
+
+class GameTimeExpiredEvent extends GameEvent<int> {
+  GameTimeExpiredEvent(int player) : super(GameEventType.timeExpired, player);
 }

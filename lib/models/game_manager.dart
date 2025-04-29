@@ -430,6 +430,19 @@ class GameManager {
     manual.result = result;
   }
 
+  /// Handle time expiration for a player
+  void handleTimeExpired(int player) {
+    // Player lost on time
+    final result = player == 0
+        ? ChessManual.resultFstLoose  // Red player lost on time
+        : ChessManual.resultFstWin;   // Black player lost on time
+
+    setResult(result, '超时判负');
+
+    // Notify about time expiration
+    add(GameTimeExpiredEvent(player));
+  }
+
   /// 棋局结果判断
   bool checkResult(int hand, int curMove) {
     logger.info('checkResult');
@@ -520,6 +533,8 @@ class GameManager {
     if (curHand >= hands.length) {
       curHand = 0;
     }
+
+    // Notify about player change (this will trigger timer switch)
     add(GamePlayerEvent(curHand));
 
     logger.info('切换选手: $curHand ${player.title} ${player.driverType.name}');
