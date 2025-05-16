@@ -68,15 +68,15 @@ This document breaks down the migration process into specific tasks that can be 
   - [x] Configure board dimensions
 
 ### Task 2.2: Create Piece Components
-- **Status**: 🔄 Not Started
+- **Status**: ✅ Completed
 - **Priority**: High
 - **Estimated Time**: 2 days
 - **Description**: Implement chess piece components.
 - **Subtasks**:
-  - [ ] Create base piece component
-  - [ ] Implement piece rendering
-  - [ ] Add piece selection functionality
-  - [ ] Configure piece dimensions and scaling
+  - [x] Create base piece component
+  - [x] Implement piece rendering
+  - [x] Add piece selection functionality
+  - [x] Configure piece dimensions and scaling
 
 ### Task 2.3: Implement Game Logic
 - **Status**: 🔄 Not Started
