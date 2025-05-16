@@ -76,6 +76,13 @@ const HomeScreen: React.FC = () => {
           <Text style={styles.buttonText}>{t('game.history')}</Text>
         </TouchableOpacity>
 
+        {/* Leaderboard button */}
+        <TouchableOpacity
+          style={[styles.button, styles.leaderboardButton]}
+          onPress={() => navigation.navigate('Leaderboard')}>
+          <Text style={styles.buttonText}>Leaderboard</Text>
+        </TouchableOpacity>
+
         {/* About button */}
         <TouchableOpacity
           style={[styles.button, styles.aboutButton]}
@@ -133,6 +140,9 @@ const styles = StyleSheet.create({
   },
   historyButton: {
     backgroundColor: '#8e44ad',
+  },
+  leaderboardButton: {
+    backgroundColor: '#3498db',
   },
   aboutButton: {
     backgroundColor: '#6b7f94',

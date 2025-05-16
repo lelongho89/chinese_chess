@@ -6,3 +6,4 @@ export * from './game';
 export * from './firebase/services';
 export * from './online';
 export * from './history';
+export * from './rating';

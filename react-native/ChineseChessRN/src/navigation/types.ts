@@ -22,6 +22,10 @@ export type RootStackParamList = {
   // History screens
   GameHistory: undefined;
   GameReplay: { gameId: string };
+
+  // Rating screens
+  Leaderboard: undefined;
+  PlayerProfile: { userId: string };
 };
 
 // Navigation prop types for each screen
@@ -41,6 +45,10 @@ export type AboutScreenNavigationProp = StackNavigationProp<RootStackParamList, 
 export type GameHistoryScreenNavigationProp = StackNavigationProp<RootStackParamList, 'GameHistory'>;
 export type GameReplayScreenNavigationProp = StackNavigationProp<RootStackParamList, 'GameReplay'>;
 
+// Rating screens
+export type LeaderboardScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Leaderboard'>;
+export type PlayerProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'PlayerProfile'>;
+
 // Route prop types for each screen
 // Auth screens
 export type LoginScreenRouteProp = RouteProp<RootStackParamList, 'Login'>;
@@ -57,3 +65,7 @@ export type AboutScreenRouteProp = RouteProp<RootStackParamList, 'About'>;
 // History screens
 export type GameHistoryScreenRouteProp = RouteProp<RootStackParamList, 'GameHistory'>;
 export type GameReplayScreenRouteProp = RouteProp<RootStackParamList, 'GameReplay'>;
+
+// Rating screens
+export type LeaderboardScreenRouteProp = RouteProp<RootStackParamList, 'Leaderboard'>;
+export type PlayerProfileScreenRouteProp = RouteProp<RootStackParamList, 'PlayerProfile'>;

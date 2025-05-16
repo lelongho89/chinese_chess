@@ -6,3 +6,4 @@ export * from './gameActions';
 export * from './authActions';
 export * from './onlineActions';
 export * from './historyActions';
+export * from './ratingActions';

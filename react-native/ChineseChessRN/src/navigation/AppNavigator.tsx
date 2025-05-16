@@ -29,6 +29,12 @@ import {
   GameReplayScreen
 } from '../screens/history';
 
+// Import rating screens
+import {
+  LeaderboardScreen,
+  PlayerProfileScreen
+} from '../screens/rating';
+
 const Stack = createStackNavigator<RootStackParamList>();
 
 /**
@@ -153,6 +159,16 @@ const AppNavigator: React.FC = () => {
               name="GameReplay"
               component={GameReplayScreen}
               options={{ title: 'Game Replay' }}
+            />
+            <Stack.Screen
+              name="Leaderboard"
+              component={LeaderboardScreen}
+              options={{ title: 'Leaderboard' }}
+            />
+            <Stack.Screen
+              name="PlayerProfile"
+              component={PlayerProfileScreen}
+              options={{ title: 'Player Profile' }}
             />
           </>
         ) : (
