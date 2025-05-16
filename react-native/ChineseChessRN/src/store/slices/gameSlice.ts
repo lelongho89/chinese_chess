@@ -1,4 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { User } from './authSlice';
+import { OnlineGame, Match } from '../../services/online';
 
 /**
  * Game state types
@@ -15,6 +17,14 @@ export type ChessPiece = {
 export type GameResult = {
   winner: 'red' | 'black' | 'draw' | null;
   reason: 'checkmate' | 'resignation' | 'timeout' | 'draw' | 'stalemate' | null;
+};
+
+export type ChatMessage = {
+  id: string;
+  senderId: string;
+  senderName: string;
+  message: string;
+  timestamp: number;
 };
 
 export type GameState = {
@@ -34,6 +44,15 @@ export type GameState = {
   initialTimeSeconds: number;
   incrementSeconds: number;
   gameResult: GameResult;
+  // Online game state
+  onlineGameId: string | null;
+  opponent: User | null;
+  availableGames: OnlineGame[];
+  activeMatches: Match[];
+  gameHistory: OnlineGame[];
+  chatMessages: ChatMessage[];
+  isLoading: boolean;
+  error: string | null;
 };
 
 /**
@@ -58,7 +77,16 @@ const initialState: GameState = {
   gameResult: {
     winner: null,
     reason: null
-  }
+  },
+  // Online game state
+  onlineGameId: null,
+  opponent: null,
+  availableGames: [],
+  activeMatches: [],
+  gameHistory: [],
+  chatMessages: [],
+  isLoading: false,
+  error: null
 };
 
 /**
@@ -128,6 +156,34 @@ const gameSlice = createSlice({
         reason: null
       };
     },
+    // Online game reducers
+    setOnlineGameId: (state, action: PayloadAction<string | null>) => {
+      state.onlineGameId = action.payload;
+    },
+    setOpponent: (state, action: PayloadAction<User | null>) => {
+      state.opponent = action.payload;
+    },
+    setAvailableGames: (state, action: PayloadAction<OnlineGame[]>) => {
+      state.availableGames = action.payload;
+    },
+    setActiveMatches: (state, action: PayloadAction<Match[]>) => {
+      state.activeMatches = action.payload;
+    },
+    setGameHistory: (state, action: PayloadAction<OnlineGame[]>) => {
+      state.gameHistory = action.payload;
+    },
+    addChatMessage: (state, action: PayloadAction<ChatMessage>) => {
+      state.chatMessages.push(action.payload);
+    },
+    setChatMessages: (state, action: PayloadAction<ChatMessage[]>) => {
+      state.chatMessages = action.payload;
+    },
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
+    },
+    setError: (state, action: PayloadAction<string | null>) => {
+      state.error = action.payload;
+    },
   },
 });
 
@@ -149,6 +205,16 @@ export const {
   setIncrementTime,
   setGameResult,
   resetGame,
+  // Online game actions
+  setOnlineGameId,
+  setOpponent,
+  setAvailableGames,
+  setActiveMatches,
+  setGameHistory,
+  addChatMessage,
+  setChatMessages,
+  setLoading,
+  setError,
 } = gameSlice.actions;
 
 export default gameSlice.reducer;
