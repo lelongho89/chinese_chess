@@ -154,8 +154,8 @@ class ChessTimer extends ChangeNotifier {
     // Convert milliseconds to deciseconds (0.1 seconds)
     final elapsedDeciSeconds = elapsed ~/ 100;
     
-    // Subtract elapsed time (in deciseconds)
-    _timeRemaining -= elapsedDeciSeconds / 10;
+    // Subtract elapsed time (in deciseconds, converted to seconds)
+    _timeRemaining -= (elapsedDeciSeconds / 10).round();
     
     // Ensure time doesn't go below zero
     if (_timeRemaining <= 0) {

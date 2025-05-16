@@ -30,15 +30,16 @@ dependencies:
 
   audioplayers: ^6.4.0
 
-  # Firebase
-  firebase_core: ^2.24.2
-  firebase_auth: ^4.15.3
-  cloud_firestore: ^4.13.6
-  firebase_analytics: ^10.7.4
+  # Firebase - use specific versions known to work together
+  firebase_core: 2.15.1
+  firebase_auth: 4.7.3
+  firebase_messaging: 14.6.7
+  cloud_firestore: 4.8.5
+  firebase_analytics: 10.4.5
 
-  # Social Login
-  google_sign_in: ^6.0.2  # Using a version compatible with Firebase
-  flutter_facebook_auth: ^6.0.4
+  # Social Login - use latest versions compatible with Firebase
+  google_sign_in: ^6.2.1  # Updated to latest version
+  flutter_facebook_auth: ^6.0.3  # Updated to latest version
 
 dev_dependencies:
   flutter_test:

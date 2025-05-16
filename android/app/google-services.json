@@ -1,26 +1,43 @@
 {
   "project_info": {
-    "project_number": "123456789012",
-    "project_id": "chinese-chess-app",
-    "storage_bucket": "chinese-chess-app.appspot.com"
+    "project_number": "131579197850",
+    "project_id": "chinesechess-b0878",
+    "storage_bucket": "chinesechess-b0878.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:123456789012:android:abcdef1234567890",
+        "mobilesdk_app_id": "1:131579197850:android:943b5912677f9b9ecde223",
         "android_client_info": {
           "package_name": "com.shirne.chinese_chess"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "131579197850-55aj86n416bctii338kg3j4j7rorqsaj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyABCDEFGHIJKLMNOPQRSTUVWXYZabcdefg"
+          "current_key": "AIzaSyC4IvbFPtsPmauNRxeeGANisc4ZhuTZ3Uc"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "131579197850-55aj86n416bctii338kg3j4j7rorqsaj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "131579197850-5t9ogmd1rktkt33m2p879950071vnsqu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.hole.chinesechess"
+              }
+            }
+          ]
         }
       }
     }

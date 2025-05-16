@@ -27,57 +27,32 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 
 flutter_ios_podfile_setup
 
-# Override the dependency versions to ensure compatibility
-def override_dependency(installer, pod_name, dependency_name, version)
-  installer.pod_targets.each do |pod|
-    if pod.name.eql?(pod_name) || pod.name.start_with?("#{pod_name}/")
-      pod.specs.each do |spec|
-        if spec.dependencies.key?(dependency_name)
-          spec.dependencies[dependency_name] = version
-        end
-      end
-    end
-  end
-end
-
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-end
-
-# This pre_install hook modifies the dependencies before they are resolved
-pre_install do |installer|
-  # Force GoogleSignIn to use the same GoogleUtilities version as Firebase
-  installer.pod_targets.each do |pod|
-    if pod.name.start_with?('GoogleSignIn')
-      pod.specs.each do |spec|
-        if spec.dependencies.key?('GoogleUtilities')
-          spec.dependencies['GoogleUtilities'] = ['~> 7.12.0']
-        end
-        if spec.dependencies.key?('GTMAppAuth')
-          spec.dependencies['GTMAppAuth'] = ['~> 1.3.1']
-        end
-      end
-    end
-
-    # Force Firebase to use specific versions
-    if pod.name.start_with?('Firebase')
-      pod.specs.each do |spec|
-        if spec.dependencies.key?('GoogleUtilities')
-          spec.dependencies['GoogleUtilities'] = ['~> 7.12.0']
-        end
-      end
-    end
-  end
+  
+  # Add GoogleUtilities with a compatible version
+  pod 'GoogleUtilities', '7.12.0'
+  
+  # Use the newer version of AppAuth required by google_sign_in_ios
+  pod 'AppAuth', '>= 1.7.4'
 end
 
 post_install do |installer|
+  # Fix for Xcode 15 build issues
+  installer.pods_project.targets.each do |target|
+    if target.respond_to?(:product_type) && target.product_type == "com.apple.product-type.bundle"
+      target.build_configurations.each do |config|
+        config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+      end
+    end
+  end
+
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
 
-    # Fix for Xcode 15 build issues
     target.build_configurations.each do |config|
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
         '$(inherited)',
@@ -104,15 +79,10 @@ post_install do |installer|
       if config.build_settings['SWIFT_VERSION'].nil?
         config.build_settings['SWIFT_VERSION'] = '5.0'
       end
-    end
-  end
-
-  # After installation, modify the Pods.xcodeproj to ensure compatibility
-  installer.pods_project.targets.each do |target|
-    if target.name == 'GoogleSignIn'
-      target.build_configurations.each do |config|
-        # Force GoogleSignIn to use the same deployment target
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      
+      # Fix for arm64 architecture issues
+      if config.name == 'Debug' && config.build_settings['ARCHS'] && config.build_settings['ARCHS'].include?('arm64')
+        config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
       end
     end
   end
