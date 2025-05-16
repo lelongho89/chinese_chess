@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAppDispatch } from '../../hooks';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { initGame } from '../../store/actions';
+import SkinSelector from './SkinSelector';
 
 /**
  * Props for the GameOptionsModal component
@@ -18,32 +19,40 @@ interface GameOptionsModalProps {
  * GameOptionsModal component for the Chinese Chess game
  * This component displays a modal with game options
  */
-const GameOptionsModal: React.FC<GameOptionsModalProps> = ({ 
+const GameOptionsModal: React.FC<GameOptionsModalProps> = ({
   visible,
   onClose,
   gameMode
 }) => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
-  
+
+  // State for showing skin selector
+  const [showSkinSelector, setShowSkinSelector] = useState(false);
+
   // Handle restart game
   const handleRestart = () => {
     dispatch(initGame({ gameMode: gameMode as 'ai' | 'online' | 'free' }));
     onClose();
   };
-  
+
   // Handle go to home
   const handleGoToHome = () => {
     onClose();
     navigation.navigate('Home' as never);
   };
-  
+
   // Handle go to settings
   const handleGoToSettings = () => {
     onClose();
     navigation.navigate('Settings' as never);
   };
-  
+
+  // Handle toggle skin selector
+  const handleToggleSkinSelector = () => {
+    setShowSkinSelector(!showSkinSelector);
+  };
+
   return (
     <Modal
       visible={visible}
@@ -56,22 +65,34 @@ const GameOptionsModal: React.FC<GameOptionsModalProps> = ({
           <TouchableWithoutFeedback>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Game Options</Text>
-              
+
               <TouchableOpacity style={styles.option} onPress={handleRestart}>
                 <Icon name="refresh" size={24} color="#333" />
                 <Text style={styles.optionText}>Restart Game</Text>
               </TouchableOpacity>
-              
+
+              <TouchableOpacity style={styles.option} onPress={handleToggleSkinSelector}>
+                <Icon name="palette" size={24} color="#333" />
+                <Text style={styles.optionText}>Change Skin</Text>
+              </TouchableOpacity>
+
               <TouchableOpacity style={styles.option} onPress={handleGoToSettings}>
                 <Icon name="settings" size={24} color="#333" />
                 <Text style={styles.optionText}>Settings</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity style={styles.option} onPress={handleGoToHome}>
                 <Icon name="home" size={24} color="#333" />
                 <Text style={styles.optionText}>Back to Home</Text>
               </TouchableOpacity>
-              
+
+              {showSkinSelector && (
+                <View style={styles.skinSelectorContainer}>
+                  <Text style={styles.sectionTitle}>Select Skin</Text>
+                  <SkinSelector horizontal={false} previewSize={80} />
+                </View>
+              )}
+
               <TouchableOpacity style={styles.closeButton} onPress={onClose}>
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
@@ -113,6 +134,19 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 16,
     marginLeft: 16,
+  },
+  skinSelectorContainer: {
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    color: '#333',
   },
   closeButton: {
     marginTop: 16,

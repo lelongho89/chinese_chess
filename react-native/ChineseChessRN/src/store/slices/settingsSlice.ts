@@ -1,6 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 /**
+ * AI difficulty levels
+ */
+export type AIDifficulty = 'easy' | 'medium' | 'hard';
+
+/**
  * Settings state types
  */
 export type SettingsState = {
@@ -9,6 +14,7 @@ export type SettingsState = {
   notificationsEnabled: boolean;
   language: 'english' | 'chinese' | 'vietnamese';
   boardOrientation: 'normal' | 'flipped';
+  aiDifficulty: AIDifficulty;
 };
 
 /**
@@ -20,6 +26,7 @@ const initialState: SettingsState = {
   notificationsEnabled: true,
   language: 'english',
   boardOrientation: 'normal',
+  aiDifficulty: 'medium',
 };
 
 /**
@@ -44,12 +51,16 @@ const settingsSlice = createSlice({
     setBoardOrientation: (state, action: PayloadAction<'normal' | 'flipped'>) => {
       state.boardOrientation = action.payload;
     },
+    setAIDifficulty: (state, action: PayloadAction<AIDifficulty>) => {
+      state.aiDifficulty = action.payload;
+    },
     resetSettings: (state) => {
       state.soundEnabled = true;
       state.musicEnabled = true;
       state.notificationsEnabled = true;
       state.language = 'english';
       state.boardOrientation = 'normal';
+      state.aiDifficulty = 'medium';
     },
   },
 });
@@ -60,6 +71,7 @@ export const {
   setNotificationsEnabled,
   setLanguage,
   setBoardOrientation,
+  setAIDifficulty,
   resetSettings,
 } = settingsSlice.actions;
 

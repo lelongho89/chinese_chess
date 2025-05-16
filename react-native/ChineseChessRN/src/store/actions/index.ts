@@ -3,3 +3,4 @@
  */
 
 export * from './gameActions';
+export * from './authActions';

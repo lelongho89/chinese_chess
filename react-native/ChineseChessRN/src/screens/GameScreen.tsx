@@ -8,11 +8,15 @@ import {
   GameBottomBar,
   GameStatus,
   PlayerInfo,
-  GameOptionsModal
+  GameOptionsModal,
+  AIThinkingIndicator
 } from '../components/ui';
+import { GameTimerDisplay } from '../components/timer';
 import { useAppDispatch, useAppSelector } from '../hooks';
+import { useLocalization } from '../hooks/useLocalization';
 import { ChessPiece } from '../store/slices/gameSlice';
 import { initGame, selectPiece, movePiece } from '../store/actions';
+import GameService from '../services/game/GameService';
 
 /**
  * Game screen component for the Chinese Chess application
@@ -26,16 +30,50 @@ const GameScreen: React.FC = () => {
   // State for options modal
   const [optionsModalVisible, setOptionsModalVisible] = useState(false);
 
+  // State for AI thinking
+  const [aiThinking, setAIThinking] = useState(false);
+  const [aiDifficulty, setAIDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
+
   // Get state from Redux store
   const currentPlayer = useAppSelector(state => state.game.currentPlayer);
   const selectedPiece = useAppSelector(state => state.game.selectedPiece);
   const history = useAppSelector(state => state.game.history);
   const isGameActive = useAppSelector(state => state.game.isGameActive);
+  const aiDifficultyFromSettings = useAppSelector(state => state.settings.aiDifficulty);
 
   // Initialize the game when the component mounts
   useEffect(() => {
     dispatch(initGame({ gameMode }));
-  }, [dispatch, gameMode]);
+
+    // Set up AI difficulty from settings
+    if (gameMode === 'ai') {
+      GameService.setAIDifficulty(aiDifficultyFromSettings as any);
+      setAIDifficulty(aiDifficultyFromSettings as any);
+    }
+  }, [dispatch, gameMode, aiDifficultyFromSettings]);
+
+  // Set up event listeners for AI thinking
+  useEffect(() => {
+    if (gameMode === 'ai') {
+      // Add event listener for AI thinking
+      const handleAIThinking = (event: string, data: any) => {
+        if (event === 'aiThinking') {
+          setAIThinking(data.thinking);
+          if (data.difficulty) {
+            setAIDifficulty(data.difficulty);
+          }
+        }
+      };
+
+      // Add the event listener
+      const removeListener = GameService.addListener(handleAIThinking);
+
+      // Clean up the event listener when the component unmounts
+      return () => {
+        removeListener();
+      };
+    }
+  }, [gameMode]);
 
   // Handle cell press
   const handleCellPress = (row: number, col: number) => {
@@ -105,7 +143,15 @@ const GameScreen: React.FC = () => {
         />
       </View>
 
+      {/* Game timer display */}
+      <GameTimerDisplay />
+
       <GameStatus />
+
+      {/* AI thinking indicator */}
+      {gameMode === 'ai' && (
+        <AIThinkingIndicator isThinking={aiThinking} difficulty={aiDifficulty} />
+      )}
 
       <View style={styles.gameBoard}>
         <ChessBoard

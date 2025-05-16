@@ -1,15 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Switch, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, Switch, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SettingsScreenNavigationProp } from '../navigation/types';
 import { useAppSelector, useAppDispatch } from '../hooks';
+import { useLocalization } from '../hooks/useLocalization';
 import {
   setSoundEnabled,
   setMusicEnabled,
   setNotificationsEnabled,
-  setLanguage,
   setSkin,
+  setLanguage,
 } from '../store';
+import { AISettingsComponent } from '../components/ui';
 
 /**
  * Settings screen component for the Chinese Chess application
@@ -17,6 +19,7 @@ import {
 const SettingsScreen: React.FC = () => {
   const navigation = useNavigation<SettingsScreenNavigationProp>();
   const dispatch = useAppDispatch();
+  const { t } = useLocalization();
 
   // Get settings from Redux store
   const soundEnabled = useAppSelector(state => state.settings.soundEnabled);
@@ -28,10 +31,10 @@ const SettingsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Audio Settings</Text>
+        <Text style={styles.sectionTitle}>{t('settings.audioSettings')}</Text>
 
         <View style={styles.settingRow}>
-          <Text style={styles.settingLabel}>Sound Effects</Text>
+          <Text style={styles.settingLabel}>{t('settings.soundEffects')}</Text>
           <Switch
             value={soundEnabled}
             onValueChange={(value) => dispatch(setSoundEnabled(value))}
@@ -41,7 +44,7 @@ const SettingsScreen: React.FC = () => {
         </View>
 
         <View style={styles.settingRow}>
-          <Text style={styles.settingLabel}>Background Music</Text>
+          <Text style={styles.settingLabel}>{t('settings.backgroundMusic')}</Text>
           <Switch
             value={musicEnabled}
             onValueChange={(value) => dispatch(setMusicEnabled(value))}
@@ -52,10 +55,10 @@ const SettingsScreen: React.FC = () => {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Appearance</Text>
+        <Text style={styles.sectionTitle}>{t('settings.appearance')}</Text>
 
         <View style={styles.settingRow}>
-          <Text style={styles.settingLabel}>Skin</Text>
+          <Text style={styles.settingLabel}>{t('settings.skin')}</Text>
           <View style={styles.optionsContainer}>
             <TouchableOpacity
               style={[
@@ -63,7 +66,7 @@ const SettingsScreen: React.FC = () => {
                 selectedSkin === 'woods' && styles.selectedOption,
               ]}
               onPress={() => dispatch(setSkin('woods'))}>
-              <Text style={styles.optionText}>Woods</Text>
+              <Text style={styles.optionText}>{t('settings.skinWoods')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -71,17 +74,17 @@ const SettingsScreen: React.FC = () => {
                 selectedSkin === 'stones' && styles.selectedOption,
               ]}
               onPress={() => dispatch(setSkin('stones'))}>
-              <Text style={styles.optionText}>Stones</Text>
+              <Text style={styles.optionText}>{t('settings.skinStones')}</Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Language</Text>
+        <Text style={styles.sectionTitle}>{t('settings.language')}</Text>
 
         <View style={styles.settingRow}>
-          <Text style={styles.settingLabel}>Language</Text>
+          <Text style={styles.settingLabel}>{t('settings.language')}</Text>
           <View style={styles.optionsContainer}>
             <TouchableOpacity
               style={[
@@ -89,7 +92,7 @@ const SettingsScreen: React.FC = () => {
                 selectedLanguage === 'english' && styles.selectedOption,
               ]}
               onPress={() => dispatch(setLanguage('english'))}>
-              <Text style={styles.optionText}>English</Text>
+              <Text style={styles.optionText}>{t('languages.english')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -97,7 +100,7 @@ const SettingsScreen: React.FC = () => {
                 selectedLanguage === 'chinese' && styles.selectedOption,
               ]}
               onPress={() => dispatch(setLanguage('chinese'))}>
-              <Text style={styles.optionText}>Chinese</Text>
+              <Text style={styles.optionText}>{t('languages.chinese')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -105,17 +108,25 @@ const SettingsScreen: React.FC = () => {
                 selectedLanguage === 'vietnamese' && styles.selectedOption,
               ]}
               onPress={() => dispatch(setLanguage('vietnamese'))}>
-              <Text style={styles.optionText}>Vietnamese</Text>
+              <Text style={styles.optionText}>{t('languages.vietnamese')}</Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Notifications</Text>
+        <Text style={styles.sectionTitle}>{t('settings.aiLevel')}</Text>
 
         <View style={styles.settingRow}>
-          <Text style={styles.settingLabel}>Enable Notifications</Text>
+          <AISettingsComponent horizontal={false} showLabel={false} />
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t('settings.notifications')}</Text>
+
+        <View style={styles.settingRow}>
+          <Text style={styles.settingLabel}>{t('settings.enableNotifications')}</Text>
           <Switch
             value={notificationsEnabled}
             onValueChange={(value) => dispatch(setNotificationsEnabled(value))}
@@ -129,7 +140,7 @@ const SettingsScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.saveButton}
           onPress={() => navigation.goBack()}>
-          <Text style={styles.saveButtonText}>Save Settings</Text>
+          <Text style={styles.saveButtonText}>{t('settings.saveSettings')}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

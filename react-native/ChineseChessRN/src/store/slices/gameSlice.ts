@@ -12,6 +12,11 @@ export type ChessPiece = {
   color: 'red' | 'black';
 };
 
+export type GameResult = {
+  winner: 'red' | 'black' | 'draw' | null;
+  reason: 'checkmate' | 'resignation' | 'timeout' | 'draw' | 'stalemate' | null;
+};
+
 export type GameState = {
   gameMode: GameMode | null;
   pieces: ChessPiece[];
@@ -24,6 +29,11 @@ export type GameState = {
   history: any[];
   skin: string;
   scale: number;
+  // Timer related state
+  timerEnabled: boolean;
+  initialTimeSeconds: number;
+  incrementSeconds: number;
+  gameResult: GameResult;
 };
 
 /**
@@ -41,6 +51,14 @@ const initialState: GameState = {
   history: [],
   skin: 'woods',
   scale: 1,
+  // Timer related state
+  timerEnabled: false,
+  initialTimeSeconds: 180, // 3 minutes
+  incrementSeconds: 2,     // 2 seconds per move
+  gameResult: {
+    winner: null,
+    reason: null
+  }
 };
 
 /**
@@ -83,6 +101,20 @@ const gameSlice = createSlice({
     addToHistory: (state, action: PayloadAction<any>) => {
       state.history.push(action.payload);
     },
+    // Timer related reducers
+    setTimerEnabled: (state, action: PayloadAction<boolean>) => {
+      state.timerEnabled = action.payload;
+    },
+    setInitialTime: (state, action: PayloadAction<number>) => {
+      state.initialTimeSeconds = action.payload;
+    },
+    setIncrementTime: (state, action: PayloadAction<number>) => {
+      state.incrementSeconds = action.payload;
+    },
+    setGameResult: (state, action: PayloadAction<GameResult>) => {
+      state.gameResult = action.payload;
+      state.isGameActive = false;
+    },
     resetGame: (state) => {
       state.pieces = [];
       state.selectedPiece = null;
@@ -91,6 +123,10 @@ const gameSlice = createSlice({
       state.currentPlayer = 'red';
       state.history = [];
       state.fenString = 'rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w';
+      state.gameResult = {
+        winner: null,
+        reason: null
+      };
     },
   },
 });
@@ -107,6 +143,11 @@ export const {
   setScale,
   setFenString,
   addToHistory,
+  // Timer related actions
+  setTimerEnabled,
+  setInitialTime,
+  setIncrementTime,
+  setGameResult,
   resetGame,
 } = gameSlice.actions;
 

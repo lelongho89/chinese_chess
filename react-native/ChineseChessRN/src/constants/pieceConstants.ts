@@ -12,7 +12,7 @@ export const PIECE_TYPES = {
   RED_CHARIOT: 'R',
   RED_CANNON: 'C',
   RED_PAWN: 'P',
-  
+
   // Black pieces (lowercase)
   BLACK_GENERAL: 'k',
   BLACK_ADVISOR: 'a',
@@ -21,7 +21,7 @@ export const PIECE_TYPES = {
   BLACK_CHARIOT: 'r',
   BLACK_CANNON: 'c',
   BLACK_PAWN: 'p',
-  
+
   // Empty
   EMPTY: '0',
 };
@@ -60,6 +60,32 @@ export const getPieceName = (pieceType: string) => {
   }
 };
 
+// Piece values for AI evaluation
+export const PIECE_VALUES = {
+  // Red pieces
+  [PIECE_TYPES.RED_GENERAL]: 10000,
+  [PIECE_TYPES.RED_ADVISOR]: 200,
+  [PIECE_TYPES.RED_ELEPHANT]: 200,
+  [PIECE_TYPES.RED_HORSE]: 400,
+  [PIECE_TYPES.RED_CHARIOT]: 900,
+  [PIECE_TYPES.RED_CANNON]: 450,
+  [PIECE_TYPES.RED_PAWN]: 100,
+
+  // Black pieces
+  [PIECE_TYPES.BLACK_GENERAL]: 10000,
+  [PIECE_TYPES.BLACK_ADVISOR]: 200,
+  [PIECE_TYPES.BLACK_ELEPHANT]: 200,
+  [PIECE_TYPES.BLACK_HORSE]: 400,
+  [PIECE_TYPES.BLACK_CHARIOT]: 900,
+  [PIECE_TYPES.BLACK_CANNON]: 450,
+  [PIECE_TYPES.BLACK_PAWN]: 100,
+};
+
+// Get piece value for AI evaluation
+export const getPieceValue = (pieceType: string): number => {
+  return PIECE_VALUES[pieceType] || 0;
+};
+
 // Initial board setup in FEN notation
 export const INITIAL_FEN = 'rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w';
 
@@ -67,15 +93,15 @@ export const INITIAL_FEN = 'rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RN
 export const parseFen = (fen: string) => {
   const [boardPart] = fen.split(' ');
   const rows = boardPart.split('/');
-  
+
   const pieces: { type: string; position: { row: number; col: number } }[] = [];
-  
+
   for (let row = 0; row < rows.length; row++) {
     let col = 0;
-    
+
     for (let i = 0; i < rows[row].length; i++) {
       const char = rows[row][i];
-      
+
       if (/[0-9]/.test(char)) {
         // If it's a number, skip that many columns
         col += parseInt(char, 10);
@@ -89,6 +115,6 @@ export const parseFen = (fen: string) => {
       }
     }
   }
-  
+
   return pieces;
 };
