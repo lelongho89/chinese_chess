@@ -23,6 +23,12 @@ import {
   ProfileScreen
 } from '../screens/auth';
 
+// Import history screens
+import {
+  GameHistoryScreen,
+  GameReplayScreen
+} from '../screens/history';
+
 const Stack = createStackNavigator<RootStackParamList>();
 
 /**
@@ -137,6 +143,16 @@ const AppNavigator: React.FC = () => {
               name="Profile"
               component={ProfileScreen}
               options={{ title: 'My Profile' }}
+            />
+            <Stack.Screen
+              name="GameHistory"
+              component={GameHistoryScreen}
+              options={{ title: 'Game History' }}
+            />
+            <Stack.Screen
+              name="GameReplay"
+              component={GameReplayScreen}
+              options={{ title: 'Game Replay' }}
             />
           </>
         ) : (

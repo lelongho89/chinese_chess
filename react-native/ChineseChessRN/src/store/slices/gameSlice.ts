@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User } from './authSlice';
 import { OnlineGame, Match } from '../../services/online';
+import { GameHistoryEntry } from '../../services/history';
 
 /**
  * Game state types
@@ -51,6 +52,12 @@ export type GameState = {
   activeMatches: Match[];
   gameHistory: OnlineGame[];
   chatMessages: ChatMessage[];
+  // Game history state
+  savedGames: GameHistoryEntry[];
+  currentGame: GameHistoryEntry | null;
+  currentMoveIndex: number;
+  isReplayMode: boolean;
+  replaySpeed: number;
   isLoading: boolean;
   error: string | null;
 };
@@ -85,6 +92,12 @@ const initialState: GameState = {
   activeMatches: [],
   gameHistory: [],
   chatMessages: [],
+  // Game history state
+  savedGames: [],
+  currentGame: null,
+  currentMoveIndex: -1,
+  isReplayMode: false,
+  replaySpeed: 1000, // 1 second per move
   isLoading: false,
   error: null
 };
@@ -184,6 +197,22 @@ const gameSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
+    // Game history reducers
+    setSavedGames: (state, action: PayloadAction<GameHistoryEntry[]>) => {
+      state.savedGames = action.payload;
+    },
+    setCurrentGame: (state, action: PayloadAction<GameHistoryEntry | null>) => {
+      state.currentGame = action.payload;
+    },
+    setCurrentMoveIndex: (state, action: PayloadAction<number>) => {
+      state.currentMoveIndex = action.payload;
+    },
+    setReplayMode: (state, action: PayloadAction<boolean>) => {
+      state.isReplayMode = action.payload;
+    },
+    setReplaySpeed: (state, action: PayloadAction<number>) => {
+      state.replaySpeed = action.payload;
+    },
   },
 });
 
@@ -215,6 +244,12 @@ export const {
   setChatMessages,
   setLoading,
   setError,
+  // Game history actions
+  setSavedGames,
+  setCurrentGame,
+  setCurrentMoveIndex,
+  setReplayMode,
+  setReplaySpeed,
 } = gameSlice.actions;
 
 export default gameSlice.reducer;

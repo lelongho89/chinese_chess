@@ -18,6 +18,10 @@ export type RootStackParamList = {
   Game: { gameMode: 'ai' | 'online' | 'free' };
   Settings: undefined;
   About: undefined;
+
+  // History screens
+  GameHistory: undefined;
+  GameReplay: { gameId: string };
 };
 
 // Navigation prop types for each screen
@@ -33,6 +37,10 @@ export type GameScreenNavigationProp = StackNavigationProp<RootStackParamList, '
 export type SettingsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Settings'>;
 export type AboutScreenNavigationProp = StackNavigationProp<RootStackParamList, 'About'>;
 
+// History screens
+export type GameHistoryScreenNavigationProp = StackNavigationProp<RootStackParamList, 'GameHistory'>;
+export type GameReplayScreenNavigationProp = StackNavigationProp<RootStackParamList, 'GameReplay'>;
+
 // Route prop types for each screen
 // Auth screens
 export type LoginScreenRouteProp = RouteProp<RootStackParamList, 'Login'>;
@@ -45,3 +53,7 @@ export type HomeScreenRouteProp = RouteProp<RootStackParamList, 'Home'>;
 export type GameScreenRouteProp = RouteProp<RootStackParamList, 'Game'>;
 export type SettingsScreenRouteProp = RouteProp<RootStackParamList, 'Settings'>;
 export type AboutScreenRouteProp = RouteProp<RootStackParamList, 'About'>;
+
+// History screens
+export type GameHistoryScreenRouteProp = RouteProp<RootStackParamList, 'GameHistory'>;
+export type GameReplayScreenRouteProp = RouteProp<RootStackParamList, 'GameReplay'>;

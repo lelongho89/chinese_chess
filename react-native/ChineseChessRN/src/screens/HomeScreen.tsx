@@ -69,6 +69,13 @@ const HomeScreen: React.FC = () => {
           <Text style={styles.buttonText}>{t('settings.setting')}</Text>
         </TouchableOpacity>
 
+        {/* Game History button */}
+        <TouchableOpacity
+          style={[styles.button, styles.historyButton]}
+          onPress={() => navigation.navigate('GameHistory')}>
+          <Text style={styles.buttonText}>{t('game.history')}</Text>
+        </TouchableOpacity>
+
         {/* About button */}
         <TouchableOpacity
           style={[styles.button, styles.aboutButton]}
@@ -123,6 +130,9 @@ const styles = StyleSheet.create({
   settingsButton: {
     backgroundColor: '#4a6ea9',
     marginTop: 20,
+  },
+  historyButton: {
+    backgroundColor: '#8e44ad',
   },
   aboutButton: {
     backgroundColor: '#6b7f94',
