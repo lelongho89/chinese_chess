@@ -79,15 +79,15 @@ This document breaks down the migration process into specific tasks that can be 
   - [x] Configure piece dimensions and scaling
 
 ### Task 2.3: Implement Game Logic
-- **Status**: 🔄 Not Started
+- **Status**: ✅ Completed
 - **Priority**: High
 - **Estimated Time**: 3 days
 - **Description**: Port the core game logic from Flutter to React Native.
 - **Subtasks**:
-  - [ ] Implement board representation
-  - [ ] Create move validation
-  - [ ] Implement game state management
-  - [ ] Add FEN notation parsing and generation
+  - [x] Implement board representation
+  - [x] Create move validation
+  - [x] Implement game state management
+  - [x] Add FEN notation parsing and generation
 
 ### Task 2.4: Create Game Screen
 - **Status**: 🔄 Not Started
