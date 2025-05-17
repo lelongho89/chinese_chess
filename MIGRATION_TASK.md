@@ -206,15 +206,15 @@ This document breaks down the migration process into specific tasks that can be 
   - [x] Set up test scripts
 
 ### Task 5.2: Write Unit Tests
-- **Status**: 🔄 Not Started
+- **Status**: ✅ Completed
 - **Priority**: Medium
 - **Estimated Time**: 3 days
 - **Description**: Write unit tests for core functionality.
 - **Subtasks**:
-  - [ ] Test game logic
-  - [ ] Test Redux reducers
-  - [ ] Test utility functions
-  - [ ] Test Firebase services
+  - [x] Test game logic
+  - [x] Test Redux reducers
+  - [x] Test utility functions
+  - [x] Test Firebase services
 
 ### Task 5.3: Write Component Tests
 - **Status**: 🔄 Not Started
