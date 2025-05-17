@@ -217,15 +217,15 @@ This document breaks down the migration process into specific tasks that can be 
   - [x] Test Firebase services
 
 ### Task 5.3: Write Component Tests
-- **Status**: 🔄 Not Started
+- **Status**: ✅ Completed
 - **Priority**: Medium
 - **Estimated Time**: 2 days
 - **Description**: Write tests for React components.
 - **Subtasks**:
-  - [ ] Test board component
-  - [ ] Test piece components
-  - [ ] Test game screen
-  - [ ] Test navigation
+  - [x] Test board component
+  - [x] Test piece components
+  - [x] Test game screen
+  - [x] Test navigation
 
 ### Task 5.4: Optimize Performance
 - **Status**: 🔄 Not Started
