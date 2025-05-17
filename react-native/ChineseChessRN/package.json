@@ -55,6 +55,9 @@
     "@types/react-test-renderer": "^19.0.0",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
+    "babel-plugin-module-resolver": "^5.0.2",
+    "babel-plugin-transform-define": "^2.1.4",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "eslint": "^8.19.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.4.0",
@@ -64,6 +67,7 @@
     "jest-expo": "^53.0.5",
     "jest-junit": "^16.0.0",
     "prettier": "2.8.8",
+    "react-native-performance-monitor": "^2.0.0",
     "react-test-renderer": "^19.0.0",
     "typescript": "5.0.4"
   },
