@@ -34,7 +34,17 @@ jest.mock('react-native-gesture-handler', () => {
 });
 
 // Silence the warning: Animated: `useNativeDriver` is not supported because the native animated module is missing
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+jest.mock('react-native', () => {
+  const reactNative = jest.requireActual('react-native');
+  reactNative.NativeModules.StatusBarManager = { getHeight: jest.fn() };
+  reactNative.Animated.timing = () => ({
+    start: jest.fn(),
+  });
+  reactNative.Animated.spring = () => ({
+    start: jest.fn(),
+  });
+  return reactNative;
+});
 
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () => ({
