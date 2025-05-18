@@ -1,87 +1,40 @@
-# Define a global platform for your project
-platform :ios, '13.0'
+# iOS deployment target
+platform :ios, '14.0'
 
-# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
-ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+# Disable warnings
+inhibit_all_warnings!
 
-project 'Runner', {
-  'Debug' => :debug,
-  'Profile' => :release,
-  'Release' => :release,
-}
+# For Firebase compatibility
+use_frameworks! :linkage => :static
 
-def flutter_root
-  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
-  unless File.exist?(generated_xcode_build_settings_path)
-    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
-  end
+target 'ChineseChessRN' do
+  # Firebase pods
+  pod 'Firebase', '~> 10.15.0'
+  pod 'FirebaseCore', '~> 10.15.0'
+  pod 'FirebaseAuth', '~> 10.15.0'
+  pod 'FirebaseFirestore', '~> 10.15.0'
+  pod 'FirebaseStorage', '~> 10.15.0'
+  pod 'FirebaseAnalytics', '~> 10.15.0'
 
-  File.foreach(generated_xcode_build_settings_path) do |line|
-    matches = line.match(/FLUTTER_ROOT\=(.*)/)
-    return matches[1].strip if matches
-  end
-  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
-end
-
-require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
-
-flutter_ios_podfile_setup
-
-target 'Runner' do
-  use_frameworks!
-  use_modular_headers!
-
-  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-  
-  # Add GoogleUtilities with a compatible version
-  pod 'GoogleUtilities', '7.12.0'
-  
-  # Use the newer version of AppAuth required by google_sign_in_ios
-  pod 'AppAuth', '>= 1.7.4'
-end
-
-post_install do |installer|
-  # Fix for Xcode 15 build issues
-  installer.pods_project.targets.each do |target|
-    if target.respond_to?(:product_type) && target.product_type == "com.apple.product-type.bundle"
+  post_install do |installer|
+    # Configuration for all targets
+    installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
-        config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
-      end
-    end
-  end
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
 
-  installer.pods_project.targets.each do |target|
-    flutter_additional_ios_build_settings(target)
+        # Fix for Xcode 15 build issues
+        if target.respond_to?(:product_type) && target.product_type == "com.apple.product-type.bundle"
+          config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+        end
 
-    target.build_configurations.each do |config|
-      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
-        '$(inherited)',
-        'PERMISSION_EVENTS=0',
-        'PERMISSION_REMINDERS=0',
-        'PERMISSION_CONTACTS=0',
-        'PERMISSION_CAMERA=0',
-        'PERMISSION_MICROPHONE=0',
-        'PERMISSION_SPEECH_RECOGNIZER=0',
-        'PERMISSION_PHOTOS=0',
-        'PERMISSION_NOTIFICATIONS=0',
-        'PERMISSION_MEDIA_LIBRARY=0',
-        'PERMISSION_SENSORS=0',
-        'PERMISSION_BLUETOOTH=0'
-      ]
+        # Disable bitcode as it's deprecated in Xcode 14+
+        config.build_settings['ENABLE_BITCODE'] = 'NO'
 
-      # Required for compatibility with GoogleUtilities
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+        # Fix for non-modular includes in framework modules
+        config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
+        config.build_settings["CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES"] = "YES"
 
-      # Disable bitcode as it's deprecated in Xcode 14+
-      config.build_settings['ENABLE_BITCODE'] = 'NO'
-
-      # Ensure all pods use the same Swift version
-      if config.build_settings['SWIFT_VERSION'].nil?
-        config.build_settings['SWIFT_VERSION'] = '5.0'
-      end
-      
-      # Fix for arm64 architecture issues
-      if config.name == 'Debug' && config.build_settings['ARCHS'] && config.build_settings['ARCHS'].include?('arm64')
+        # Fix for arm64 architecture issues
         config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
       end
     end

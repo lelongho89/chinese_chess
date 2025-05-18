@@ -1,0 +1,63 @@
+{
+  "name": "react-native-performance-monitor",
+  "description": "Monitor the performance of your React Native components in realtime",
+  "version": "2.0.0",
+  "author": "kyle @kyle-ssg",
+  "bin": {
+    "react-native-performance-monitor": "./bin/run"
+  },
+  "dependencies": {
+    "@oclif/command": "1",
+    "@oclif/config": "1",
+    "@oclif/plugin-help": "2",
+    "cli-ux": "5.4.2",
+    "hoist-non-react-statics": "^3.3.2",
+    "http-server": "0.12.1",
+    "lodash": "4.17.19",
+    "socket.io": "2.4.0",
+    "ws": "^7.2.3"
+  },
+  "devDependencies": {
+    "@oclif/dev-cli": "1",
+    "eslint": "5.13",
+    "eslint-config-oclif": "3.1",
+    "globby": "10"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "/bin",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json",
+    "/src",
+    "/provider.js",
+    "/out"
+  ],
+  "keywords": [
+    "react-native",
+    "react",
+    "performance"
+  ],
+  "license": "MIT",
+  "main": "src/index.js",
+  "oclif": {
+    "commands": "./src/commands",
+    "bin": "react-native-performance-monitor",
+    "plugins": [
+      "@oclif/plugin-help"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:BulletTrainHQ/react-native-performance-monitor.git"
+  },
+  "scripts": {
+    "dev": "node start-server.js",
+    "postpack": "rm -f oclif.manifest.json",
+    "posttest": "eslint .",
+    "prepack": "oclif-dev manifest && oclif-dev readme",
+    "test": "echo NO TESTS",
+    "version": "oclif-dev readme && git add README.md"
+  }
+}
