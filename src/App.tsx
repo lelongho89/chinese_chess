@@ -1,4 +1,4 @@
-import React, { useEffect, memo } from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar, useColorScheme } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -16,9 +16,9 @@ import { PerformanceMonitor } from './utils/performance';
 enableScreens();
 
 /**
- * StatusBar component memoized to prevent unnecessary re-renders
+ * StatusBar component for handling light/dark mode
  */
-const AppStatusBar = memo(() => {
+function AppStatusBar(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
   return (
@@ -27,10 +27,17 @@ const AppStatusBar = memo(() => {
       backgroundColor={isDarkMode ? Colors.darker : Colors.lighter}
     />
   );
-});
+}
 
 /**
  * Main App component for Chinese Chess
+ *
+ * This is the root component that sets up:
+ * - Redux store with persistence
+ * - i18n internationalization
+ * - Safe area handling
+ * - Navigation
+ * - Performance monitoring (DEV only)
  */
 function App(): React.JSX.Element {
   // Use performance monitoring in development mode
@@ -56,4 +63,4 @@ function App(): React.JSX.Element {
   );
 }
 
-export default memo(App);
+export default React.memo(App);

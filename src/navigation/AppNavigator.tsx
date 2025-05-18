@@ -3,7 +3,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+// TODO: Add @react-native-google-signin/google-signin to package.json
+// import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 import { RootStackParamList } from './types';
 import { useAppDispatch, useAppSelector } from '../hooks';
@@ -39,17 +40,23 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 /**
  * Main navigation component for the Chinese Chess application
+ *
+ * This component handles:
+ * - Authentication state management
+ * - Screen navigation
+ * - Conditional rendering based on authentication state
  */
-const AppNavigator: React.FC = () => {
+function AppNavigator(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const { user, isLoading } = useAppSelector(state => state.auth);
   const [initializing, setInitializing] = useState(true);
 
   // Configure Google Sign-In
   useEffect(() => {
-    GoogleSignin.configure({
-      webClientId: '1234567890-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com', // Replace with your web client ID
-    });
+    // TODO: Uncomment when Google Sign-In package is added
+    // GoogleSignin.configure({
+    //   webClientId: '1234567890-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com', // Replace with your web client ID
+    // });
   }, []);
 
   // Handle auth state changes
@@ -99,7 +106,7 @@ const AppNavigator: React.FC = () => {
     return unsubscribe;
   }, [dispatch, initializing]);
 
-  // Define common screen options
+  // Define common screen options with proper TypeScript typing
   const screenOptions = {
     headerStyle: {
       backgroundColor: '#f4511e',
@@ -108,6 +115,9 @@ const AppNavigator: React.FC = () => {
     headerTitleStyle: {
       fontWeight: 'bold',
     },
+    headerBackTitleVisible: false,
+    cardStyle: { backgroundColor: '#fff' },
+    animationEnabled: true,
   };
 
   // Show loading screen while initializing
