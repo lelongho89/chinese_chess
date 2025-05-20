@@ -1,0 +1,45 @@
+import groovy.json.JsonSlurper
+
+def getRNPackageJsonDir() {
+    def currentDir = rootDir
+    while (currentDir != null) {
+        def nodeModulesDir = new File(currentDir, "node_modules/react-native")
+        def file = new File(nodeModulesDir, 'package.json')
+        if (file.exists()) {
+            return file.path
+        }
+        currentDir = currentDir.parentFile
+    }
+    throw new GradleException("Unable to find module: $moduleName")
+}
+
+def getRNVersion = { rnPackageJsonPath ->
+    println("RNInfo: package.json=$rnPackageJsonPath")
+    def jsonSlurper = new JsonSlurper()
+    def packageFile =
+    println("RNInfo: reading $rnPackageJsonPath")
+    Map<String, Object> packageJSON  = jsonSlurper.parse(new File(rnPackageJsonPath))
+    String rnVersion = packageJSON.get('version')
+    return rnVersion
+}
+
+def getMajorVersionInternal = { semanticVersion ->
+    Integer rnVersionMajor = semanticVersion.split('\\.')[1].toInteger()
+    return rnVersionMajor
+}
+
+def rnVersion = getRNVersion(getRNPackageJsonDir())
+def rnMajorVer = getMajorVersionInternal(rnVersion)
+println "RNInfo: detected React Native version: $rnVersion (major=$rnMajorVer)"
+
+ext.rnInfo = [
+    version       : rnVersion,
+    majorVersion  : rnMajorVer,
+    isRN69OrHigher: rnMajorVer >= 69,
+    isRN70OrHigher: rnMajorVer >= 70,
+    isRN71OrHigher: rnMajorVer >= 71,
+    isRN72OrHigher: rnMajorVer >= 72,
+    isRN73OrHigher: rnMajorVer >= 73,
+    isRN74OrHigher: rnMajorVer >= 74,
+    isRN75OrHigher: rnMajorVer >= 75,
+]

@@ -1,8 +1,0 @@
-This file should be replaced with a board.png image that matches the provided reference image.
-
-The board should have:
-- Light tan/bamboo wooden background
-- Brown grid lines
-- River markings with "楚河" on the left and "漢界" on the right
-- Palace areas marked with diagonal lines
-- Dimensions: 521x577 pixels

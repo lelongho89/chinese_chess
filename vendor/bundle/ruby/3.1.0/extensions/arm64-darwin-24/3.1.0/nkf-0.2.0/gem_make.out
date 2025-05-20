@@ -1,0 +1,19 @@
+current directory: /Users/hole/Code/chinese_chess/react-native/ChineseChessRN/vendor/bundle/ruby/3.1.0/gems/nkf-0.2.0/ext/nkf
+/Users/hole/.rvm/rubies/ruby-3.1.4/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/hole/Code/chinese_chess/react-native/ChineseChessRN/vendor/bundle/ruby/3.1.0/gems/nkf-0.2.0/ext/nkf
+make DESTDIR\= sitearchdir\=./.gem.20250516-34197-qzdrbb sitelibdir\=./.gem.20250516-34197-qzdrbb clean
+
+current directory: /Users/hole/Code/chinese_chess/react-native/ChineseChessRN/vendor/bundle/ruby/3.1.0/gems/nkf-0.2.0/ext/nkf
+make DESTDIR\= sitearchdir\=./.gem.20250516-34197-qzdrbb sitelibdir\=./.gem.20250516-34197-qzdrbb
+compiling nkf.c
+linking shared-object nkf.bundle
+ld: warning: ignoring duplicate libraries: '-lruby.3.1'
+
+current directory: /Users/hole/Code/chinese_chess/react-native/ChineseChessRN/vendor/bundle/ruby/3.1.0/gems/nkf-0.2.0/ext/nkf
+make DESTDIR\= sitearchdir\=./.gem.20250516-34197-qzdrbb sitelibdir\=./.gem.20250516-34197-qzdrbb install
+/opt/homebrew/opt/coreutils/bin/ginstall -c -m 0755 nkf.bundle ./.gem.20250516-34197-qzdrbb
+
+current directory: /Users/hole/Code/chinese_chess/react-native/ChineseChessRN/vendor/bundle/ruby/3.1.0/gems/nkf-0.2.0/ext/nkf
+make DESTDIR\= sitearchdir\=./.gem.20250516-34197-qzdrbb sitelibdir\=./.gem.20250516-34197-qzdrbb clean

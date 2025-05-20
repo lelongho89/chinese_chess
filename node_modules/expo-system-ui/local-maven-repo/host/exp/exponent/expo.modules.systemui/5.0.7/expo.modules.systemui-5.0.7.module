@@ -1,0 +1,105 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "host.exp.exponent",
+    "module": "expo.modules.systemui",
+    "version": "5.0.7",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.13"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseVariantReleaseApiPublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "expo.modules.systemui-5.0.7.aar",
+          "url": "expo.modules.systemui-5.0.7.aar",
+          "size": 17176,
+          "sha512": "631b11bfe8763a82438af833fc8a1f551184239a0b7c6eb4a34e4c2f0580c04f13439ca8e8ea59142691bc57ceea05c54ef67d6ddf8b0c3f8474a179fd19905f",
+          "sha256": "f08ef44262f1f2aa26e831d417900c2fea0561d66238d0907f722319ab10af39",
+          "sha1": "3e06e938774f45ede0c060bb1ee2101eb812502c",
+          "md5": "5b2486678812a92b6f461178455415db"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseRuntimePublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk7",
+          "version": {
+            "requires": "2.0.21"
+          }
+        },
+        {
+          "group": "com.facebook.react",
+          "module": "react-android"
+        },
+        {
+          "group": "androidx.core",
+          "module": "core",
+          "version": {
+            "requires": "1.6.0"
+          }
+        },
+        {
+          "group": "androidx.appcompat",
+          "module": "appcompat",
+          "version": {
+            "requires": "1.2.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "expo.modules.systemui-5.0.7.aar",
+          "url": "expo.modules.systemui-5.0.7.aar",
+          "size": 17176,
+          "sha512": "631b11bfe8763a82438af833fc8a1f551184239a0b7c6eb4a34e4c2f0580c04f13439ca8e8ea59142691bc57ceea05c54ef67d6ddf8b0c3f8474a179fd19905f",
+          "sha256": "f08ef44262f1f2aa26e831d417900c2fea0561d66238d0907f722319ab10af39",
+          "sha1": "3e06e938774f45ede0c060bb1ee2101eb812502c",
+          "md5": "5b2486678812a92b6f461178455415db"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseSourcePublication",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "expo.modules.systemui-5.0.7-sources.jar",
+          "url": "expo.modules.systemui-5.0.7-sources.jar",
+          "size": 3562,
+          "sha512": "883e7643b0823cb13d47762ff4eb84ec4b36e9694f1d2716591ee9adeccd8a70ea1ae8cb02fa7a38717a8fae352e4f6d304eb4e920a5fab7f22c30571cebe194",
+          "sha256": "d79c7fe5dc307fb526c8d73b008ceedcaf6e78e311699bdde6433efaf3349413",
+          "sha1": "2c16ddad7ea82eeb1a68c42a8555ab241fcc8262",
+          "md5": "fbed60b9a805c3a72302de5426ec1a19"
+        }
+      ]
+    }
+  ]
+}
