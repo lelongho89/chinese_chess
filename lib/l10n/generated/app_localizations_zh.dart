@@ -244,4 +244,75 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get quitGame => '退出游戏';
+
+  @override
+  String get inviteFriend => 'Invite Friend';
+
+  @override
+  String get scanQRCode => 'Scan QR Code';
+
+  @override
+  String get scanQRCodeInstructions => 'Point the camera at a QR code';
+
+  @override
+  String get scanQRCodeToJoinMatch => 'Scan this QR code to join the match';
+
+  @override
+  String get qrCodeValidFor24Hours => 'This QR code is valid for 24 hours';
+
+  @override
+  String get shareQRCode => 'Share QR Code';
+
+  @override
+  String get sharing => 'Sharing...';
+
+  @override
+  String get joinMyChineseChessMatch => 'Join my Chinese Chess match!';
+
+  @override
+  String get joinMatch => 'Join Match';
+
+  @override
+  String joinMatchConfirmation(Object name) {
+    return 'Do you want to join $name\'s match?';
+  }
+
+  @override
+  String get matchJoinedSuccessfully => 'Match joined successfully!';
+
+  @override
+  String get success => 'Success';
+
+  @override
+  String get error => 'Error';
+
+  @override
+  String get invalidOrExpiredInvitation => 'Invalid or expired invitation';
+
+  @override
+  String get invitationAlreadyUsed => 'This invitation has already been used';
+
+  @override
+  String get invitationExpired => 'This invitation has expired';
+
+  @override
+  String get errorProcessingQRCode => 'Error processing QR code';
+
+  @override
+  String get errorGeneratingQRCode => 'Error generating QR code';
+
+  @override
+  String get errorSharingQRCode => 'Error sharing QR code';
+
+  @override
+  String get errorShowingQRScanner => 'Error showing QR scanner';
+
+  @override
+  String get errorShowingQRGenerator => 'Error showing QR generator';
+
+  @override
+  String get cannotJoinYourOwnInvitation => 'You cannot join your own invitation';
+
+  @override
+  String get errorJoiningMatch => 'Error joining match';
 }

@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../global.dart';
 import '../models/game_data_model.dart';
 import '../repositories/game_repository.dart';
@@ -31,7 +29,7 @@ class GameService {
         tournamentId: tournamentId,
         metadata: metadata,
       );
-      
+
       logger.info('Game started: $gameId');
       return gameId;
     } catch (e) {
@@ -53,11 +51,11 @@ class GameService {
     try {
       // Get the game
       final game = await GameRepository.instance.get(gameId);
-      
+
       if (game == null) {
         throw Exception('Game not found');
       }
-      
+
       // End the game
       await GameRepository.instance.endGame(
         gameId,
@@ -68,10 +66,10 @@ class GameService {
         blackTimeRemaining: blackTimeRemaining,
         moves: moves,
       );
-      
+
       // Update player statistics
       await _updatePlayerStats(game, winnerId, isDraw);
-      
+
       // Update Elo ratings if the game is ranked
       if (game.isRanked) {
         await EloService.instance.calculateNewRatings(
@@ -81,7 +79,7 @@ class GameService {
           isDraw: isDraw,
         );
       }
-      
+
       logger.info('Game ended: $gameId');
     } catch (e) {
       logger.severe('Error ending game: $e');
@@ -98,7 +96,7 @@ class GameService {
         winnerId == game.redPlayerId,
         isDraw,
       );
-      
+
       // Update black player stats
       await UserRepository.instance.updateGameStats(
         game.blackPlayerId,

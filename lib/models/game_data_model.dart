@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-/// Model for storing game data in Firestore
+/// Model for storing game data in Supabase
 class GameDataModel {
   final String id;
   final String redPlayerId;
@@ -12,8 +10,8 @@ class GameDataModel {
   final String finalFen;
   final int redTimeRemaining; // in seconds
   final int blackTimeRemaining; // in seconds
-  final Timestamp startedAt;
-  final Timestamp? endedAt;
+  final DateTime startedAt;
+  final DateTime? endedAt;
   final bool isRanked;
   final int? tournamentId;
   final Map<String, dynamic>? metadata;
@@ -36,44 +34,43 @@ class GameDataModel {
     this.metadata,
   });
 
-  // Create a GameDataModel from a Firestore document
-  factory GameDataModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+  // Create a GameDataModel from a Supabase record
+  factory GameDataModel.fromSupabase(Map<String, dynamic> data, String id) {
     return GameDataModel(
-      id: doc.id,
-      redPlayerId: data['redPlayerId'] ?? '',
-      blackPlayerId: data['blackPlayerId'] ?? '',
-      winnerId: data['winnerId'],
-      isDraw: data['isDraw'] ?? false,
-      moveCount: data['moveCount'] ?? 0,
+      id: id,
+      redPlayerId: data['red_player_id'] ?? '',
+      blackPlayerId: data['black_player_id'] ?? '',
+      winnerId: data['winner_id'],
+      isDraw: data['is_draw'] ?? false,
+      moveCount: data['move_count'] ?? 0,
       moves: List<String>.from(data['moves'] ?? []),
-      finalFen: data['finalFen'] ?? '',
-      redTimeRemaining: data['redTimeRemaining'] ?? 0,
-      blackTimeRemaining: data['blackTimeRemaining'] ?? 0,
-      startedAt: data['startedAt'] ?? Timestamp.now(),
-      endedAt: data['endedAt'],
-      isRanked: data['isRanked'] ?? true,
-      tournamentId: data['tournamentId'],
+      finalFen: data['final_fen'] ?? '',
+      redTimeRemaining: data['red_time_remaining'] ?? 0,
+      blackTimeRemaining: data['black_time_remaining'] ?? 0,
+      startedAt: DateTime.parse(data['started_at'] ?? DateTime.now().toIso8601String()),
+      endedAt: data['ended_at'] != null ? DateTime.parse(data['ended_at']) : null,
+      isRanked: data['is_ranked'] ?? true,
+      tournamentId: data['tournament_id'],
       metadata: data['metadata'],
     );
   }
 
-  // Convert GameDataModel to a Map for Firestore
+  // Convert GameDataModel to a Map for Supabase
   Map<String, dynamic> toMap() {
     return {
-      'redPlayerId': redPlayerId,
-      'blackPlayerId': blackPlayerId,
-      'winnerId': winnerId,
-      'isDraw': isDraw,
-      'moveCount': moveCount,
+      'red_player_id': redPlayerId,
+      'black_player_id': blackPlayerId,
+      'winner_id': winnerId,
+      'is_draw': isDraw,
+      'move_count': moveCount,
       'moves': moves,
-      'finalFen': finalFen,
-      'redTimeRemaining': redTimeRemaining,
-      'blackTimeRemaining': blackTimeRemaining,
-      'startedAt': startedAt,
-      'endedAt': endedAt,
-      'isRanked': isRanked,
-      'tournamentId': tournamentId,
+      'final_fen': finalFen,
+      'red_time_remaining': redTimeRemaining,
+      'black_time_remaining': blackTimeRemaining,
+      'started_at': startedAt.toIso8601String(),
+      'ended_at': endedAt?.toIso8601String(),
+      'is_ranked': isRanked,
+      'tournament_id': tournamentId,
       'metadata': metadata,
     };
   }
@@ -89,8 +86,8 @@ class GameDataModel {
     String? finalFen,
     int? redTimeRemaining,
     int? blackTimeRemaining,
-    Timestamp? startedAt,
-    Timestamp? endedAt,
+    DateTime? startedAt,
+    DateTime? endedAt,
     bool? isRanked,
     int? tournamentId,
     Map<String, dynamic>? metadata,

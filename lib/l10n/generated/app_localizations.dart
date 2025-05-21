@@ -570,6 +570,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Quit Game'**
   String get quitGame;
+
+  /// No description provided for @inviteFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Friend'**
+  String get inviteFriend;
+
+  /// No description provided for @scanQRCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR Code'**
+  String get scanQRCode;
+
+  /// No description provided for @scanQRCodeInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Point the camera at a QR code'**
+  String get scanQRCodeInstructions;
+
+  /// No description provided for @scanQRCodeToJoinMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan this QR code to join the match'**
+  String get scanQRCodeToJoinMatch;
+
+  /// No description provided for @qrCodeValidFor24Hours.
+  ///
+  /// In en, this message translates to:
+  /// **'This QR code is valid for 24 hours'**
+  String get qrCodeValidFor24Hours;
+
+  /// No description provided for @shareQRCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Share QR Code'**
+  String get shareQRCode;
+
+  /// No description provided for @sharing.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharing...'**
+  String get sharing;
+
+  /// No description provided for @joinMyChineseChessMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Join my Chinese Chess match!'**
+  String get joinMyChineseChessMatch;
+
+  /// No description provided for @joinMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Match'**
+  String get joinMatch;
+
+  /// No description provided for @joinMatchConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to join {name}\'s match?'**
+  String joinMatchConfirmation(Object name);
+
+  /// No description provided for @matchJoinedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Match joined successfully!'**
+  String get matchJoinedSuccessfully;
+
+  /// No description provided for @success.
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get success;
+
+  /// No description provided for @error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get error;
+
+  /// No description provided for @invalidOrExpiredInvitation.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid or expired invitation'**
+  String get invalidOrExpiredInvitation;
+
+  /// No description provided for @invitationAlreadyUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation has already been used'**
+  String get invitationAlreadyUsed;
+
+  /// No description provided for @invitationExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation has expired'**
+  String get invitationExpired;
+
+  /// No description provided for @errorProcessingQRCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Error processing QR code'**
+  String get errorProcessingQRCode;
+
+  /// No description provided for @errorGeneratingQRCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Error generating QR code'**
+  String get errorGeneratingQRCode;
+
+  /// No description provided for @errorSharingQRCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Error sharing QR code'**
+  String get errorSharingQRCode;
+
+  /// No description provided for @errorShowingQRScanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Error showing QR scanner'**
+  String get errorShowingQRScanner;
+
+  /// No description provided for @errorShowingQRGenerator.
+  ///
+  /// In en, this message translates to:
+  /// **'Error showing QR generator'**
+  String get errorShowingQRGenerator;
+
+  /// No description provided for @cannotJoinYourOwnInvitation.
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot join your own invitation'**
+  String get cannotJoinYourOwnInvitation;
+
+  /// No description provided for @errorJoiningMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Error joining match'**
+  String get errorJoiningMatch;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

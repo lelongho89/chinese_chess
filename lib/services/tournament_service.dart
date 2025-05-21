@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../global.dart';
 import '../models/match_model.dart';
 import '../models/tournament_model.dart';
@@ -32,12 +30,12 @@ class TournamentService {
         description: description,
         creatorId: creatorId,
         maxParticipants: maxParticipants,
-        startTime: Timestamp.fromDate(startTime),
+        startTime: startTime,
         type: type,
         settings: settings,
         metadata: metadata,
       );
-      
+
       logger.info('Tournament created: $tournamentId');
       return tournamentId;
     } catch (e) {
@@ -73,22 +71,22 @@ class TournamentService {
     try {
       // Get the tournament
       final tournament = await TournamentRepository.instance.get(tournamentId);
-      
+
       if (tournament == null) {
         throw Exception('Tournament not found');
       }
-      
+
       // Check if tournament has enough participants
       if (tournament.participantIds.length < 2) {
         throw Exception('Tournament needs at least 2 participants');
       }
-      
+
       // Update tournament status
       await TournamentRepository.instance.updateStatus(tournamentId, TournamentStatus.inProgress);
-      
+
       // Generate matches based on tournament type
       await _generateMatches(tournament);
-      
+
       logger.info('Tournament started: $tournamentId');
     } catch (e) {
       logger.severe('Error starting tournament: $e');
@@ -123,55 +121,55 @@ class TournamentService {
   Future<void> _generateSingleEliminationMatches(TournamentModel tournament) async {
     try {
       final participants = List<String>.from(tournament.participantIds);
-      
+
       // Shuffle participants
       participants.shuffle();
-      
+
       // Calculate number of rounds
       final numParticipants = participants.length;
       final numRounds = (numParticipants - 1).toRadixString(2).length;
-      
+
       // Calculate number of byes
       final numMatches = 1 << numRounds;
       final numByes = numMatches - numParticipants;
-      
+
       // Create first round matches
       final firstRoundMatches = <String>[];
-      
+
       for (int i = 0; i < numMatches / 2; i++) {
         final redIndex = i;
         final blackIndex = numMatches - 1 - i;
-        
+
         String redPlayerId;
         String blackPlayerId;
-        
+
         if (redIndex < participants.length) {
           redPlayerId = participants[redIndex];
         } else {
           // Bye
           continue;
         }
-        
+
         if (blackIndex < participants.length) {
           blackPlayerId = participants[blackIndex];
         } else {
           // Bye
           continue;
         }
-        
+
         // Create match
         final matchId = await MatchRepository.instance.createMatch(
           tournamentId: tournament.id,
           redPlayerId: redPlayerId,
           blackPlayerId: blackPlayerId,
-          scheduledTime: Timestamp.now(),
+          scheduledTime: DateTime.now(),
           round: 1,
           matchNumber: i + 1,
         );
-        
+
         firstRoundMatches.add(matchId);
       }
-      
+
       // Add matches to tournament bracket
       await TournamentRepository.instance.update(tournament.id, {
         'brackets': {
@@ -188,54 +186,54 @@ class TournamentService {
   Future<void> _generateRoundRobinMatches(TournamentModel tournament) async {
     try {
       final participants = List<String>.from(tournament.participantIds);
-      
+
       // If odd number of participants, add a dummy participant
       if (participants.length % 2 == 1) {
         participants.add('bye');
       }
-      
+
       final numParticipants = participants.length;
       final numRounds = numParticipants - 1;
       final halfSize = numParticipants ~/ 2;
-      
+
       // Create rounds
       final brackets = <String, List<String>>{};
-      
+
       for (int round = 0; round < numRounds; round++) {
         final roundMatches = <String>[];
-        
+
         for (int match = 0; match < halfSize; match++) {
           final redIndex = (round + match) % (numParticipants - 1);
           var blackIndex = (round - match + numParticipants - 1) % (numParticipants - 1);
-          
+
           if (match == 0) {
             blackIndex = numParticipants - 1;
           }
-          
+
           final redPlayerId = participants[redIndex];
           final blackPlayerId = participants[blackIndex];
-          
+
           // Skip matches with bye
           if (redPlayerId == 'bye' || blackPlayerId == 'bye') {
             continue;
           }
-          
+
           // Create match
           final matchId = await MatchRepository.instance.createMatch(
             tournamentId: tournament.id,
             redPlayerId: redPlayerId,
             blackPlayerId: blackPlayerId,
-            scheduledTime: Timestamp.now(),
+            scheduledTime: DateTime.now(),
             round: round + 1,
             matchNumber: match + 1,
           );
-          
+
           roundMatches.add(matchId);
         }
-        
+
         brackets['${round + 1}'] = roundMatches;
       }
-      
+
       // Add matches to tournament bracket
       await TournamentRepository.instance.update(tournament.id, {
         'brackets': brackets,
@@ -251,11 +249,11 @@ class TournamentService {
     try {
       // Get the match
       final match = await MatchRepository.instance.get(matchId);
-      
+
       if (match == null) {
         throw Exception('Match not found');
       }
-      
+
       // Create a game for the match
       final gameId = await GameService.instance.startGame(
         redPlayerId: match.redPlayerId,
@@ -268,10 +266,10 @@ class TournamentService {
           'matchNumber': match.matchNumber,
         },
       );
-      
+
       // Update match status
       await MatchRepository.instance.startMatch(matchId, gameId);
-      
+
       logger.info('Match started: $matchId -> $gameId');
     } catch (e) {
       logger.severe('Error starting match: $e');
@@ -284,19 +282,19 @@ class TournamentService {
     try {
       // Get the match
       final match = await MatchRepository.instance.get(matchId);
-      
+
       if (match == null) {
         throw Exception('Match not found');
       }
-      
+
       // Update match status
       await MatchRepository.instance.endMatch(matchId, winnerId: winnerId, isDraw: isDraw);
-      
+
       // If this is a tournament match, update the tournament bracket
       if (match.tournamentId != null) {
         await _advanceWinner(match.tournamentId!, match.round, match.matchNumber, winnerId);
       }
-      
+
       logger.info('Match ended: $matchId');
     } catch (e) {
       logger.severe('Error ending match: $e');
@@ -309,25 +307,25 @@ class TournamentService {
     try {
       // Get the tournament
       final tournament = await TournamentRepository.instance.get(tournamentId);
-      
+
       if (tournament == null) {
         throw Exception('Tournament not found');
       }
-      
+
       // Check if this is the final round
       if (round >= tournament.brackets.length) {
         // Tournament is complete
         await TournamentRepository.instance.updateStatus(tournamentId, TournamentStatus.completed);
         return;
       }
-      
+
       // Calculate next round and match number
       final nextRound = round + 1;
       final nextMatchNumber = (matchNumber + 1) ~/ 2;
-      
+
       // Get next round matches
       final nextRoundMatches = tournament.brackets['$nextRound'] ?? [];
-      
+
       // Find the match in the next round
       String? nextMatchId;
       for (final matchId in nextRoundMatches) {
@@ -337,38 +335,38 @@ class TournamentService {
           break;
         }
       }
-      
+
       if (nextMatchId == null) {
         // Create a new match for the next round
         final nextMatchId = await MatchRepository.instance.createMatch(
           tournamentId: tournamentId,
           redPlayerId: winnerId ?? '',
           blackPlayerId: '', // Will be filled later
-          scheduledTime: Timestamp.now(),
+          scheduledTime: DateTime.now(),
           round: nextRound,
           matchNumber: nextMatchNumber,
         );
-        
+
         // Add match to tournament bracket
         await TournamentRepository.instance.addMatchToBracket(tournamentId, '$nextRound', nextMatchId);
       } else {
         // Update the existing match
         final match = await MatchRepository.instance.get(nextMatchId);
-        
+
         if (match == null) {
           throw Exception('Next match not found');
         }
-        
+
         // Determine if this winner should be red or black player
         if (matchNumber % 2 == 1) {
           // Odd match number, winner goes to red
           await MatchRepository.instance.update(nextMatchId, {
-            'redPlayerId': winnerId,
+            'red_player_id': winnerId,
           });
         } else {
           // Even match number, winner goes to black
           await MatchRepository.instance.update(nextMatchId, {
-            'blackPlayerId': winnerId,
+            'black_player_id': winnerId,
           });
         }
       }

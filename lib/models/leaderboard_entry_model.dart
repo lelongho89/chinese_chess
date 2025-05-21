@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-/// Model for storing leaderboard entry data in Firestore
+/// Model for storing leaderboard entry data in Supabase
 class LeaderboardEntryModel {
   final String id;
   final String userId;
@@ -12,7 +10,7 @@ class LeaderboardEntryModel {
   final int gamesLost;
   final int gamesDraw;
   final double winRate;
-  final Timestamp lastUpdated;
+  final DateTime lastUpdated;
   final Map<String, dynamic>? metadata;
 
   LeaderboardEntryModel({
@@ -30,44 +28,42 @@ class LeaderboardEntryModel {
     this.metadata,
   });
 
-  // Create a LeaderboardEntryModel from a Firestore document
-  factory LeaderboardEntryModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    
+  // Create a LeaderboardEntryModel from a Supabase record
+  factory LeaderboardEntryModel.fromSupabase(Map<String, dynamic> data, String id) {
     // Calculate win rate
-    final gamesPlayed = data['gamesPlayed'] ?? 0;
-    final gamesWon = data['gamesWon'] ?? 0;
+    final gamesPlayed = data['games_played'] ?? 0;
+    final gamesWon = data['games_won'] ?? 0;
     final winRate = gamesPlayed > 0 ? gamesWon / gamesPlayed : 0.0;
-    
+
     return LeaderboardEntryModel(
-      id: doc.id,
-      userId: data['userId'] ?? '',
-      displayName: data['displayName'] ?? '',
-      eloRating: data['eloRating'] ?? 1200,
+      id: id,
+      userId: data['user_id'] ?? '',
+      displayName: data['display_name'] ?? '',
+      eloRating: data['elo_rating'] ?? 1200,
       rank: data['rank'] ?? 0,
       gamesPlayed: gamesPlayed,
       gamesWon: gamesWon,
-      gamesLost: data['gamesLost'] ?? 0,
-      gamesDraw: data['gamesDraw'] ?? 0,
+      gamesLost: data['games_lost'] ?? 0,
+      gamesDraw: data['games_draw'] ?? 0,
       winRate: winRate,
-      lastUpdated: data['lastUpdated'] ?? Timestamp.now(),
+      lastUpdated: DateTime.parse(data['last_updated'] ?? DateTime.now().toIso8601String()),
       metadata: data['metadata'],
     );
   }
 
-  // Convert LeaderboardEntryModel to a Map for Firestore
+  // Convert LeaderboardEntryModel to a Map for Supabase
   Map<String, dynamic> toMap() {
     return {
-      'userId': userId,
-      'displayName': displayName,
-      'eloRating': eloRating,
+      'user_id': userId,
+      'display_name': displayName,
+      'elo_rating': eloRating,
       'rank': rank,
-      'gamesPlayed': gamesPlayed,
-      'gamesWon': gamesWon,
-      'gamesLost': gamesLost,
-      'gamesDraw': gamesDraw,
-      'winRate': winRate,
-      'lastUpdated': lastUpdated,
+      'games_played': gamesPlayed,
+      'games_won': gamesWon,
+      'games_lost': gamesLost,
+      'games_draw': gamesDraw,
+      'win_rate': winRate,
+      'last_updated': lastUpdated.toIso8601String(),
       'metadata': metadata,
     };
   }
@@ -83,7 +79,7 @@ class LeaderboardEntryModel {
     int? gamesLost,
     int? gamesDraw,
     double? winRate,
-    Timestamp? lastUpdated,
+    DateTime? lastUpdated,
     Map<String, dynamic>? metadata,
   }) {
     return LeaderboardEntryModel(

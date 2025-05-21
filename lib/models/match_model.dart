@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-/// Model for storing match data in Firestore
+/// Model for storing match data in Supabase
 class MatchModel {
   final String id;
   final String? tournamentId;
@@ -9,9 +7,9 @@ class MatchModel {
   final String? winnerId;
   final bool isDraw;
   final MatchStatus status;
-  final Timestamp scheduledTime;
-  final Timestamp? startTime;
-  final Timestamp? endTime;
+  final DateTime scheduledTime;
+  final DateTime? startTime;
+  final DateTime? endTime;
   final String? gameId;
   final int round;
   final int matchNumber;
@@ -34,42 +32,41 @@ class MatchModel {
     this.metadata,
   });
 
-  // Create a MatchModel from a Firestore document
-  factory MatchModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+  // Create a MatchModel from a Supabase record
+  factory MatchModel.fromSupabase(Map<String, dynamic> data, String id) {
     return MatchModel(
-      id: doc.id,
-      tournamentId: data['tournamentId'],
-      redPlayerId: data['redPlayerId'] ?? '',
-      blackPlayerId: data['blackPlayerId'] ?? '',
-      winnerId: data['winnerId'],
-      isDraw: data['isDraw'] ?? false,
+      id: id,
+      tournamentId: data['tournament_id'],
+      redPlayerId: data['red_player_id'] ?? '',
+      blackPlayerId: data['black_player_id'] ?? '',
+      winnerId: data['winner_id'],
+      isDraw: data['is_draw'] ?? false,
       status: MatchStatus.values[data['status'] ?? 0],
-      scheduledTime: data['scheduledTime'] ?? Timestamp.now(),
-      startTime: data['startTime'],
-      endTime: data['endTime'],
-      gameId: data['gameId'],
+      scheduledTime: DateTime.parse(data['scheduled_time'] ?? DateTime.now().toIso8601String()),
+      startTime: data['start_time'] != null ? DateTime.parse(data['start_time']) : null,
+      endTime: data['end_time'] != null ? DateTime.parse(data['end_time']) : null,
+      gameId: data['game_id'],
       round: data['round'] ?? 0,
-      matchNumber: data['matchNumber'] ?? 0,
+      matchNumber: data['match_number'] ?? 0,
       metadata: data['metadata'],
     );
   }
 
-  // Convert MatchModel to a Map for Firestore
+  // Convert MatchModel to a Map for Supabase
   Map<String, dynamic> toMap() {
     return {
-      'tournamentId': tournamentId,
-      'redPlayerId': redPlayerId,
-      'blackPlayerId': blackPlayerId,
-      'winnerId': winnerId,
-      'isDraw': isDraw,
+      'tournament_id': tournamentId,
+      'red_player_id': redPlayerId,
+      'black_player_id': blackPlayerId,
+      'winner_id': winnerId,
+      'is_draw': isDraw,
       'status': status.index,
-      'scheduledTime': scheduledTime,
-      'startTime': startTime,
-      'endTime': endTime,
-      'gameId': gameId,
+      'scheduled_time': scheduledTime.toIso8601String(),
+      'start_time': startTime?.toIso8601String(),
+      'end_time': endTime?.toIso8601String(),
+      'game_id': gameId,
       'round': round,
-      'matchNumber': matchNumber,
+      'match_number': matchNumber,
       'metadata': metadata,
     };
   }
@@ -82,9 +79,9 @@ class MatchModel {
     String? winnerId,
     bool? isDraw,
     MatchStatus? status,
-    Timestamp? scheduledTime,
-    Timestamp? startTime,
-    Timestamp? endTime,
+    DateTime? scheduledTime,
+    DateTime? startTime,
+    DateTime? endTime,
     String? gameId,
     int? round,
     int? matchNumber,
