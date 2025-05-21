@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Chinese Chess game uses Firebase Authentication for user registration and login. The authentication system supports:
+The Chinese Chess game uses Supabase Authentication for user registration and login. The authentication system supports:
 
 1. Email/password registration and login
 2. Google sign-in
@@ -16,9 +16,9 @@ The Chinese Chess game uses Firebase Authentication for user registration and lo
 
 The authentication system is built using the following components:
 
-1. **AuthService**: A singleton service that handles all Firebase Authentication operations
+1. **SupabaseAuthService**: A singleton service that handles all Supabase Authentication operations
 2. **UserModel**: A model class for storing user data
-3. **UserRepository**: A repository for handling user data in Firestore
+3. **UserRepository**: A repository for handling user data in Supabase
 4. **Authentication Screens**: UI components for login, registration, password reset, and email verification
 
 ## Authentication Flow
@@ -64,9 +64,9 @@ User data is stored in Firestore with the following structure:
 }
 ```
 
-## Security Rules
+## Row Level Security (RLS)
 
-Firestore security rules should be configured to:
+Supabase uses Row Level Security (RLS) to control access to data. The following policies are implemented:
 
 1. Allow users to read and write only their own data
 2. Prevent unauthorized access to other users' data
@@ -74,9 +74,9 @@ Firestore security rules should be configured to:
 
 ## Implementation Details
 
-### AuthService
+### SupabaseAuthService
 
-The `AuthService` class is a singleton that provides methods for:
+The `SupabaseAuthService` class is a singleton that provides methods for:
 
 - Signing in with email and password
 - Signing in with Google
@@ -86,9 +86,8 @@ The `AuthService` class is a singleton that provides methods for:
 - Resetting password
 - Signing out
 - Updating user profile
-- Linking accounts (Google, Facebook)
-- Unlinking accounts
-- Getting linked providers
+- Refreshing the session
+- Checking email verification status
 
 ### UserRepository
 

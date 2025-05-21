@@ -1,87 +1,96 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:chinese_chess/models/user_model.dart';
 import 'package:chinese_chess/repositories/user_repository.dart';
+import 'package:chinese_chess/supabase_client.dart';
 
 import 'user_repository_test.mocks.dart';
 
 @GenerateMocks([
-  FirebaseFirestore,
-  CollectionReference,
-  DocumentReference,
-  DocumentSnapshot,
-  QuerySnapshot,
-  Query,
+  SupabaseClient,
+  SupabaseQueryBuilder,
+  PostgrestFilterBuilder,
+  PostgrestResponse,
   User,
 ])
 void main() {
-  late MockFirebaseFirestore mockFirestore;
-  late MockCollectionReference mockCollectionReference;
-  late MockDocumentReference mockDocumentReference;
-  late MockDocumentSnapshot mockDocumentSnapshot;
-  late MockQuerySnapshot mockQuerySnapshot;
-  late MockQuery mockQuery;
+  late MockSupabaseClient mockSupabaseClient;
+  late MockSupabaseQueryBuilder mockSupabaseQueryBuilder;
+  late MockPostgrestFilterBuilder mockPostgrestFilterBuilder;
+  late MockPostgrestResponse mockPostgrestResponse;
   late UserRepository userRepository;
 
   setUp(() {
-    mockFirestore = MockFirebaseFirestore();
-    mockCollectionReference = MockCollectionReference();
-    mockDocumentReference = MockDocumentReference();
-    mockDocumentSnapshot = MockDocumentSnapshot();
-    mockQuerySnapshot = MockQuerySnapshot();
-    mockQuery = MockQuery();
+    mockSupabaseClient = MockSupabaseClient();
+    mockSupabaseQueryBuilder = MockSupabaseQueryBuilder();
+    mockPostgrestFilterBuilder = MockPostgrestFilterBuilder();
+    mockPostgrestResponse = MockPostgrestResponse();
 
-    // Mock FirebaseFirestore.instance
-    when(mockFirestore.collection('users')).thenReturn(mockCollectionReference);
-    
-    // Mock collection reference
-    when(mockCollectionReference.doc(any)).thenReturn(mockDocumentReference);
-    
-    // Mock document reference
-    when(mockDocumentReference.get()).thenAnswer((_) async => mockDocumentSnapshot);
-    when(mockDocumentReference.set(any)).thenAnswer((_) async => {});
-    when(mockDocumentReference.update(any)).thenAnswer((_) async => {});
-    
-    // Mock document snapshot
-    when(mockDocumentSnapshot.exists).thenReturn(true);
-    when(mockDocumentSnapshot.id).thenReturn('test_user_id');
-    when(mockDocumentSnapshot.data()).thenReturn({
-      'email': 'test@example.com',
-      'displayName': 'Test User',
-      'eloRating': 1200,
-      'gamesPlayed': 10,
-      'gamesWon': 5,
-      'gamesLost': 3,
-      'gamesDraw': 2,
-      'createdAt': Timestamp.now(),
-      'lastLoginAt': Timestamp.now(),
-    });
-    
-    // Mock query
-    when(mockCollectionReference.orderBy(any, descending: anyNamed('descending')))
-        .thenReturn(mockQuery);
-    when(mockQuery.limit(any)).thenReturn(mockQuery);
-    when(mockQuery.get()).thenAnswer((_) async => mockQuerySnapshot);
-    
-    // Mock query snapshot
-    when(mockQuerySnapshot.docs).thenReturn([mockDocumentSnapshot]);
-    
+    // Mock Supabase client
+    SupabaseClient.instance = mockSupabaseClient;
+
+    // Mock table query builder
+    when(mockSupabaseClient.from('users')).thenReturn(mockSupabaseQueryBuilder);
+
+    // Mock select
+    when(mockSupabaseQueryBuilder.select()).thenReturn(mockPostgrestFilterBuilder);
+
+    // Mock filter operations
+    when(mockPostgrestFilterBuilder.eq('id', any)).thenReturn(mockPostgrestFilterBuilder);
+    when(mockPostgrestFilterBuilder.order(any, ascending: anyNamed('ascending')))
+        .thenReturn(mockPostgrestFilterBuilder);
+    when(mockPostgrestFilterBuilder.limit(any)).thenReturn(mockPostgrestFilterBuilder);
+
+    // Mock response
+    when(mockPostgrestFilterBuilder.execute()).thenAnswer((_) async => mockPostgrestResponse);
+    when(mockPostgrestResponse.data).thenReturn([
+      {
+        'id': 'test_user_id',
+        'email': 'test@example.com',
+        'display_name': 'Test User',
+        'elo_rating': 1200,
+        'games_played': 10,
+        'games_won': 5,
+        'games_lost': 3,
+        'games_draw': 2,
+        'created_at': DateTime.now().toIso8601String(),
+        'last_login_at': DateTime.now().toIso8601String(),
+      }
+    ]);
+
+    // Mock insert, update, delete
+    when(mockSupabaseQueryBuilder.insert(any)).thenReturn(mockPostgrestFilterBuilder);
+    when(mockSupabaseQueryBuilder.update(any)).thenReturn(mockPostgrestFilterBuilder);
+    when(mockSupabaseQueryBuilder.delete()).thenReturn(mockPostgrestFilterBuilder);
+
     // Create UserRepository instance
     userRepository = UserRepository.instance;
   });
 
   group('UserRepository', () {
-    test('get should return a UserModel when document exists', () async {
+    test('get should return a UserModel when record exists', () async {
       // Arrange
-      when(mockDocumentSnapshot.exists).thenReturn(true);
-      
+      when(mockPostgrestResponse.data).thenReturn([
+        {
+          'id': 'test_user_id',
+          'email': 'test@example.com',
+          'display_name': 'Test User',
+          'elo_rating': 1200,
+          'games_played': 10,
+          'games_won': 5,
+          'games_lost': 3,
+          'games_draw': 2,
+          'created_at': DateTime.now().toIso8601String(),
+          'last_login_at': DateTime.now().toIso8601String(),
+        }
+      ]);
+
       // Act
       final user = await userRepository.get('test_user_id');
-      
+
       // Assert
       expect(user, isNotNull);
       expect(user?.uid, equals('test_user_id'));
@@ -89,54 +98,53 @@ void main() {
       expect(user?.displayName, equals('Test User'));
       expect(user?.eloRating, equals(1200));
     });
-    
-    test('get should return null when document does not exist', () async {
+
+    test('get should return null when record does not exist', () async {
       // Arrange
-      when(mockDocumentSnapshot.exists).thenReturn(false);
-      
+      when(mockPostgrestResponse.data).thenReturn([]);
+
       // Act
       final user = await userRepository.get('test_user_id');
-      
+
       // Assert
       expect(user, isNull);
     });
-    
-    test('createUser should create a new user document', () async {
+
+    test('createUser should create a new user record', () async {
       // Arrange
       final mockUser = MockUser();
-      when(mockUser.uid).thenReturn('test_user_id');
+      when(mockUser.id).thenReturn('test_user_id');
       when(mockUser.email).thenReturn('test@example.com');
-      when(mockUser.displayName).thenReturn('Test User');
-      
+
       // Act
       await userRepository.createUser(mockUser);
-      
+
       // Assert
-      verify(mockDocumentReference.set(any)).called(1);
+      verify(mockSupabaseQueryBuilder.insert(any)).called(1);
     });
-    
-    test('updateLastLogin should update lastLoginAt field', () async {
+
+    test('updateLastLogin should update last_login_at field', () async {
       // Act
       await userRepository.updateLastLogin('test_user_id');
-      
+
       // Assert
-      verify(mockDocumentReference.update(argThat(
-        predicate((Map<String, dynamic> data) => data.containsKey('lastLoginAt'))
+      verify(mockSupabaseQueryBuilder.update(argThat(
+        predicate((Map<String, dynamic> data) => data.containsKey('last_login_at'))
       ))).called(1);
     });
-    
-    test('updateEloRating should update eloRating field', () async {
+
+    test('updateEloRating should update elo_rating field', () async {
       // Act
       await userRepository.updateEloRating('test_user_id', 1250);
-      
+
       // Assert
-      verify(mockDocumentReference.update({'eloRating': 1250})).called(1);
+      verify(mockSupabaseQueryBuilder.update({'elo_rating': 1250})).called(1);
     });
-    
+
     test('getTopPlayers should return a list of UserModel', () async {
       // Act
       final users = await userRepository.getTopPlayers(limit: 10);
-      
+
       // Assert
       expect(users, isNotEmpty);
       expect(users.length, equals(1));

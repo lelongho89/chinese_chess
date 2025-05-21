@@ -1,11 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../global.dart';
 import '../models/leaderboard_entry_model.dart';
-import 'base_repository.dart';
+import 'supabase_base_repository.dart';
 
-/// Repository for handling leaderboard data in Firestore
-class LeaderboardRepository extends BaseRepository<LeaderboardEntryModel> {
+/// Repository for handling leaderboard data in Supabase
+class LeaderboardRepository extends SupabaseBaseRepository<LeaderboardEntryModel> {
   // Singleton pattern
   static LeaderboardRepository? _instance;
   static LeaderboardRepository get instance => _instance ??= LeaderboardRepository._();
@@ -13,12 +11,12 @@ class LeaderboardRepository extends BaseRepository<LeaderboardEntryModel> {
   LeaderboardRepository._() : super('leaderboard');
 
   @override
-  LeaderboardEntryModel fromFirestore(DocumentSnapshot doc) {
-    return LeaderboardEntryModel.fromFirestore(doc);
+  LeaderboardEntryModel fromSupabase(Map<String, dynamic> data, String id) {
+    return LeaderboardEntryModel.fromSupabase(data, id);
   }
 
   @override
-  Map<String, dynamic> toFirestore(LeaderboardEntryModel model) {
+  Map<String, dynamic> toSupabase(LeaderboardEntryModel model) {
     return model.toMap();
   }
 
@@ -36,7 +34,7 @@ class LeaderboardRepository extends BaseRepository<LeaderboardEntryModel> {
     try {
       // Calculate win rate
       final winRate = gamesPlayed > 0 ? gamesWon / gamesPlayed : 0.0;
-      
+
       final leaderboardEntry = LeaderboardEntryModel(
         id: userId, // Use userId as the document ID
         userId: userId,
@@ -48,7 +46,7 @@ class LeaderboardRepository extends BaseRepository<LeaderboardEntryModel> {
         gamesLost: gamesLost,
         gamesDraw: gamesDraw,
         winRate: winRate,
-        lastUpdated: Timestamp.now(),
+        lastUpdated: DateTime.now(),
         metadata: null,
       );
 
@@ -63,11 +61,15 @@ class LeaderboardRepository extends BaseRepository<LeaderboardEntryModel> {
   // Get top players
   Future<List<LeaderboardEntryModel>> getTopPlayers({int limit = 10}) async {
     try {
-      return await query((collection) => 
-        collection
-          .orderBy('eloRating', descending: true)
-          .limit(limit)
-      );
+      final response = await table
+          .select()
+          .order('elo_rating', ascending: false)
+          .limit(limit);
+
+      return response.map((record) {
+        final id = record['id'] as String;
+        return fromSupabase(record, id);
+      }).toList();
     } catch (e) {
       logger.severe('Error getting top players: $e');
       rethrow;
@@ -89,21 +91,23 @@ class LeaderboardRepository extends BaseRepository<LeaderboardEntryModel> {
   Future<void> recalculateRanks() async {
     try {
       // Get all players sorted by Elo rating
-      final players = await query((collection) => 
-        collection.orderBy('eloRating', descending: true)
-      );
-      
-      // Update ranks in batches
-      final batch = FirebaseFirestore.instance.batch();
-      
+      final response = await table
+          .select()
+          .order('elo_rating', ascending: false);
+
+      final players = response.map((record) {
+        final id = record['id'] as String;
+        return fromSupabase(record, id);
+      }).toList();
+
+      // Update ranks one by one
       for (int i = 0; i < players.length; i++) {
         final player = players[i];
         final rank = i + 1; // Ranks start at 1
-        
-        batch.update(collection.doc(player.id), {'rank': rank});
+
+        await update(player.id, {'rank': rank});
       }
-      
-      await batch.commit();
+
       logger.info('Ranks recalculated for ${players.length} players');
     } catch (e) {
       logger.severe('Error recalculating ranks: $e');
@@ -114,12 +118,16 @@ class LeaderboardRepository extends BaseRepository<LeaderboardEntryModel> {
   // Get players by rank range
   Future<List<LeaderboardEntryModel>> getPlayersByRankRange(int startRank, int endRank) async {
     try {
-      return await query((collection) => 
-        collection
-          .where('rank', isGreaterThanOrEqualTo: startRank)
-          .where('rank', isLessThanOrEqualTo: endRank)
-          .orderBy('rank')
-      );
+      final response = await table
+          .select()
+          .gte('rank', startRank)
+          .lte('rank', endRank)
+          .order('rank');
+
+      return response.map((record) {
+        final id = record['id'] as String;
+        return fromSupabase(record, id);
+      }).toList();
     } catch (e) {
       logger.severe('Error getting players by rank range: $e');
       rethrow;
@@ -128,10 +136,21 @@ class LeaderboardRepository extends BaseRepository<LeaderboardEntryModel> {
 
   // Listen to leaderboard changes
   Stream<List<LeaderboardEntryModel>> listenToTopPlayers({int limit = 10}) {
-    return listenToQuery((collection) => 
-      collection
-        .orderBy('eloRating', descending: true)
-        .limit(limit)
-    );
+    try {
+      return table
+          .select()
+          .order('elo_rating', ascending: false)
+          .limit(limit)
+          .stream()
+          .map((response) {
+            return response.map((record) {
+              final id = record['id'] as String;
+              return fromSupabase(record, id);
+            }).toList();
+          });
+    } catch (e) {
+      logger.severe('Error listening to top players: $e');
+      rethrow;
+    }
   }
 }

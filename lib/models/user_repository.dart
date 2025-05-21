@@ -1,58 +1,76 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../global.dart';
+import '../repositories/supabase_base_repository.dart';
+import '../supabase_client.dart';
 import 'user_model.dart';
 
-/// Repository for handling user data in Firestore
-class UserRepository {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final CollectionReference _usersCollection;
-
+/// Repository for handling user data in Supabase
+class UserRepository extends SupabaseBaseRepository<UserModel> {
   // Singleton pattern
   static UserRepository? _instance;
   static UserRepository get instance => _instance ??= UserRepository._();
 
-  UserRepository._() : _usersCollection = FirebaseFirestore.instance.collection('users');
+  UserRepository._() : super('users');
 
-  // Create a new user in Firestore
-  Future<void> createUser(User firebaseUser) async {
+  @override
+  UserModel fromSupabase(Map<String, dynamic> data, String id) {
+    return UserModel.fromSupabase(data, id);
+  }
+
+  @override
+  Map<String, dynamic> toSupabase(UserModel model) {
+    return model.toMap();
+  }
+
+  // Create a new user in Supabase
+  Future<void> createUser(User supabaseUser) async {
     try {
-      final userModel = UserModel.fromFirebaseUser(
-        firebaseUser.uid,
-        firebaseUser.email ?? '',
-        firebaseUser.displayName,
-      );
-
-      await _usersCollection.doc(firebaseUser.uid).set(userModel.toMap());
-      logger.info('User created in Firestore: ${firebaseUser.uid}');
+      final userModel = UserModel.fromSupabaseUser(supabaseUser);
+      await set(supabaseUser.id, userModel);
+      logger.info('User created in Supabase: ${supabaseUser.id}');
     } catch (e) {
-      logger.severe('Error creating user in Firestore: $e');
+      logger.severe('Error creating user in Supabase: $e');
       rethrow;
     }
   }
 
-  // Get a user from Firestore
-  Future<UserModel?> getUser(String uid) async {
+  // Create or update a user in Supabase
+  Future<void> createOrUpdateUser(User supabaseUser, {String? displayName}) async {
     try {
-      final doc = await _usersCollection.doc(uid).get();
-      if (doc.exists) {
-        return UserModel.fromFirestore(doc);
+      final existingUser = await get(supabaseUser.id);
+      if (existingUser == null) {
+        // Create new user
+        final userModel = UserModel.fromSupabaseUser(supabaseUser);
+        await set(supabaseUser.id, userModel);
+        logger.info('User created in Supabase: ${supabaseUser.id}');
+      } else {
+        // Update existing user
+        await updateLastLogin(supabaseUser.id);
+
+        // Update display name if provided
+        if (displayName != null) {
+          await update(supabaseUser.id, {'display_name': displayName});
+        }
       }
-      return null;
     } catch (e) {
-      logger.severe('Error getting user from Firestore: $e');
+      logger.severe('Error creating or updating user in Supabase: $e');
       rethrow;
     }
   }
 
-  // Update a user in Firestore
+  // Get a user from Supabase
+  Future<UserModel?> getUser(String uid) async {
+    return get(uid);
+  }
+
+  // Update a user in Supabase
   Future<void> updateUser(UserModel user) async {
     try {
-      await _usersCollection.doc(user.uid).update(user.toMap());
-      logger.info('User updated in Firestore: ${user.uid}');
+      await update(user.uid, user.toMap());
+      logger.info('User updated in Supabase: ${user.uid}');
     } catch (e) {
-      logger.severe('Error updating user in Firestore: $e');
+      logger.severe('Error updating user in Supabase: $e');
       rethrow;
     }
   }
@@ -60,8 +78,8 @@ class UserRepository {
   // Update user's last login time
   Future<void> updateLastLogin(String uid) async {
     try {
-      await _usersCollection.doc(uid).update({
-        'lastLoginAt': Timestamp.now(),
+      await update(uid, {
+        'last_login_at': DateTime.now().toIso8601String(),
       });
       logger.info('User last login updated: $uid');
     } catch (e) {
@@ -70,13 +88,13 @@ class UserRepository {
     }
   }
 
-  // Delete a user from Firestore
+  // Delete a user from Supabase
   Future<void> deleteUser(String uid) async {
     try {
-      await _usersCollection.doc(uid).delete();
-      logger.info('User deleted from Firestore: $uid');
+      await delete(uid);
+      logger.info('User deleted from Supabase: $uid');
     } catch (e) {
-      logger.severe('Error deleting user from Firestore: $e');
+      logger.severe('Error deleting user from Supabase: $e');
       rethrow;
     }
   }
@@ -84,8 +102,8 @@ class UserRepository {
   // Update user's Elo rating
   Future<void> updateEloRating(String uid, int newRating) async {
     try {
-      await _usersCollection.doc(uid).update({
-        'eloRating': newRating,
+      await update(uid, {
+        'elo_rating': newRating,
       });
       logger.info('User Elo rating updated: $uid, $newRating');
     } catch (e) {
@@ -97,24 +115,22 @@ class UserRepository {
   // Update user's game statistics
   Future<void> updateGameStats(String uid, bool isWin, bool isDraw) async {
     try {
-      final userDoc = await _usersCollection.doc(uid).get();
-      if (!userDoc.exists) return;
+      final user = await get(uid);
+      if (user == null) return;
 
-      final userData = userDoc.data() as Map<String, dynamic>;
-      
       final updates = {
-        'gamesPlayed': (userData['gamesPlayed'] ?? 0) + 1,
+        'games_played': user.gamesPlayed + 1,
       };
 
       if (isDraw) {
-        updates['gamesDraw'] = (userData['gamesDraw'] ?? 0) + 1;
+        updates['games_draw'] = user.gamesDraw + 1;
       } else if (isWin) {
-        updates['gamesWon'] = (userData['gamesWon'] ?? 0) + 1;
+        updates['games_won'] = user.gamesWon + 1;
       } else {
-        updates['gamesLost'] = (userData['gamesLost'] ?? 0) + 1;
+        updates['games_lost'] = user.gamesLost + 1;
       }
 
-      await _usersCollection.doc(uid).update(updates);
+      await update(uid, updates);
       logger.info('User game stats updated: $uid, Win: $isWin, Draw: $isDraw');
     } catch (e) {
       logger.severe('Error updating user game stats: $e');
@@ -125,16 +141,37 @@ class UserRepository {
   // Get top players by Elo rating
   Future<List<UserModel>> getTopPlayers({int limit = 10}) async {
     try {
-      final querySnapshot = await _usersCollection
-          .orderBy('eloRating', descending: true)
-          .limit(limit)
-          .get();
-      
-      return querySnapshot.docs
-          .map((doc) => UserModel.fromFirestore(doc))
-          .toList();
+      final response = await table
+          .select()
+          .order('elo_rating', ascending: false)
+          .limit(limit);
+
+      return response.map((record) {
+        final id = record['id'] as String;
+        return fromSupabase(record, id);
+      }).toList();
     } catch (e) {
       logger.severe('Error getting top players: $e');
+      rethrow;
+    }
+  }
+
+  // Search users by display name
+  Future<List<UserModel>> searchByDisplayName(String query, {int limit = 10}) async {
+    try {
+      // Use ilike for case-insensitive search with Supabase
+      final response = await table
+          .select()
+          .ilike('display_name', '%$query%')
+          .order('display_name')
+          .limit(limit);
+
+      return response.map((record) {
+        final id = record['id'] as String;
+        return fromSupabase(record, id);
+      }).toList();
+    } catch (e) {
+      logger.severe('Error searching users by display name: $e');
       rethrow;
     }
   }

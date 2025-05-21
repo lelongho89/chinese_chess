@@ -40,12 +40,12 @@ class SupabaseAuthService extends ChangeNotifier {
       if (session != null) {
         _user = session.user;
       }
-      
+
       // Listen for auth state changes
       SupabaseClient.instance.auth.onAuthStateChange.listen((data) {
         final AuthChangeEvent event = data.event;
         final Session? session = data.session;
-        
+
         switch (event) {
           case AuthChangeEvent.signedIn:
             _user = session?.user;
@@ -75,7 +75,7 @@ class SupabaseAuthService extends ChangeNotifier {
             break;
         }
       });
-      
+
       _isInitialized = true;
       notifyListeners();
     } catch (e) {
@@ -96,7 +96,7 @@ class SupabaseAuthService extends ChangeNotifier {
         email: email,
         password: password,
       );
-      
+
       _user = response.user;
       return _user;
     } catch (e) {
@@ -115,14 +115,14 @@ class SupabaseAuthService extends ChangeNotifier {
         email: email,
         password: password,
       );
-      
+
       _user = response.user;
-      
+
       // Create user in database
       if (_user != null) {
         await UserRepository.instance.createUser(_user!);
       }
-      
+
       return _user;
     } catch (e) {
       logger.severe('Error registering: $e');
@@ -160,6 +160,29 @@ class SupabaseAuthService extends ChangeNotifier {
     }
   }
 
+  // Refresh session to get latest user data
+  Future<void> refreshSession() async {
+    try {
+      _setLoading(true);
+
+      // Get the current session
+      final session = SupabaseClient.instance.auth.currentSession;
+      if (session == null) {
+        return;
+      }
+
+      // Refresh the session
+      final response = await SupabaseClient.instance.auth.refreshSession();
+      _user = response.user;
+      notifyListeners();
+    } catch (e) {
+      logger.severe('Error refreshing session: $e');
+      rethrow;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   // Send password reset email
   Future<void> sendPasswordResetEmail(String email) async {
     try {
@@ -177,34 +200,34 @@ class SupabaseAuthService extends ChangeNotifier {
   Future<User?> signInWithGoogle() async {
     try {
       _setLoading(true);
-      
+
       // Start the Google sign-in process
       final GoogleSignIn googleSignIn = GoogleSignIn();
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-      
+
       if (googleUser == null) {
         // User canceled the sign-in flow
         return null;
       }
-      
+
       // Get auth details from Google
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      
+
       // Sign in with Supabase using Google token
       final response = await SupabaseClient.instance.auth.signInWithIdToken(
         provider: OAuthProvider.google,
         idToken: googleAuth.idToken!,
         accessToken: googleAuth.accessToken,
       );
-      
+
       _user = response.user;
-      
+
       // Check if this is a new user
       if (response.session?.accessToken != null) {
         // Create or update user in database
         await UserRepository.instance.createOrUpdateUser(_user!);
       }
-      
+
       return _user;
     } catch (e) {
       logger.severe('Error signing in with Google: $e');
@@ -218,29 +241,29 @@ class SupabaseAuthService extends ChangeNotifier {
   Future<User?> signInWithFacebook() async {
     try {
       _setLoading(true);
-      
+
       // Trigger the Facebook sign-in flow
       final LoginResult result = await FacebookAuth.instance.login();
-      
+
       if (result.status != LoginStatus.success) {
         // User canceled the sign-in flow or it failed
         return null;
       }
-      
+
       // Sign in with Supabase using Facebook token
       final response = await SupabaseClient.instance.auth.signInWithIdToken(
         provider: OAuthProvider.facebook,
         idToken: result.accessToken!.token,
       );
-      
+
       _user = response.user;
-      
+
       // Check if this is a new user
       if (response.session?.accessToken != null) {
         // Create or update user in database
         await UserRepository.instance.createOrUpdateUser(_user!);
       }
-      
+
       return _user;
     } catch (e) {
       logger.severe('Error signing in with Facebook: $e');

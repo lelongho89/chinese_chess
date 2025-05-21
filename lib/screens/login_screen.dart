@@ -1,10 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shirne_dialog/shirne_dialog.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../global.dart';
-import '../models/auth_service.dart';
+import '../models/supabase_auth_service.dart';
 import '../models/user_repository.dart';
 import '../widgets/social_login_buttons.dart';
 
@@ -41,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final authService = Provider.of<AuthService>(context, listen: false);
+    final authService = Provider.of<SupabaseAuthService>(context, listen: false);
 
     try {
       // Show loading indicator
@@ -58,27 +58,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (user != null) {
         // Update last login time
-        await UserRepository.instance.updateLastLogin(user.uid);
+        await UserRepository.instance.updateLastLogin(user.id);
 
         // Check if email is verified
-        if (!user.emailVerified) {
+        if (!authService.isEmailVerified) {
           if (context.mounted) {
-            MyDialog.confirm(
-              Text(context.l10n.emailNotVerified),
+            MyDialog.alert(
+              context.l10n.emailNotVerified,
               title: context.l10n.verificationRequired,
-              buttonText: context.l10n.resendVerification,
-              cancelText: context.l10n.cancel,
-            ).then((confirmed) async {
-              if (confirmed ?? false) {
-                await authService.sendEmailVerification();
-                if (context.mounted) {
-                  MyDialog.toast(
-                    context.l10n.verificationEmailSent,
-                    iconType: IconType.success,
-                  );
-                }
-              }
-            });
+            );
           }
           return;
         }
@@ -86,45 +74,35 @@ class _LoginScreenState extends State<LoginScreen> {
         // Call the onLoginSuccess callback
         widget.onLoginSuccess();
       }
-    } on FirebaseAuthException catch (e) {
+    } catch (e) {
       // Hide loading indicator
       if (context.mounted) Navigator.of(context).pop();
 
       String errorMessage;
-
-      switch (e.code) {
-        case 'user-not-found':
-          errorMessage = context.l10n.userNotFound;
-          break;
-        case 'wrong-password':
-          errorMessage = context.l10n.wrongPassword;
-          break;
-        case 'invalid-email':
-          errorMessage = context.l10n.invalidEmail;
-          break;
-        case 'user-disabled':
-          errorMessage = context.l10n.userDisabled;
-          break;
-        case 'too-many-requests':
-          errorMessage = context.l10n.tooManyRequests;
-          break;
-        default:
-          errorMessage = '${context.l10n.loginFailed}: ${e.message}';
+      if (e is AuthException) {
+        switch (e.statusCode) {
+          case '400':
+            errorMessage = context.l10n.invalidCredentials;
+            break;
+          case '401':
+            errorMessage = context.l10n.userNotFound;
+            break;
+          case '403':
+            errorMessage = context.l10n.userDisabled;
+            break;
+          case '429':
+            errorMessage = context.l10n.tooManyRequests;
+            break;
+          default:
+            errorMessage = '${context.l10n.loginFailed}: ${e.message}';
+        }
+      } else {
+        errorMessage = '${context.l10n.loginFailed}: $e';
       }
 
       if (context.mounted) {
         MyDialog.alert(
           errorMessage,
-          title: context.l10n.error,
-        );
-      }
-    } catch (e) {
-      // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
-
-      if (context.mounted) {
-        MyDialog.alert(
-          '${context.l10n.loginFailed}: $e',
           title: context.l10n.error,
         );
       }

@@ -1,10 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shirne_dialog/shirne_dialog.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../global.dart';
-import '../models/auth_service.dart';
+import '../models/supabase_auth_service.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   final VoidCallback onBackToLogin;
@@ -31,18 +31,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Future<void> _resetPassword() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final authService = Provider.of<AuthService>(context, listen: false);
-    
+    final authService = Provider.of<SupabaseAuthService>(context, listen: false);
+
     try {
       // Show loading indicator
       MyDialog.showLoading(context, message: context.l10n.sendingResetLink);
-      
+
       // Send password reset email
       await authService.resetPassword(_emailController.text.trim());
-      
+
       // Hide loading indicator
       if (context.mounted) Navigator.of(context).pop();
-      
+
       // Show success dialog
       if (context.mounted) {
         MyDialog.alert(
@@ -52,36 +52,32 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           widget.onBackToLogin();
         });
       }
-    } on FirebaseAuthException catch (e) {
-      // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
-      
-      String errorMessage;
-      
-      switch (e.code) {
-        case 'user-not-found':
-          errorMessage = context.l10n.userNotFound;
-          break;
-        case 'invalid-email':
-          errorMessage = context.l10n.invalidEmail;
-          break;
-        default:
-          errorMessage = '${context.l10n.resetPasswordFailed}: ${e.message}';
-      }
-      
-      if (context.mounted) {
-        MyDialog.alert(
-          errorMessage,
-          title: context.l10n.error,
-        );
-      }
     } catch (e) {
       // Hide loading indicator
       if (context.mounted) Navigator.of(context).pop();
-      
+
+      String errorMessage;
+      if (e is AuthException) {
+        switch (e.statusCode) {
+          case '400':
+            errorMessage = context.l10n.invalidEmail;
+            break;
+          case '404':
+            errorMessage = context.l10n.userNotFound;
+            break;
+          case '429':
+            errorMessage = context.l10n.tooManyRequests;
+            break;
+          default:
+            errorMessage = '${context.l10n.resetPasswordFailed}: ${e.message}';
+        }
+      } else {
+        errorMessage = '${context.l10n.resetPasswordFailed}: $e';
+      }
+
       if (context.mounted) {
         MyDialog.alert(
-          '${context.l10n.resetPasswordFailed}: $e',
+          errorMessage,
           title: context.l10n.error,
         );
       }
@@ -117,7 +113,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       height: 100,
                     ),
                   ),
-                  
+
                   // Title
                   Text(
                     context.l10n.resetPassword,
@@ -125,14 +121,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Description
                   Text(
                     context.l10n.resetPasswordDescription,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Email field
                   TextFormField(
                     controller: _emailController,
@@ -154,7 +150,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     },
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Reset password button
                   ElevatedButton(
                     onPressed: _resetPassword,
@@ -164,7 +160,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     child: Text(context.l10n.sendResetLink),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Back to login button
                   TextButton(
                     onPressed: widget.onBackToLogin,

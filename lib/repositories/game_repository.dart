@@ -1,11 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../global.dart';
 import '../models/game_data_model.dart';
-import 'base_repository.dart';
+import 'supabase_base_repository.dart';
 
-/// Repository for handling game data in Firestore
-class GameRepository extends BaseRepository<GameDataModel> {
+/// Repository for handling game data in Supabase
+class GameRepository extends SupabaseBaseRepository<GameDataModel> {
   // Singleton pattern
   static GameRepository? _instance;
   static GameRepository get instance => _instance ??= GameRepository._();
@@ -13,12 +11,12 @@ class GameRepository extends BaseRepository<GameDataModel> {
   GameRepository._() : super('games');
 
   @override
-  GameDataModel fromFirestore(DocumentSnapshot doc) {
-    return GameDataModel.fromFirestore(doc);
+  GameDataModel fromSupabase(Map<String, dynamic> data, String id) {
+    return GameDataModel.fromSupabase(data, id);
   }
 
   @override
-  Map<String, dynamic> toFirestore(GameDataModel model) {
+  Map<String, dynamic> toSupabase(GameDataModel model) {
     return model.toMap();
   }
 
@@ -30,13 +28,13 @@ class GameRepository extends BaseRepository<GameDataModel> {
   }) async {
     try {
       final gameModel = GameDataModel(
-        id: '', // Will be set by Firestore
+        id: '', // Will be set by Supabase
         redPlayerId: redPlayerId,
         blackPlayerId: blackPlayerId,
         finalFen: '', // Initial empty FEN
         redTimeRemaining: 180, // 3 minutes in seconds
         blackTimeRemaining: 180, // 3 minutes in seconds
-        startedAt: Timestamp.now(),
+        startedAt: DateTime.now(),
         isRanked: isRanked,
         tournamentId: tournamentId,
         metadata: metadata,
@@ -62,14 +60,14 @@ class GameRepository extends BaseRepository<GameDataModel> {
   }) async {
     try {
       final updates = {
-        'winnerId': winnerId,
-        'isDraw': isDraw,
-        'finalFen': finalFen,
-        'redTimeRemaining': redTimeRemaining,
-        'blackTimeRemaining': blackTimeRemaining,
-        'moveCount': moves.length,
+        'winner_id': winnerId,
+        'is_draw': isDraw,
+        'final_fen': finalFen,
+        'red_time_remaining': redTimeRemaining,
+        'black_time_remaining': blackTimeRemaining,
+        'move_count': moves.length,
         'moves': moves,
-        'endedAt': Timestamp.now(),
+        'ended_at': DateTime.now().toIso8601String(),
       };
 
       await update(gameId, updates);
@@ -83,22 +81,20 @@ class GameRepository extends BaseRepository<GameDataModel> {
   // Add a move to a game
   Future<void> addMove(String gameId, String move) async {
     try {
-      await FirebaseFirestore.instance.runTransaction((transaction) async {
-        final gameDoc = await transaction.get(collection.doc(gameId));
-        
-        if (!gameDoc.exists) return;
-        
-        final gameData = gameDoc.data() as Map<String, dynamic>;
-        final List<String> moves = List<String>.from(gameData['moves'] ?? []);
-        
-        moves.add(move);
-        
-        transaction.update(collection.doc(gameId), {
-          'moves': moves,
-          'moveCount': moves.length,
-        });
+      // Get current game data
+      final game = await get(gameId);
+      if (game == null) return;
+
+      // Add the move to the list
+      final List<String> moves = List<String>.from(game.moves);
+      moves.add(move);
+
+      // Update the game
+      await update(gameId, {
+        'moves': moves,
+        'move_count': moves.length,
       });
-      
+
       logger.info('Move added to game: $gameId');
     } catch (e) {
       logger.severe('Error adding move to game: $e');
@@ -110,8 +106,8 @@ class GameRepository extends BaseRepository<GameDataModel> {
   Future<void> updateTimeRemaining(String gameId, int redTimeRemaining, int blackTimeRemaining) async {
     try {
       await update(gameId, {
-        'redTimeRemaining': redTimeRemaining,
-        'blackTimeRemaining': blackTimeRemaining,
+        'red_time_remaining': redTimeRemaining,
+        'black_time_remaining': blackTimeRemaining,
       });
     } catch (e) {
       logger.severe('Error updating time remaining: $e');
@@ -122,15 +118,16 @@ class GameRepository extends BaseRepository<GameDataModel> {
   // Get games by player
   Future<List<GameDataModel>> getGamesByPlayer(String playerId, {int limit = 10}) async {
     try {
-      return await query((collection) => 
-        collection
-          .where(Filter.or(
-            Filter('redPlayerId', isEqualTo: playerId),
-            Filter('blackPlayerId', isEqualTo: playerId),
-          ))
-          .orderBy('startedAt', descending: true)
-          .limit(limit)
-      );
+      final response = await table
+          .select()
+          .or('red_player_id.eq.$playerId,black_player_id.eq.$playerId')
+          .order('started_at', ascending: false)
+          .limit(limit);
+
+      return response.map((record) {
+        final id = record['id'] as String;
+        return fromSupabase(record, id);
+      }).toList();
     } catch (e) {
       logger.severe('Error getting games by player: $e');
       rethrow;
@@ -140,11 +137,15 @@ class GameRepository extends BaseRepository<GameDataModel> {
   // Get games by tournament
   Future<List<GameDataModel>> getGamesByTournament(int tournamentId) async {
     try {
-      return await query((collection) => 
-        collection
-          .where('tournamentId', isEqualTo: tournamentId)
-          .orderBy('startedAt', descending: true)
-      );
+      final response = await table
+          .select()
+          .eq('tournament_id', tournamentId)
+          .order('started_at', ascending: false);
+
+      return response.map((record) {
+        final id = record['id'] as String;
+        return fromSupabase(record, id);
+      }).toList();
     } catch (e) {
       logger.severe('Error getting games by tournament: $e');
       rethrow;
@@ -154,15 +155,16 @@ class GameRepository extends BaseRepository<GameDataModel> {
   // Get active games by player
   Future<List<GameDataModel>> getActiveGamesByPlayer(String playerId) async {
     try {
-      return await query((collection) => 
-        collection
-          .where(Filter.or(
-            Filter('redPlayerId', isEqualTo: playerId),
-            Filter('blackPlayerId', isEqualTo: playerId),
-          ))
-          .where('endedAt', isNull: true)
-          .orderBy('startedAt', descending: true)
-      );
+      final response = await table
+          .select()
+          .or('red_player_id.eq.$playerId,black_player_id.eq.$playerId')
+          .is_('ended_at', 'null')
+          .order('started_at', ascending: false);
+
+      return response.map((record) {
+        final id = record['id'] as String;
+        return fromSupabase(record, id);
+      }).toList();
     } catch (e) {
       logger.severe('Error getting active games by player: $e');
       rethrow;
@@ -171,6 +173,22 @@ class GameRepository extends BaseRepository<GameDataModel> {
 
   // Listen to active game
   Stream<GameDataModel?> listenToActiveGame(String gameId) {
-    return listen(gameId);
+    try {
+      return table
+          .select()
+          .eq('id', gameId)
+          .stream()
+          .map((response) {
+            if (response.isNotEmpty) {
+              final record = response.first;
+              final id = record['id'] as String;
+              return fromSupabase(record, id);
+            }
+            return null;
+          });
+    } catch (e) {
+      logger.severe('Error listening to active game: $e');
+      rethrow;
+    }
   }
 }

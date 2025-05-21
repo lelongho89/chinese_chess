@@ -19,18 +19,18 @@ The MVP will extend the existing Flutter frontend for cross-platform support, in
 1. **Frontend (Flutter)**
    - Framework: Flutter with Dart for cross-platform UI (iOS, Android, web).
    - Styling: Material Design for consistent, responsive UI; custom widgets for chess board and pieces.
-   - Dependencies: Firebase SDK for authentication and Firestore, WebSocket package (e.g., `web_socket_channel`) for real-time sync.
+   - Dependencies: Supabase SDK for authentication and database, WebSocket package (e.g., `web_socket_channel`) for real-time sync.
    - Features: Login/registration, game board, blitz timer, and basic tournament UI.
 
 2. **Backend**
    - Language: Node.js with Express for REST APIs.
    - Real-time: WebSocket server (Socket.IO) for game state synchronization.
-   - Authentication: Firebase Authentication for email/password login.
+   - Authentication: Supabase Authentication for email/password login.
    - Anti-cheating: Basic server-side validation for moves and timers.
 
 3. **Database**
-   - Primary: Firebase Firestore for user data, ratings, and game history.
-   - Asset Storage: Firebase Storage for default skin assets.
+   - Primary: Supabase PostgreSQL for user data, ratings, and game history.
+   - Asset Storage: Supabase Storage for default skin assets.
 
 4. **Game Logic**
    - Core: Reuse existing Flutter-based move validation logic, with server-side verification.
@@ -50,12 +50,13 @@ The MVP will extend the existing Flutter frontend for cross-platform support, in
 - **Scope**: Exclude social logins, leaderboards, custom skins, and advanced tournament formats.
 
 ## Tech Stack
-- **Frontend**: Flutter, Dart, Material Design, Firebase SDK, `web_socket_channel`.
-- **Backend**: Node.js, Express, Socket.IO, Firebase Authentication.
-- **Database**: Firebase Firestore, Firebase Storage.
+
+- **Frontend**: Flutter, Dart, Material Design, Supabase SDK, `web_socket_channel`.
+- **Backend**: Node.js, Express, Socket.IO, Supabase Authentication.
+- **Database**: Supabase PostgreSQL, Supabase Storage.
 - **DevOps**: GitHub Actions for CI/CD, Flutter’s build tools for platform-specific outputs.
 - **Testing**: Flutter’s `test` package for unit tests, `integration_test` for E2E tests.
-- **Monitoring**: Firebase Analytics for basic usage tracking.
+- **Monitoring**: Supabase Analytics for basic usage tracking.
 
 ## Tools
 - **Version Control**: Git with GitHub.
