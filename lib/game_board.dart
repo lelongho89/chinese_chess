@@ -17,6 +17,7 @@ import 'widgets/game_wrapper.dart';
 import 'models/game_manager.dart';
 import 'components/play.dart';
 import 'components/edit_fen.dart';
+import 'services/match_invitation_handler.dart';
 
 /// 游戏页面
 class GameBoard extends StatefulWidget {
@@ -227,6 +228,14 @@ class GameBoardState extends State<GameBoard> {
               onTap: () {
                 Navigator.pop(context);
                 copyFen();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.qr_code_scanner),
+              title: Text(context.l10n.scanQRCode),
+              onTap: () {
+                Navigator.pop(context);
+                MatchInvitationHandler.instance.showQRScanner(context);
               },
             ),
             ListTile(

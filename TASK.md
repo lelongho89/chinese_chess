@@ -9,6 +9,15 @@
 | T1-004  | Update existing Flutter chess board for default skin | Frontend Team | Completed | Medium | 0.5 weeks | Phase 1 |
 | T1-005  | Implement blitz timer (3+2) in Flutter | Frontend Team | Completed | High | 1 week | Phase 1 |
 | T1-010  | Migrate from Firebase to Supabase | Backend/Frontend Team | Completed | High | 1 week | Phase 1 |
+| T1-011  | Implement QR code sharing for match invitations | Frontend Team | Completed | Medium | 0.5 weeks | Phase 1 |
+
+### T1-011: Implement QR code sharing for match invitations (Completed)
+- ✅ Create database schema for match invitations
+- ✅ Implement match invitation model and repository
+- ✅ Add QR code generation and scanning functionality
+- ✅ Create UI for sharing and scanning QR codes
+- ✅ Implement match joining via QR code
+- ✅ Test QR code sharing on iOS and Android
 
 ## Backlog
 ### Phase 1

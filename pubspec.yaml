@@ -42,6 +42,13 @@ dependencies:
   flutter_riverpod: ^2.4.10
   riverpod_annotation: ^2.3.4
 
+  # QR Code
+  qr_flutter: ^4.1.0
+  mobile_scanner: ^7.0.0
+
+  # Sharing
+  share_plus: ^11.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

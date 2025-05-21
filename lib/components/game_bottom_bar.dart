@@ -5,6 +5,7 @@ import '../global.dart';
 import '../game_board.dart';
 import '../models/game_manager.dart';
 import '../models/play_mode.dart';
+import '../services/match_invitation_handler.dart';
 import 'play_step.dart';
 
 class GameBottomBar extends StatefulWidget {
@@ -49,6 +50,13 @@ class GameBottomBarState extends State<GameBottomBar> {
   void _showCode() {}
 
   void _doReply() {}
+
+  void _showQRCodeGenerator() {
+    MatchInvitationHandler.instance.showQRGenerator(context, metadata: {
+      'isRanked': true,
+      'gameType': 'standard',
+    });
+  }
 
   void _goPrev() {
     if (gamer.currentStep < 1) return;
@@ -116,6 +124,11 @@ class GameBottomBarState extends State<GameBottomBar> {
         children: [
           IconButton(icon: const Icon(Icons.list), onPressed: _showStepList),
           IconButton(icon: const Icon(Icons.replay), onPressed: _doReply),
+          IconButton(
+            icon: const Icon(Icons.qr_code),
+            tooltip: context.l10n.inviteFriend,
+            onPressed: _showQRCodeGenerator,
+          ),
           IconButton(
             icon: const Icon(Icons.navigate_before),
             onPressed: _goPrev,
