@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../models/auth_service.dart';
+import '../models/supabase_auth_service.dart';
 import 'email_verification_screen.dart';
 import 'forgot_password_screen.dart';
 import 'login_screen.dart';
@@ -48,7 +48,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthService>(
+    return Consumer<SupabaseAuthService>(
       builder: (context, authService, _) {
         // Show loading indicator while initializing
         if (!authService.isInitialized) {

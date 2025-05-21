@@ -1,12 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../global.dart';
 import '../models/user_model.dart';
-import 'base_repository.dart';
+import '../supabase_client.dart';
+import 'supabase_base_repository.dart';
 
-/// Repository for handling user data in Firestore
-class UserRepository extends BaseRepository<UserModel> {
+/// Repository for handling user data in Supabase
+class UserRepository extends SupabaseBaseRepository<UserModel> {
   // Singleton pattern
   static UserRepository? _instance;
   static UserRepository get instance => _instance ??= UserRepository._();
@@ -14,28 +14,38 @@ class UserRepository extends BaseRepository<UserModel> {
   UserRepository._() : super('users');
 
   @override
-  UserModel fromFirestore(DocumentSnapshot doc) {
-    return UserModel.fromFirestore(doc);
+  UserModel fromSupabase(Map<String, dynamic> data, String id) {
+    return UserModel.fromSupabase(data, id);
   }
 
   @override
-  Map<String, dynamic> toFirestore(UserModel model) {
+  Map<String, dynamic> toSupabase(UserModel model) {
     return model.toMap();
   }
 
-  // Create a new user in Firestore
-  Future<void> createUser(User firebaseUser) async {
+  // Create a new user in Supabase
+  Future<void> createUser(User supabaseUser) async {
     try {
-      final userModel = UserModel.fromFirebaseUser(
-        firebaseUser.uid,
-        firebaseUser.email ?? '',
-        firebaseUser.displayName,
-      );
-
-      await set(firebaseUser.uid, userModel);
-      logger.info('User created in Firestore: ${firebaseUser.uid}');
+      final userModel = UserModel.fromSupabaseUser(supabaseUser);
+      await set(supabaseUser.id, userModel);
+      logger.info('User created in Supabase: ${supabaseUser.id}');
     } catch (e) {
-      logger.severe('Error creating user in Firestore: $e');
+      logger.severe('Error creating user in Supabase: $e');
+      rethrow;
+    }
+  }
+
+  // Create or update a user in Supabase
+  Future<void> createOrUpdateUser(User supabaseUser) async {
+    try {
+      final existingUser = await get(supabaseUser.id);
+      if (existingUser == null) {
+        await createUser(supabaseUser);
+      } else {
+        await updateLastLogin(supabaseUser.id);
+      }
+    } catch (e) {
+      logger.severe('Error creating or updating user in Supabase: $e');
       rethrow;
     }
   }
@@ -44,7 +54,7 @@ class UserRepository extends BaseRepository<UserModel> {
   Future<void> updateLastLogin(String uid) async {
     try {
       await update(uid, {
-        'lastLoginAt': Timestamp.now(),
+        'last_login_at': DateTime.now().toIso8601String(),
       });
       logger.info('User last login updated: $uid');
     } catch (e) {
@@ -57,7 +67,7 @@ class UserRepository extends BaseRepository<UserModel> {
   Future<void> updateEloRating(String uid, int newRating) async {
     try {
       await update(uid, {
-        'eloRating': newRating,
+        'elo_rating': newRating,
       });
       logger.info('User Elo rating updated: $uid, $newRating');
     } catch (e) {
@@ -69,21 +79,19 @@ class UserRepository extends BaseRepository<UserModel> {
   // Update user's game statistics
   Future<void> updateGameStats(String uid, bool isWin, bool isDraw) async {
     try {
-      final userDoc = await collection.doc(uid).get();
-      if (!userDoc.exists) return;
+      final user = await get(uid);
+      if (user == null) return;
 
-      final userData = userDoc.data() as Map<String, dynamic>;
-      
       final updates = {
-        'gamesPlayed': (userData['gamesPlayed'] ?? 0) + 1,
+        'games_played': user.gamesPlayed + 1,
       };
 
       if (isDraw) {
-        updates['gamesDraw'] = (userData['gamesDraw'] ?? 0) + 1;
+        updates['games_draw'] = user.gamesDraw + 1;
       } else if (isWin) {
-        updates['gamesWon'] = (userData['gamesWon'] ?? 0) + 1;
+        updates['games_won'] = user.gamesWon + 1;
       } else {
-        updates['gamesLost'] = (userData['gamesLost'] ?? 0) + 1;
+        updates['games_lost'] = user.gamesLost + 1;
       }
 
       await update(uid, updates);
@@ -97,11 +105,37 @@ class UserRepository extends BaseRepository<UserModel> {
   // Get top players by Elo rating
   Future<List<UserModel>> getTopPlayers({int limit = 10}) async {
     try {
-      return await query((collection) => 
-        collection.orderBy('eloRating', descending: true).limit(limit)
-      );
+      final response = await table
+          .select()
+          .order('elo_rating', ascending: false)
+          .limit(limit);
+
+      return response.map((record) {
+        final id = record['id'] as String;
+        return fromSupabase(record, id);
+      }).toList();
     } catch (e) {
       logger.severe('Error getting top players: $e');
+      rethrow;
+    }
+  }
+
+  // Listen to top players by Elo rating
+  Stream<List<UserModel>> listenToTopPlayers({int limit = 10}) {
+    try {
+      return table
+          .select()
+          .order('elo_rating', ascending: false)
+          .limit(limit)
+          .stream()
+          .map((response) {
+            return response.map((record) {
+              final id = record['id'] as String;
+              return fromSupabase(record, id);
+            }).toList();
+          });
+    } catch (e) {
+      logger.severe('Error listening to top players: $e');
       rethrow;
     }
   }
@@ -109,16 +143,17 @@ class UserRepository extends BaseRepository<UserModel> {
   // Search users by display name
   Future<List<UserModel>> searchByDisplayName(String query, {int limit = 10}) async {
     try {
-      // Use a compound query with startAt and endAt for prefix search
-      final String endQuery = query + '\uf8ff'; // \uf8ff is a high code point
-      
-      return await this.query((collection) => 
-        collection
-          .orderBy('displayName')
-          .startAt([query])
-          .endAt([endQuery])
-          .limit(limit)
-      );
+      // Use ilike for case-insensitive search with Supabase
+      final response = await table
+          .select()
+          .ilike('display_name', '%$query%')
+          .order('display_name')
+          .limit(limit);
+
+      return response.map((record) {
+        final id = record['id'] as String;
+        return fromSupabase(record, id);
+      }).toList();
     } catch (e) {
       logger.severe('Error searching users by display name: $e');
       rethrow;
@@ -128,21 +163,30 @@ class UserRepository extends BaseRepository<UserModel> {
   // Get user's friends
   Future<List<UserModel>> getUserFriends(String uid) async {
     try {
-      final userDoc = await collection.doc(uid).get();
-      if (!userDoc.exists) return [];
+      final user = await get(uid);
+      if (user == null) return [];
 
-      final userData = userDoc.data() as Map<String, dynamic>;
-      final List<String> friendIds = List<String>.from(userData['friendIds'] ?? []);
-      
+      // Get the user's friends from the friends table
+      final response = await SupabaseClient.instance.database
+          .from('friends')
+          .select('friend_id')
+          .eq('user_id', uid);
+
+      final List<String> friendIds = response
+          .map((record) => record['friend_id'] as String)
+          .toList();
+
       if (friendIds.isEmpty) return [];
-      
+
       // Get all friends in a single batch
-      final friendDocs = await FirebaseFirestore.instance
-          .collection('users')
-          .where(FieldPath.documentId, whereIn: friendIds)
-          .get();
-      
-      return friendDocs.docs.map((doc) => fromFirestore(doc)).toList();
+      final friendsResponse = await table
+          .select()
+          .in_('id', friendIds);
+
+      return friendsResponse.map((record) {
+        final id = record['id'] as String;
+        return fromSupabase(record, id);
+      }).toList();
     } catch (e) {
       logger.severe('Error getting user friends: $e');
       rethrow;
@@ -152,21 +196,25 @@ class UserRepository extends BaseRepository<UserModel> {
   // Add a friend
   Future<void> addFriend(String uid, String friendId) async {
     try {
-      // Add friend to user's friend list
-      await FirebaseFirestore.instance.runTransaction((transaction) async {
-        final userDoc = await transaction.get(collection.doc(uid));
-        
-        if (!userDoc.exists) return;
-        
-        final userData = userDoc.data() as Map<String, dynamic>;
-        final List<String> friendIds = List<String>.from(userData['friendIds'] ?? []);
-        
-        if (!friendIds.contains(friendId)) {
-          friendIds.add(friendId);
-          transaction.update(collection.doc(uid), {'friendIds': friendIds});
-        }
-      });
-      
+      // Check if the friendship already exists
+      final existingFriendship = await SupabaseClient.instance.database
+          .from('friends')
+          .select()
+          .eq('user_id', uid)
+          .eq('friend_id', friendId)
+          .maybeSingle();
+
+      if (existingFriendship == null) {
+        // Add friend to user's friend list
+        await SupabaseClient.instance.database
+            .from('friends')
+            .insert({
+              'user_id': uid,
+              'friend_id': friendId,
+              'created_at': DateTime.now().toIso8601String(),
+            });
+      }
+
       logger.info('Friend added: $uid -> $friendId');
     } catch (e) {
       logger.severe('Error adding friend: $e');
@@ -178,20 +226,12 @@ class UserRepository extends BaseRepository<UserModel> {
   Future<void> removeFriend(String uid, String friendId) async {
     try {
       // Remove friend from user's friend list
-      await FirebaseFirestore.instance.runTransaction((transaction) async {
-        final userDoc = await transaction.get(collection.doc(uid));
-        
-        if (!userDoc.exists) return;
-        
-        final userData = userDoc.data() as Map<String, dynamic>;
-        final List<String> friendIds = List<String>.from(userData['friendIds'] ?? []);
-        
-        if (friendIds.contains(friendId)) {
-          friendIds.remove(friendId);
-          transaction.update(collection.doc(uid), {'friendIds': friendIds});
-        }
-      });
-      
+      await SupabaseClient.instance.database
+          .from('friends')
+          .delete()
+          .eq('user_id', uid)
+          .eq('friend_id', friendId);
+
       logger.info('Friend removed: $uid -> $friendId');
     } catch (e) {
       logger.severe('Error removing friend: $e');

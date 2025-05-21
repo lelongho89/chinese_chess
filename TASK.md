@@ -8,6 +8,7 @@
 | T1-003  | Adapt existing Flutter game logic for server-side validation | Backend/Frontend Team | Not Started | High | 1 week | Phase 1 |
 | T1-004  | Update existing Flutter chess board for default skin | Frontend Team | Completed | Medium | 0.5 weeks | Phase 1 |
 | T1-005  | Implement blitz timer (3+2) in Flutter | Frontend Team | Completed | High | 1 week | Phase 1 |
+| T1-010  | Migrate from Firebase to Supabase | Backend/Frontend Team | Completed | High | 1 week | Phase 1 |
 
 ## Backlog
 ### Phase 1
@@ -55,6 +56,15 @@
 - ✅ Add color-coded low-time warning
 - ✅ Sync with server via WebSocket
 - ✅ Test timer accuracy across platforms
+
+### T1-010: Migrate from Firebase to Supabase (Completed)
+- ✅ Add Supabase dependencies to Flutter project
+- ✅ Create Supabase database schema
+- ✅ Implement Supabase authentication service
+- ✅ Update repositories to use Supabase
+- ✅ Update UI components to work with Supabase
+- ✅ Set up Supabase Realtime for real-time updates
+- ✅ Test Supabase integration
 
 ## Notes
 - Assume existing Flutter code handles basic Chinese Chess gameplay; tasks focus on online integration.

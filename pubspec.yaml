@@ -30,15 +30,17 @@ dependencies:
 
   audioplayers: ^6.4.0
 
-  # Firebase
-  firebase_core: ^2.24.2
-  firebase_auth: ^4.15.3
-  cloud_firestore: ^4.13.6
-  firebase_analytics: ^10.7.4
+  # Supabase
+  supabase_flutter: ^2.3.4
+  flutter_dotenv: ^5.1.0
 
   # Social Login
-  google_sign_in: ^6.0.2  # Using a version compatible with Firebase
+  google_sign_in: ^6.0.2
   flutter_facebook_auth: ^6.0.4
+
+  # State Management with Riverpod
+  flutter_riverpod: ^2.4.10
+  riverpod_annotation: ^2.3.4
 
 dev_dependencies:
   flutter_test:
@@ -49,6 +51,9 @@ dev_dependencies:
   flutter_lints: ^3.0.1
   mockito: ^5.4.4
   build_runner: ^2.4.8
+  riverpod_generator: ^2.3.10
+  custom_lint: ^0.5.10
+  riverpod_lint: ^2.3.8
 
 # flutter pub run icons_launcher:create
 icons_launcher:
@@ -87,3 +92,4 @@ flutter:
     - assets/skins/stones/
     - assets/images/
     - assets/sounds/
+    - .env

@@ -1,36 +1,33 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:provider/provider.dart';
 import 'package:shirne_dialog/shirne_dialog.dart';
 
 import 'global.dart';
 import 'l10n/generated/app_localizations.dart';
-import 'models/auth_service.dart';
+import 'models/supabase_auth_service.dart';
 import 'models/game_manager.dart';
 import 'models/game_setting.dart';
 import 'models/locale_provider.dart';
 import 'screens/auth_wrapper.dart';
+import 'supabase_client.dart';
 import 'widgets/game_wrapper.dart';
 import 'game_board.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
+  // Load environment variables
+  await dotenv.load();
+
+  // Initialize Supabase
   try {
-    await Firebase.initializeApp();
-
-    // Configure Firestore for offline persistence
-    await FirebaseFirestore.instance.settings = const Settings(
-      persistenceEnabled: true,
-      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
-    );
-
-    logger.info('Firebase initialized successfully');
+    await SupabaseClient.initialize();
+    logger.info('Supabase initialized successfully');
   } catch (e) {
-    logger.severe('Failed to initialize Firebase: $e');
+    logger.severe('Failed to initialize Supabase: $e');
   }
 
   // Initialize game settings
@@ -40,15 +37,17 @@ void main() async {
   final localeProvider = await LocaleProvider.getInstance();
 
   // Initialize auth service
-  final authService = await AuthService.getInstance();
+  final authService = await SupabaseAuthService.getInstance();
 
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: localeProvider),
-        ChangeNotifierProvider.value(value: authService),
-      ],
-      child: const MainApp(),
+    ProviderScope(
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: localeProvider),
+          ChangeNotifierProvider.value(value: authService),
+        ],
+        child: const MainApp(),
+      ),
     ),
   );
 }

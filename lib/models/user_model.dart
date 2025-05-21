@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// User model for storing user data in Firestore
+/// User model for storing user data in Supabase
 class UserModel {
   final String uid;
   final String email;
@@ -10,8 +10,8 @@ class UserModel {
   final int gamesWon;
   final int gamesLost;
   final int gamesDraw;
-  final Timestamp createdAt;
-  final Timestamp lastLoginAt;
+  final DateTime createdAt;
+  final DateTime lastLoginAt;
 
   UserModel({
     required this.uid,
@@ -26,47 +26,46 @@ class UserModel {
     required this.lastLoginAt,
   });
 
-  // Create a UserModel from a Firebase User
-  factory UserModel.fromFirebaseUser(String uid, String email, String? displayName) {
-    final now = Timestamp.now();
+  // Create a UserModel from a Supabase User
+  factory UserModel.fromSupabaseUser(User user) {
+    final now = DateTime.now();
     return UserModel(
-      uid: uid,
-      email: email,
-      displayName: displayName ?? email.split('@').first, // Use part of email if no display name
+      uid: user.id,
+      email: user.email ?? '',
+      displayName: user.userMetadata?['name'] ?? user.email?.split('@').first ?? 'User',
       createdAt: now,
       lastLoginAt: now,
     );
   }
 
-  // Create a UserModel from a Firestore document
-  factory UserModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+  // Create a UserModel from a Supabase record
+  factory UserModel.fromSupabase(Map<String, dynamic> data, String id) {
     return UserModel(
-      uid: doc.id,
+      uid: id,
       email: data['email'] ?? '',
-      displayName: data['displayName'] ?? '',
-      eloRating: data['eloRating'] ?? 1200,
-      gamesPlayed: data['gamesPlayed'] ?? 0,
-      gamesWon: data['gamesWon'] ?? 0,
-      gamesLost: data['gamesLost'] ?? 0,
-      gamesDraw: data['gamesDraw'] ?? 0,
-      createdAt: data['createdAt'] ?? Timestamp.now(),
-      lastLoginAt: data['lastLoginAt'] ?? Timestamp.now(),
+      displayName: data['display_name'] ?? '',
+      eloRating: data['elo_rating'] ?? 1200,
+      gamesPlayed: data['games_played'] ?? 0,
+      gamesWon: data['games_won'] ?? 0,
+      gamesLost: data['games_lost'] ?? 0,
+      gamesDraw: data['games_draw'] ?? 0,
+      createdAt: DateTime.parse(data['created_at'] ?? DateTime.now().toIso8601String()),
+      lastLoginAt: DateTime.parse(data['last_login_at'] ?? DateTime.now().toIso8601String()),
     );
   }
 
-  // Convert UserModel to a Map for Firestore
+  // Convert UserModel to a Map for Supabase
   Map<String, dynamic> toMap() {
     return {
       'email': email,
-      'displayName': displayName,
-      'eloRating': eloRating,
-      'gamesPlayed': gamesPlayed,
-      'gamesWon': gamesWon,
-      'gamesLost': gamesLost,
-      'gamesDraw': gamesDraw,
-      'createdAt': createdAt,
-      'lastLoginAt': lastLoginAt,
+      'display_name': displayName,
+      'elo_rating': eloRating,
+      'games_played': gamesPlayed,
+      'games_won': gamesWon,
+      'games_lost': gamesLost,
+      'games_draw': gamesDraw,
+      'created_at': createdAt.toIso8601String(),
+      'last_login_at': lastLoginAt.toIso8601String(),
     };
   }
 
@@ -78,7 +77,7 @@ class UserModel {
     int? gamesWon,
     int? gamesLost,
     int? gamesDraw,
-    Timestamp? lastLoginAt,
+    DateTime? lastLoginAt,
   }) {
     return UserModel(
       uid: uid,
