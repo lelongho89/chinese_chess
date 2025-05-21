@@ -19,16 +19,14 @@ class SocialLoginButtons extends StatelessWidget {
 
   Future<void> _handleGoogleSignIn(BuildContext context) async {
     final authService = Provider.of<SupabaseAuthService>(context, listen: false);
+    final loadingController = MyDialog.loading(context.l10n.loggingIn);
 
     try {
-      // Show loading indicator
-      MyDialog.showLoading(context, message: context.l10n.loggingIn);
-
       // Sign in with Google
       final user = await authService.signInWithGoogle();
 
       // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
+      loadingController.close();
 
       if (user != null) {
         // Call the onLoginSuccess callback
@@ -36,7 +34,7 @@ class SocialLoginButtons extends StatelessWidget {
       }
     } catch (e) {
       // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
+      loadingController.close();
 
       String errorMessage;
       if (e is AuthException) {
@@ -71,16 +69,14 @@ class SocialLoginButtons extends StatelessWidget {
 
   Future<void> _handleFacebookSignIn(BuildContext context) async {
     final authService = Provider.of<SupabaseAuthService>(context, listen: false);
+    final loadingController = MyDialog.loading(context.l10n.loggingIn);
 
     try {
-      // Show loading indicator
-      MyDialog.showLoading(context, message: context.l10n.loggingIn);
-
       // Sign in with Facebook
       final user = await authService.signInWithFacebook();
 
       // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
+      loadingController.close();
 
       if (user != null) {
         // Call the onLoginSuccess callback
@@ -88,7 +84,7 @@ class SocialLoginButtons extends StatelessWidget {
       }
     } catch (e) {
       // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
+      loadingController.close();
 
       String errorMessage;
       if (e is AuthException) {

@@ -54,11 +54,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     final authService = Provider.of<SupabaseAuthService>(context, listen: false);
+    final loadingController = MyDialog.loading(context.l10n.creatingAccount);
 
     try {
-      // Show loading indicator
-      MyDialog.showLoading(context, message: context.l10n.creatingAccount);
-
       // Register with email and password
       final user = await authService.registerWithEmailAndPassword(
         _emailController.text.trim(),
@@ -71,7 +69,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           displayName: _displayNameController.text.trim());
 
         // Hide loading indicator
-        if (context.mounted) Navigator.of(context).pop();
+        loadingController.close();
 
         // Show verification email sent dialog
         if (context.mounted) {
@@ -86,7 +84,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     } catch (e) {
       // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
+      loadingController.close();
 
       String errorMessage;
       if (e is AuthException) {

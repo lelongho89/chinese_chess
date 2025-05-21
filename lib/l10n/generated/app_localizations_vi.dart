@@ -249,10 +249,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get inviteFriend => 'Invite Friend';
 
   @override
-  String get scanQRCode => 'Scan QR Code';
+  String get scanQRCode => 'Quét Mã QR';
 
   @override
-  String get scanQRCodeInstructions => 'Point the camera at a QR code';
+  String get scanQRCodeInstructions => 'Hướng máy ảnh vào mã QR để quét';
 
   @override
   String get scanQRCodeToJoinMatch => 'Scan this QR code to join the match';
@@ -284,19 +284,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get success => 'Success';
 
   @override
-  String get error => 'Error';
+  String get error => 'Lỗi';
 
   @override
-  String get invalidOrExpiredInvitation => 'Invalid or expired invitation';
+  String get invalidOrExpiredInvitation => 'Lời mời không hợp lệ hoặc đã hết hạn';
 
   @override
-  String get invitationAlreadyUsed => 'This invitation has already been used';
+  String get invitationAlreadyUsed => 'Lời mời này đã được sử dụng';
 
   @override
-  String get invitationExpired => 'This invitation has expired';
+  String get invitationExpired => 'Lời mời này đã hết hạn';
 
   @override
-  String get errorProcessingQRCode => 'Error processing QR code';
+  String get errorProcessingQRCode => 'Lỗi khi xử lý mã QR';
 
   @override
   String get errorGeneratingQRCode => 'Error generating QR code';
@@ -315,4 +315,178 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get errorJoiningMatch => 'Error joining match';
+
+  @override
+  String get emailVerification => 'Xác Minh Email';
+
+  @override
+  String get verifyYourEmail => 'Xác Minh Email Của Bạn';
+
+  @override
+  String get verificationEmailSent => 'Đã gửi email xác minh';
+
+  @override
+  String get verificationEmailSentDescription => 'Chúng tôi đã gửi email xác minh đến địa chỉ của bạn. Vui lòng kiểm tra hộp thư đến và nhấp vào liên kết xác minh.';
+
+  @override
+  String get resendVerificationEmail => 'Gửi Lại Email Xác Minh';
+
+  @override
+  String get resendIn => 'Gửi lại trong';
+
+  @override
+  String get seconds => 'giây';
+
+  @override
+  String get failedToSendVerificationEmail => 'Không thể gửi email xác minh';
+
+  @override
+  String get signOut => 'Đăng Xuất';
+
+  @override
+  String get signOutFailed => 'Đăng xuất thất bại';
+
+  @override
+  String get forgotPassword => 'Quên Mật Khẩu';
+
+  @override
+  String get resetPassword => 'Đặt Lại Mật Khẩu';
+
+  @override
+  String get resetPasswordDescription => 'Nhập địa chỉ email của bạn và chúng tôi sẽ gửi cho bạn một liên kết để đặt lại mật khẩu.';
+
+  @override
+  String get sendResetLink => 'Gửi Liên Kết Đặt Lại';
+
+  @override
+  String get sendingResetLink => 'Đang gửi liên kết đặt lại...';
+
+  @override
+  String get resetLinkSent => 'Đã Gửi Liên Kết Đặt Lại';
+
+  @override
+  String get resetLinkSentDescription => 'Kiểm tra email của bạn để tìm liên kết đặt lại mật khẩu. Nếu nó không xuất hiện trong vài phút, hãy kiểm tra thư mục spam của bạn.';
+
+  @override
+  String get resetPasswordFailed => 'Không thể gửi liên kết đặt lại';
+
+  @override
+  String get backToLogin => 'Quay Lại Đăng Nhập';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get emailRequired => 'Email là bắt buộc';
+
+  @override
+  String get invalidEmail => 'Vui lòng nhập địa chỉ email hợp lệ';
+
+  @override
+  String get userNotFound => 'Không tìm thấy người dùng';
+
+  @override
+  String get tooManyRequests => 'Quá nhiều yêu cầu. Vui lòng thử lại sau.';
+
+  @override
+  String get login => 'Đăng Nhập';
+
+  @override
+  String get welcomeBack => 'Chào Mừng Trở Lại';
+
+  @override
+  String get password => 'Mật Khẩu';
+
+  @override
+  String get passwordRequired => 'Mật khẩu là bắt buộc';
+
+  @override
+  String get rememberMe => 'Ghi Nhớ Tôi';
+
+  @override
+  String get dontHaveAccount => 'Chưa có tài khoản?';
+
+  @override
+  String get register => 'Đăng Ký';
+
+  @override
+  String get loggingIn => 'Đang đăng nhập...';
+
+  @override
+  String get loginFailed => 'Đăng nhập thất bại';
+
+  @override
+  String get userDisabled => 'Tài khoản này đã bị vô hiệu hóa';
+
+  @override
+  String get invalidCredentials => 'Email hoặc mật khẩu không hợp lệ';
+
+  @override
+  String get emailNotVerified => 'Vui lòng xác minh địa chỉ email của bạn trước khi đăng nhập. Kiểm tra hộp thư đến của bạn để tìm liên kết xác minh.';
+
+  @override
+  String get verificationRequired => 'Yêu Cầu Xác Minh';
+
+  @override
+  String get createAccount => 'Tạo Tài Khoản';
+
+  @override
+  String get displayName => 'Tên Hiển Thị';
+
+  @override
+  String get displayNameRequired => 'Tên hiển thị là bắt buộc';
+
+  @override
+  String get confirmPassword => 'Xác Nhận Mật Khẩu';
+
+  @override
+  String get confirmPasswordRequired => 'Vui lòng xác nhận mật khẩu của bạn';
+
+  @override
+  String get passwordTooShort => 'Mật khẩu phải có ít nhất 6 ký tự';
+
+  @override
+  String get passwordsDoNotMatch => 'Mật khẩu không khớp';
+
+  @override
+  String get iAgreeToThe => 'Tôi đồng ý với';
+
+  @override
+  String get termsAndConditions => 'Điều Khoản và Điều Kiện';
+
+  @override
+  String get termsAndConditionsText => 'Bằng cách sử dụng ứng dụng này, bạn đồng ý với điều khoản dịch vụ và chính sách bảo mật của chúng tôi.';
+
+  @override
+  String get mustAgreeToTerms => 'Bạn phải đồng ý với điều khoản và điều kiện để đăng ký';
+
+  @override
+  String get alreadyHaveAccount => 'Đã có tài khoản?';
+
+  @override
+  String get creatingAccount => 'Đang tạo tài khoản...';
+
+  @override
+  String get registrationFailed => 'Đăng ký thất bại';
+
+  @override
+  String get emailAlreadyInUse => 'Email này đã được sử dụng';
+
+  @override
+  String get orContinueWith => 'Hoặc tiếp tục với';
+
+  @override
+  String get invalidCredential => 'Thông tin đăng nhập không hợp lệ';
+
+  @override
+  String get accountExistsWithDifferentCredential => 'Đã tồn tại tài khoản với thông tin đăng nhập khác';
+
+  @override
+  String get timerEnabled => 'Đã Bật Bộ Hẹn Giờ';
+
+  @override
+  String get timerDisabled => 'Đã Tắt Bộ Hẹn Giờ';
+
+  @override
+  String get resetTimer => 'Đặt Lại Bộ Hẹn Giờ';
 }

@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../global.dart';
 import '../models/supabase_auth_service.dart';
+import '../supabase_client.dart' as client;
 
 class EmailVerificationScreen extends StatefulWidget {
   final VoidCallback onVerificationComplete;
@@ -74,7 +75,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       }
 
       // Resend verification email
-      await SupabaseClient.instance.auth.resend(
+      await client.SupabaseClientWrapper.instance.auth.resend(
         type: OtpType.email,
         email: email,
       );

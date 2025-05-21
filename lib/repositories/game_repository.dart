@@ -158,7 +158,7 @@ class GameRepository extends SupabaseBaseRepository<GameDataModel> {
       final response = await table
           .select()
           .or('red_player_id.eq.$playerId,black_player_id.eq.$playerId')
-          .is_('ended_at', 'null')
+          .filter('ended_at', 'is', null)
           .order('started_at', ascending: false);
 
       return response.map((record) {
@@ -171,23 +171,21 @@ class GameRepository extends SupabaseBaseRepository<GameDataModel> {
     }
   }
 
-  // Listen to active game
-  Stream<GameDataModel?> listenToActiveGame(String gameId) {
+  // Get active game (renamed from listenToActiveGame)
+  Future<GameDataModel?> getActiveGame(String gameId) async {
     try {
-      return table
+      final response = await table
           .select()
           .eq('id', gameId)
-          .stream()
-          .map((response) {
-            if (response.isNotEmpty) {
-              final record = response.first;
-              final id = record['id'] as String;
-              return fromSupabase(record, id);
-            }
-            return null;
-          });
+          .maybeSingle();
+
+      if (response != null) {
+        final id = response['id'] as String;
+        return fromSupabase(response, id);
+      }
+      return null;
     } catch (e) {
-      logger.severe('Error listening to active game: $e');
+      logger.severe('Error getting active game: $e');
       rethrow;
     }
   }

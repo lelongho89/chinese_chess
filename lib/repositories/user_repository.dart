@@ -2,7 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../global.dart';
 import '../models/user_model.dart';
-import '../supabase_client.dart';
+import '../supabase_client.dart' as client;
 import 'supabase_base_repository.dart';
 
 /// Repository for handling user data in Supabase
@@ -120,26 +120,6 @@ class UserRepository extends SupabaseBaseRepository<UserModel> {
     }
   }
 
-  // Listen to top players by Elo rating
-  Stream<List<UserModel>> listenToTopPlayers({int limit = 10}) {
-    try {
-      return table
-          .select()
-          .order('elo_rating', ascending: false)
-          .limit(limit)
-          .stream()
-          .map((response) {
-            return response.map((record) {
-              final id = record['id'] as String;
-              return fromSupabase(record, id);
-            }).toList();
-          });
-    } catch (e) {
-      logger.severe('Error listening to top players: $e');
-      rethrow;
-    }
-  }
-
   // Search users by display name
   Future<List<UserModel>> searchByDisplayName(String query, {int limit = 10}) async {
     try {
@@ -167,7 +147,7 @@ class UserRepository extends SupabaseBaseRepository<UserModel> {
       if (user == null) return [];
 
       // Get the user's friends from the friends table
-      final response = await SupabaseClient.instance.database
+      final response = await client.SupabaseClientWrapper.instance.database
           .from('friends')
           .select('friend_id')
           .eq('user_id', uid);
@@ -181,7 +161,7 @@ class UserRepository extends SupabaseBaseRepository<UserModel> {
       // Get all friends in a single batch
       final friendsResponse = await table
           .select()
-          .in_('id', friendIds);
+          .filter('id', 'in', friendIds);
 
       return friendsResponse.map((record) {
         final id = record['id'] as String;
@@ -197,7 +177,7 @@ class UserRepository extends SupabaseBaseRepository<UserModel> {
   Future<void> addFriend(String uid, String friendId) async {
     try {
       // Check if the friendship already exists
-      final existingFriendship = await SupabaseClient.instance.database
+      final existingFriendship = await client.SupabaseClientWrapper.instance.database
           .from('friends')
           .select()
           .eq('user_id', uid)
@@ -206,7 +186,7 @@ class UserRepository extends SupabaseBaseRepository<UserModel> {
 
       if (existingFriendship == null) {
         // Add friend to user's friend list
-        await SupabaseClient.instance.database
+        await client.SupabaseClientWrapper.instance.database
             .from('friends')
             .insert({
               'user_id': uid,
@@ -226,7 +206,7 @@ class UserRepository extends SupabaseBaseRepository<UserModel> {
   Future<void> removeFriend(String uid, String friendId) async {
     try {
       // Remove friend from user's friend list
-      await SupabaseClient.instance.database
+      await client.SupabaseClientWrapper.instance.database
           .from('friends')
           .delete()
           .eq('user_id', uid)

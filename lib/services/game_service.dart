@@ -149,8 +149,8 @@ class GameService {
     }
   }
 
-  // Listen to a game
-  Stream<GameDataModel?> listenToGame(String gameId) {
-    return GameRepository.instance.listenToActiveGame(gameId);
+  // Get game data (renamed from listenToGame)
+  Future<GameDataModel?> getGameData(String gameId) {
+    return GameRepository.instance.getActiveGame(gameId);
   }
 }

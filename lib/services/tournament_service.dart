@@ -416,13 +416,13 @@ class TournamentService {
     }
   }
 
-  // Listen to tournament
-  Stream<TournamentModel?> listenToTournament(String tournamentId) {
-    return TournamentRepository.instance.listenToTournament(tournamentId);
+  // Get tournament details (renamed from listenToTournament)
+  Future<TournamentModel?> getTournamentDetails(String tournamentId) {
+    return TournamentRepository.instance.getTournamentDetails(tournamentId);
   }
 
-  // Listen to match
-  Stream<MatchModel?> listenToMatch(String matchId) {
-    return MatchRepository.instance.listenToMatch(matchId);
+  // Get match details (renamed from listenToMatch)
+  Future<MatchModel?> getMatchDetails(String matchId) {
+    return MatchRepository.instance.getMatchDetails(matchId);
   }
 }

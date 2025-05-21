@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:provider/provider.dart';
 import 'package:shirne_dialog/shirne_dialog.dart';
 
@@ -12,7 +11,7 @@ import 'models/game_manager.dart';
 import 'models/game_setting.dart';
 import 'models/locale_provider.dart';
 import 'screens/auth_wrapper.dart';
-import 'supabase_client.dart';
+import 'supabase_client.dart' as client;
 import 'widgets/game_wrapper.dart';
 import 'game_board.dart';
 
@@ -24,7 +23,7 @@ void main() async {
 
   // Initialize Supabase
   try {
-    await SupabaseClient.initialize();
+    await client.SupabaseClientWrapper.initialize();
     logger.info('Supabase initialized successfully');
   } catch (e) {
     logger.severe('Failed to initialize Supabase: $e');
@@ -40,14 +39,12 @@ void main() async {
   final authService = await SupabaseAuthService.getInstance();
 
   runApp(
-    ProviderScope(
-      child: MultiProvider(
-        providers: [
-          ChangeNotifierProvider.value(value: localeProvider),
-          ChangeNotifierProvider.value(value: authService),
-        ],
-        child: const MainApp(),
-      ),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: localeProvider),
+        ChangeNotifierProvider.value(value: authService),
+      ],
+      child: const MainApp(),
     ),
   );
 }

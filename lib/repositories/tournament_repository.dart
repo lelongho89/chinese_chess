@@ -206,23 +206,21 @@ class TournamentRepository extends SupabaseBaseRepository<TournamentModel> {
     }
   }
 
-  // Listen to tournament
-  Stream<TournamentModel?> listenToTournament(String tournamentId) {
+  // Get tournament details (renamed from listenToTournament)
+  Future<TournamentModel?> getTournamentDetails(String tournamentId) async {
     try {
-      return table
+      final response = await table
           .select()
           .eq('id', tournamentId)
-          .stream()
-          .map((response) {
-            if (response.isNotEmpty) {
-              final record = response.first;
-              final id = record['id'] as String;
-              return fromSupabase(record, id);
-            }
-            return null;
-          });
+          .maybeSingle();
+
+      if (response != null) {
+        final id = response['id'] as String;
+        return fromSupabase(response, id);
+      }
+      return null;
     } catch (e) {
-      logger.severe('Error listening to tournament: $e');
+      logger.severe('Error getting tournament details: $e');
       rethrow;
     }
   }

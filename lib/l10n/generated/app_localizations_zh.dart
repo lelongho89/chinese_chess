@@ -249,10 +249,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get inviteFriend => 'Invite Friend';
 
   @override
-  String get scanQRCode => 'Scan QR Code';
+  String get scanQRCode => '扫描二维码';
 
   @override
-  String get scanQRCodeInstructions => 'Point the camera at a QR code';
+  String get scanQRCodeInstructions => '将相机对准二维码进行扫描';
 
   @override
   String get scanQRCodeToJoinMatch => 'Scan this QR code to join the match';
@@ -284,19 +284,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get success => 'Success';
 
   @override
-  String get error => 'Error';
+  String get error => '错误';
 
   @override
-  String get invalidOrExpiredInvitation => 'Invalid or expired invitation';
+  String get invalidOrExpiredInvitation => '无效或已过期的邀请';
 
   @override
-  String get invitationAlreadyUsed => 'This invitation has already been used';
+  String get invitationAlreadyUsed => '此邀请已被使用';
 
   @override
-  String get invitationExpired => 'This invitation has expired';
+  String get invitationExpired => '此邀请已过期';
 
   @override
-  String get errorProcessingQRCode => 'Error processing QR code';
+  String get errorProcessingQRCode => '处理二维码时出错';
 
   @override
   String get errorGeneratingQRCode => 'Error generating QR code';
@@ -315,4 +315,178 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get errorJoiningMatch => 'Error joining match';
+
+  @override
+  String get emailVerification => '邮箱验证';
+
+  @override
+  String get verifyYourEmail => '验证您的邮箱';
+
+  @override
+  String get verificationEmailSent => '验证邮件已发送';
+
+  @override
+  String get verificationEmailSentDescription => '我们已向您的邮箱发送了验证邮件。请检查您的收件箱并点击验证链接。';
+
+  @override
+  String get resendVerificationEmail => '重新发送验证邮件';
+
+  @override
+  String get resendIn => '重新发送倒计时';
+
+  @override
+  String get seconds => '秒';
+
+  @override
+  String get failedToSendVerificationEmail => '发送验证邮件失败';
+
+  @override
+  String get signOut => '退出登录';
+
+  @override
+  String get signOutFailed => '退出登录失败';
+
+  @override
+  String get forgotPassword => '忘记密码';
+
+  @override
+  String get resetPassword => '重置密码';
+
+  @override
+  String get resetPasswordDescription => '输入您的电子邮件地址，我们将向您发送重置密码的链接。';
+
+  @override
+  String get sendResetLink => '发送重置链接';
+
+  @override
+  String get sendingResetLink => '正在发送重置链接...';
+
+  @override
+  String get resetLinkSent => '重置链接已发送';
+
+  @override
+  String get resetLinkSentDescription => '请检查您的电子邮件以获取重置密码的链接。如果几分钟内没有收到，请检查您的垃圾邮件文件夹。';
+
+  @override
+  String get resetPasswordFailed => '发送重置链接失败';
+
+  @override
+  String get backToLogin => '返回登录';
+
+  @override
+  String get email => '电子邮件';
+
+  @override
+  String get emailRequired => '电子邮件是必填项';
+
+  @override
+  String get invalidEmail => '请输入有效的电子邮件地址';
+
+  @override
+  String get userNotFound => '用户不存在';
+
+  @override
+  String get tooManyRequests => '请求过多。请稍后再试。';
+
+  @override
+  String get login => '登录';
+
+  @override
+  String get welcomeBack => '欢迎回来';
+
+  @override
+  String get password => '密码';
+
+  @override
+  String get passwordRequired => '密码是必填项';
+
+  @override
+  String get rememberMe => '记住我';
+
+  @override
+  String get dontHaveAccount => '没有账号？';
+
+  @override
+  String get register => '注册';
+
+  @override
+  String get loggingIn => '正在登录...';
+
+  @override
+  String get loginFailed => '登录失败';
+
+  @override
+  String get userDisabled => '此账号已被禁用';
+
+  @override
+  String get invalidCredentials => '邮箱或密码无效';
+
+  @override
+  String get emailNotVerified => '请在登录前验证您的电子邮件地址。检查您的收件箱以获取验证链接。';
+
+  @override
+  String get verificationRequired => '需要验证';
+
+  @override
+  String get createAccount => '创建账号';
+
+  @override
+  String get displayName => '显示名称';
+
+  @override
+  String get displayNameRequired => '显示名称是必填项';
+
+  @override
+  String get confirmPassword => '确认密码';
+
+  @override
+  String get confirmPasswordRequired => '请确认您的密码';
+
+  @override
+  String get passwordTooShort => '密码必须至少6个字符';
+
+  @override
+  String get passwordsDoNotMatch => '密码不匹配';
+
+  @override
+  String get iAgreeToThe => '我同意';
+
+  @override
+  String get termsAndConditions => '条款和条件';
+
+  @override
+  String get termsAndConditionsText => '使用本应用程序，即表示您同意我们的服务条款和隐私政策。';
+
+  @override
+  String get mustAgreeToTerms => '您必须同意条款和条件才能注册';
+
+  @override
+  String get alreadyHaveAccount => '已有账号？';
+
+  @override
+  String get creatingAccount => '正在创建账号...';
+
+  @override
+  String get registrationFailed => '注册失败';
+
+  @override
+  String get emailAlreadyInUse => '此电子邮件已被使用';
+
+  @override
+  String get orContinueWith => '或继续使用';
+
+  @override
+  String get invalidCredential => '无效的凭证';
+
+  @override
+  String get accountExistsWithDifferentCredential => '已存在使用不同凭证的账号';
+
+  @override
+  String get timerEnabled => '计时器已启用';
+
+  @override
+  String get timerDisabled => '计时器已禁用';
+
+  @override
+  String get resetTimer => '重置计时器';
 }

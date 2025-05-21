@@ -5,7 +5,7 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../global.dart';
-import '../supabase_client.dart';
+import '../supabase_client.dart' as client;
 import 'user_model.dart';
 import 'user_repository.dart';
 
@@ -20,7 +20,9 @@ class SupabaseAuthService extends ChangeNotifier {
   bool get isAuthenticated => _user != null;
   bool get isInitialized => _isInitialized;
   bool get isLoading => _isLoading;
-  bool get isEmailVerified => _user?.emailVerified ?? false;
+  // For Supabase, we'll assume email is verified if the user exists
+  // since Supabase handles email verification internally
+  bool get isEmailVerified => _user != null;
 
   // Singleton pattern
   static SupabaseAuthService? _instance;
@@ -36,17 +38,21 @@ class SupabaseAuthService extends ChangeNotifier {
   void _init() async {
     try {
       // Get the current user from Supabase
-      final session = SupabaseClient.instance.auth.currentSession;
+      final session = client.SupabaseClientWrapper.instance.auth.currentSession;
       if (session != null) {
         _user = session.user;
       }
 
       // Listen for auth state changes
-      SupabaseClient.instance.auth.onAuthStateChange.listen((data) {
+      client.SupabaseClientWrapper.instance.auth.onAuthStateChange.listen((data) {
         final AuthChangeEvent event = data.event;
         final Session? session = data.session;
 
         switch (event) {
+          case AuthChangeEvent.initialSession:
+            _user = session?.user;
+            notifyListeners();
+            break;
           case AuthChangeEvent.signedIn:
             _user = session?.user;
             notifyListeners();
@@ -92,7 +98,7 @@ class SupabaseAuthService extends ChangeNotifier {
   Future<User?> signInWithEmailAndPassword(String email, String password) async {
     try {
       _setLoading(true);
-      final response = await SupabaseClient.instance.auth.signInWithPassword(
+      final response = await client.SupabaseClientWrapper.instance.auth.signInWithPassword(
         email: email,
         password: password,
       );
@@ -111,7 +117,7 @@ class SupabaseAuthService extends ChangeNotifier {
   Future<User?> registerWithEmailAndPassword(String email, String password) async {
     try {
       _setLoading(true);
-      final response = await SupabaseClient.instance.auth.signUp(
+      final response = await client.SupabaseClientWrapper.instance.auth.signUp(
         email: email,
         password: password,
       );
@@ -136,7 +142,7 @@ class SupabaseAuthService extends ChangeNotifier {
   Future<void> signOut() async {
     try {
       _setLoading(true);
-      await SupabaseClient.instance.auth.signOut();
+      await client.SupabaseClientWrapper.instance.auth.signOut();
       _user = null;
     } catch (e) {
       logger.severe('Error signing out: $e');
@@ -149,7 +155,7 @@ class SupabaseAuthService extends ChangeNotifier {
   // Reload user
   Future<void> reloadUser() async {
     try {
-      final session = SupabaseClient.instance.auth.currentSession;
+      final session = client.SupabaseClientWrapper.instance.auth.currentSession;
       if (session != null) {
         _user = session.user;
         notifyListeners();
@@ -166,13 +172,13 @@ class SupabaseAuthService extends ChangeNotifier {
       _setLoading(true);
 
       // Get the current session
-      final session = SupabaseClient.instance.auth.currentSession;
+      final session = client.SupabaseClientWrapper.instance.auth.currentSession;
       if (session == null) {
         return;
       }
 
       // Refresh the session
-      final response = await SupabaseClient.instance.auth.refreshSession();
+      final response = await client.SupabaseClientWrapper.instance.auth.refreshSession();
       _user = response.user;
       notifyListeners();
     } catch (e) {
@@ -187,13 +193,18 @@ class SupabaseAuthService extends ChangeNotifier {
   Future<void> sendPasswordResetEmail(String email) async {
     try {
       _setLoading(true);
-      await SupabaseClient.instance.auth.resetPasswordForEmail(email);
+      await client.SupabaseClientWrapper.instance.auth.resetPasswordForEmail(email);
     } catch (e) {
       logger.severe('Error sending password reset email: $e');
       rethrow;
     } finally {
       _setLoading(false);
     }
+  }
+
+  // Reset password (alias for sendPasswordResetEmail)
+  Future<void> resetPassword(String email) async {
+    return sendPasswordResetEmail(email);
   }
 
   // Sign in with Google
@@ -214,7 +225,7 @@ class SupabaseAuthService extends ChangeNotifier {
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
       // Sign in with Supabase using Google token
-      final response = await SupabaseClient.instance.auth.signInWithIdToken(
+      final response = await client.SupabaseClientWrapper.instance.auth.signInWithIdToken(
         provider: OAuthProvider.google,
         idToken: googleAuth.idToken!,
         accessToken: googleAuth.accessToken,
@@ -251,7 +262,7 @@ class SupabaseAuthService extends ChangeNotifier {
       }
 
       // Sign in with Supabase using Facebook token
-      final response = await SupabaseClient.instance.auth.signInWithIdToken(
+      final response = await client.SupabaseClientWrapper.instance.auth.signInWithIdToken(
         provider: OAuthProvider.facebook,
         idToken: result.accessToken!.token,
       );

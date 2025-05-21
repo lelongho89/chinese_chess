@@ -161,23 +161,21 @@ class MatchRepository extends SupabaseBaseRepository<MatchModel> {
     }
   }
 
-  // Listen to match
-  Stream<MatchModel?> listenToMatch(String matchId) {
+  // Get match details (renamed from listenToMatch)
+  Future<MatchModel?> getMatchDetails(String matchId) async {
     try {
-      return table
+      final response = await table
           .select()
           .eq('id', matchId)
-          .stream()
-          .map((response) {
-            if (response.isNotEmpty) {
-              final record = response.first;
-              final id = record['id'] as String;
-              return fromSupabase(record, id);
-            }
-            return null;
-          });
+          .maybeSingle();
+
+      if (response != null) {
+        final id = response['id'] as String;
+        return fromSupabase(response, id);
+      }
+      return null;
     } catch (e) {
-      logger.severe('Error listening to match: $e');
+      logger.severe('Error getting match details: $e');
       rethrow;
     }
   }

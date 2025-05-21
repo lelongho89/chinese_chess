@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:fast_gbk/fast_gbk.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:flutter_document_picker/flutter_document_picker.dart';
 import 'package:shirne_dialog/shirne_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -342,30 +342,23 @@ class GameBoardState extends State<GameBoard> {
 
   Future<void> loadFile() async {
     try {
-      // Updated for file_picker 6.1.1
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pgn', 'PGN'],
-        withData: true,
+      // Use flutter_document_picker instead of file_picker
+      final filePath = await FlutterDocumentPicker.openDocument(
+        params: FlutterDocumentPickerParams(
+          allowedFileExtensions: ['pgn', 'PGN'],
+          allowedMimeTypes: ['application/octet-stream'],
+        ),
       );
 
-      if (result != null && result.files.isNotEmpty) {
-        final file = result.files.first;
-        if (file.bytes != null) {
-          String content = gbk.decode(file.bytes!);
-          if (gamer.isStop) {
-            gamer.newGame();
-          }
-          gamer.loadPGN(content);
-        } else if (file.path != null) {
-          // Handle file path if bytes are not available
-          final fileData = await File(file.path!).readAsBytes();
-          String content = gbk.decode(fileData);
-          if (gamer.isStop) {
-            gamer.newGame();
-          }
-          gamer.loadPGN(content);
+      if (filePath != null) {
+        // Read the file data
+        final fileData = await File(filePath).readAsBytes();
+        String content = gbk.decode(fileData);
+
+        if (gamer.isStop) {
+          gamer.newGame();
         }
+        gamer.loadPGN(content);
       } else {
         // User canceled the picker
       }

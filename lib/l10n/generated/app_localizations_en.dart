@@ -252,7 +252,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanQRCode => 'Scan QR Code';
 
   @override
-  String get scanQRCodeInstructions => 'Point the camera at a QR code';
+  String get scanQRCodeInstructions => 'Point the camera at a QR code to scan it';
 
   @override
   String get scanQRCodeToJoinMatch => 'Scan this QR code to join the match';
@@ -315,4 +315,178 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorJoiningMatch => 'Error joining match';
+
+  @override
+  String get emailVerification => 'Email Verification';
+
+  @override
+  String get verifyYourEmail => 'Verify Your Email';
+
+  @override
+  String get verificationEmailSent => 'Verification email sent';
+
+  @override
+  String get verificationEmailSentDescription => 'We\'ve sent a verification email to your address. Please check your inbox and click the verification link.';
+
+  @override
+  String get resendVerificationEmail => 'Resend Verification Email';
+
+  @override
+  String get resendIn => 'Resend in';
+
+  @override
+  String get seconds => 'seconds';
+
+  @override
+  String get failedToSendVerificationEmail => 'Failed to send verification email';
+
+  @override
+  String get signOut => 'Sign Out';
+
+  @override
+  String get signOutFailed => 'Sign out failed';
+
+  @override
+  String get forgotPassword => 'Forgot Password';
+
+  @override
+  String get resetPassword => 'Reset Password';
+
+  @override
+  String get resetPasswordDescription => 'Enter your email address and we\'ll send you a link to reset your password.';
+
+  @override
+  String get sendResetLink => 'Send Reset Link';
+
+  @override
+  String get sendingResetLink => 'Sending reset link...';
+
+  @override
+  String get resetLinkSent => 'Reset Link Sent';
+
+  @override
+  String get resetLinkSentDescription => 'Check your email for a link to reset your password. If it doesn\'t appear within a few minutes, check your spam folder.';
+
+  @override
+  String get resetPasswordFailed => 'Failed to send reset link';
+
+  @override
+  String get backToLogin => 'Back to Login';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get emailRequired => 'Email is required';
+
+  @override
+  String get invalidEmail => 'Please enter a valid email address';
+
+  @override
+  String get userNotFound => 'User not found';
+
+  @override
+  String get tooManyRequests => 'Too many requests. Please try again later.';
+
+  @override
+  String get login => 'Login';
+
+  @override
+  String get welcomeBack => 'Welcome Back';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get passwordRequired => 'Password is required';
+
+  @override
+  String get rememberMe => 'Remember Me';
+
+  @override
+  String get dontHaveAccount => 'Don\'t have an account?';
+
+  @override
+  String get register => 'Register';
+
+  @override
+  String get loggingIn => 'Logging in...';
+
+  @override
+  String get loginFailed => 'Login failed';
+
+  @override
+  String get userDisabled => 'This account has been disabled';
+
+  @override
+  String get invalidCredentials => 'Invalid email or password';
+
+  @override
+  String get emailNotVerified => 'Please verify your email address before logging in. Check your inbox for a verification link.';
+
+  @override
+  String get verificationRequired => 'Verification Required';
+
+  @override
+  String get createAccount => 'Create Account';
+
+  @override
+  String get displayName => 'Display Name';
+
+  @override
+  String get displayNameRequired => 'Display name is required';
+
+  @override
+  String get confirmPassword => 'Confirm Password';
+
+  @override
+  String get confirmPasswordRequired => 'Please confirm your password';
+
+  @override
+  String get passwordTooShort => 'Password must be at least 6 characters';
+
+  @override
+  String get passwordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get iAgreeToThe => 'I agree to the';
+
+  @override
+  String get termsAndConditions => 'Terms and Conditions';
+
+  @override
+  String get termsAndConditionsText => 'By using this app, you agree to our terms of service and privacy policy.';
+
+  @override
+  String get mustAgreeToTerms => 'You must agree to the terms and conditions to register';
+
+  @override
+  String get alreadyHaveAccount => 'Already have an account?';
+
+  @override
+  String get creatingAccount => 'Creating account...';
+
+  @override
+  String get registrationFailed => 'Registration failed';
+
+  @override
+  String get emailAlreadyInUse => 'This email is already in use';
+
+  @override
+  String get orContinueWith => 'Or continue with';
+
+  @override
+  String get invalidCredential => 'Invalid credential';
+
+  @override
+  String get accountExistsWithDifferentCredential => 'An account already exists with a different credential';
+
+  @override
+  String get timerEnabled => 'Timer Enabled';
+
+  @override
+  String get timerDisabled => 'Timer Disabled';
+
+  @override
+  String get resetTimer => 'Reset Timer';
 }

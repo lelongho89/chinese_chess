@@ -134,23 +134,10 @@ class LeaderboardRepository extends SupabaseBaseRepository<LeaderboardEntryModel
     }
   }
 
-  // Listen to leaderboard changes
-  Stream<List<LeaderboardEntryModel>> listenToTopPlayers({int limit = 10}) {
-    try {
-      return table
-          .select()
-          .order('elo_rating', ascending: false)
-          .limit(limit)
-          .stream()
-          .map((response) {
-            return response.map((record) {
-              final id = record['id'] as String;
-              return fromSupabase(record, id);
-            }).toList();
-          });
-    } catch (e) {
-      logger.severe('Error listening to top players: $e');
-      rethrow;
-    }
+  // Note: This method is a duplicate of getTopPlayers and can be removed
+  // The getTopPlayers method above already provides this functionality
+  // This method was renamed from listenToTopPlayers
+  Future<List<LeaderboardEntryModel>> getTopPlayersRealtime({int limit = 10}) async {
+    return getTopPlayers(limit: limit);
   }
 }

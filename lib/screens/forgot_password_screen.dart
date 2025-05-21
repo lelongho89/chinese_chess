@@ -32,16 +32,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final authService = Provider.of<SupabaseAuthService>(context, listen: false);
+    final loadingController = MyDialog.loading(context.l10n.sendingResetLink);
 
     try {
-      // Show loading indicator
-      MyDialog.showLoading(context, message: context.l10n.sendingResetLink);
-
       // Send password reset email
       await authService.resetPassword(_emailController.text.trim());
 
       // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
+      loadingController.close();
 
       // Show success dialog
       if (context.mounted) {
@@ -54,7 +52,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       }
     } catch (e) {
       // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
+      loadingController.close();
 
       String errorMessage;
       if (e is AuthException) {

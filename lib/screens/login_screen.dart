@@ -42,11 +42,9 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final authService = Provider.of<SupabaseAuthService>(context, listen: false);
+    final loadingController = MyDialog.loading(context.l10n.loggingIn);
 
     try {
-      // Show loading indicator
-      MyDialog.showLoading(context, message: context.l10n.loggingIn);
-
       // Sign in with email and password
       final user = await authService.signInWithEmailAndPassword(
         _emailController.text.trim(),
@@ -54,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
+      loadingController.close();
 
       if (user != null) {
         // Update last login time
@@ -76,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
+      loadingController.close();
 
       String errorMessage;
       if (e is AuthException) {
