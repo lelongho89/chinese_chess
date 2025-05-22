@@ -12,6 +12,7 @@ class UserModel {
   final int gamesDraw;
   final DateTime createdAt;
   final DateTime lastLoginAt;
+  final bool isAnonymous;
 
   UserModel({
     required this.uid,
@@ -24,6 +25,7 @@ class UserModel {
     this.gamesDraw = 0,
     required this.createdAt,
     required this.lastLoginAt,
+    this.isAnonymous = false,
   });
 
   // Create a UserModel from a Supabase User
@@ -35,6 +37,20 @@ class UserModel {
       displayName: user.userMetadata?['name'] ?? user.email?.split('@').first ?? 'User',
       createdAt: now,
       lastLoginAt: now,
+      isAnonymous: user.isAnonymous,
+    );
+  }
+
+  // Create a UserModel from a Supabase User with custom display name (for anonymous users)
+  factory UserModel.fromSupabaseUserWithDisplayName(User user, String displayName) {
+    final now = DateTime.now();
+    return UserModel(
+      uid: user.id,
+      email: user.email ?? '',
+      displayName: displayName,
+      createdAt: now,
+      lastLoginAt: now,
+      isAnonymous: user.isAnonymous,
     );
   }
 
@@ -51,6 +67,7 @@ class UserModel {
       gamesDraw: data['games_draw'] ?? 0,
       createdAt: DateTime.parse(data['created_at'] ?? DateTime.now().toIso8601String()),
       lastLoginAt: DateTime.parse(data['last_login_at'] ?? DateTime.now().toIso8601String()),
+      isAnonymous: data['is_anonymous'] ?? false,
     );
   }
 
@@ -66,22 +83,25 @@ class UserModel {
       'games_draw': gamesDraw,
       'created_at': createdAt.toIso8601String(),
       'last_login_at': lastLoginAt.toIso8601String(),
+      'is_anonymous': isAnonymous,
     };
   }
 
   // Create a copy of UserModel with updated fields
   UserModel copyWith({
     String? displayName,
+    String? email,
     int? eloRating,
     int? gamesPlayed,
     int? gamesWon,
     int? gamesLost,
     int? gamesDraw,
     DateTime? lastLoginAt,
+    bool? isAnonymous,
   }) {
     return UserModel(
       uid: uid,
-      email: email,
+      email: email ?? this.email,
       displayName: displayName ?? this.displayName,
       eloRating: eloRating ?? this.eloRating,
       gamesPlayed: gamesPlayed ?? this.gamesPlayed,
@@ -90,6 +110,7 @@ class UserModel {
       gamesDraw: gamesDraw ?? this.gamesDraw,
       createdAt: createdAt,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
+      isAnonymous: isAnonymous ?? this.isAnonymous,
     );
   }
 }

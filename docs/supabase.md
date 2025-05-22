@@ -22,6 +22,7 @@ CREATE TABLE users (
   games_won INTEGER DEFAULT 0,
   games_lost INTEGER DEFAULT 0,
   games_draw INTEGER DEFAULT 0,
+  is_anonymous BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   last_login_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

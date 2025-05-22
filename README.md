@@ -33,11 +33,41 @@ cd chinese_chess
 flutter pub get
 ```
 
-4. Run the app
+4. Set up environment variables
+Create a `.env` file in the root directory with your Supabase credentials:
+```
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+5. Generate localization files
+```bash
+flutter gen-l10n
+```
+
+6. Run the app
 ```bash
 flutter run
 ```
 
+## Features
+
+### Authentication
+- **Anonymous Authentication**: Users can start playing immediately without registration
+- **Email/Password Authentication**: Traditional registration and login
+- **Social Authentication**: Google and Facebook sign-in
+- **Account Conversion**: Anonymous users can convert to permanent accounts
+
+### Game Modes
+- **Robot Mode**: Play against AI with adjustable difficulty levels
+- **Free Mode**: Practice mode for studying positions
+- **Online Mode**: Multiplayer functionality (coming soon)
+
+### User Features
+- **Profile Management**: Update display names and view statistics
+- **Guest Mode**: Play without creating an account
+- **Progress Tracking**: Game statistics and Elo ratings
+- **Customization**: Board themes and sound settings
 
 ## References
 * [ECCO](https://www.xqbase.com/ecco/ecco_contents.htm#ecco_a)

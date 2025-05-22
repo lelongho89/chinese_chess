@@ -107,6 +107,36 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _continueAsGuest() async {
+    final authService = Provider.of<SupabaseAuthService>(context, listen: false);
+    final loadingController = MyDialog.loading(context.l10n.loggingIn);
+
+    try {
+      // Sign in anonymously
+      final user = await authService.signInAnonymously();
+
+      // Hide loading indicator
+      loadingController.close();
+
+      if (user != null) {
+        // Call the onLoginSuccess callback
+        widget.onLoginSuccess();
+      }
+    } catch (e) {
+      // Hide loading indicator
+      loadingController.close();
+
+      String errorMessage = '${context.l10n.loginFailed}: $e';
+
+      if (context.mounted) {
+        MyDialog.alert(
+          errorMessage,
+          title: context.l10n.error,
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -226,6 +256,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                     child: Text(context.l10n.login),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Continue as Guest button
+                  OutlinedButton(
+                    onPressed: _continueAsGuest,
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(context.l10n.continueAsGuest),
                   ),
                   const SizedBox(height: 16),
 

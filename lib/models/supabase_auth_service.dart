@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -23,6 +24,8 @@ class SupabaseAuthService extends ChangeNotifier {
   // For Supabase, we'll assume email is verified if the user exists
   // since Supabase handles email verification internally
   bool get isEmailVerified => _user != null;
+  // Check if the current user is anonymous
+  bool get isAnonymous => _user?.isAnonymous ?? false;
 
   // Singleton pattern
   static SupabaseAuthService? _instance;
@@ -132,6 +135,74 @@ class SupabaseAuthService extends ChangeNotifier {
       return _user;
     } catch (e) {
       logger.severe('Error registering: $e');
+      rethrow;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // Sign in anonymously
+  Future<User?> signInAnonymously() async {
+    try {
+      _setLoading(true);
+      final response = await client.SupabaseClientWrapper.instance.auth.signInAnonymously();
+
+      _user = response.user;
+
+      // Create user in database with random display name
+      if (_user != null) {
+        await UserRepository.instance.createAnonymousUser(_user!, _generateRandomDisplayName());
+      }
+
+      return _user;
+    } catch (e) {
+      logger.severe('Error signing in anonymously: $e');
+      rethrow;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // Generate a random display name for anonymous users
+  String _generateRandomDisplayName() {
+    final random = Random();
+    final adjectives = ['Swift', 'Clever', 'Brave', 'Wise', 'Bold', 'Quick', 'Sharp', 'Smart'];
+    final nouns = ['Player', 'Master', 'Knight', 'Warrior', 'Champion', 'Strategist', 'General', 'Scholar'];
+    final numbers = random.nextInt(9999).toString().padLeft(4, '0');
+
+    final adjective = adjectives[random.nextInt(adjectives.length)];
+    final noun = nouns[random.nextInt(nouns.length)];
+
+    return '$adjective$noun$numbers';
+  }
+
+  // Convert anonymous user to permanent account
+  Future<User?> convertAnonymousUser(String email, String password) async {
+    if (!isAnonymous) {
+      throw Exception('User is not anonymous');
+    }
+
+    try {
+      _setLoading(true);
+
+      // Link email/password to the anonymous account
+      final response = await client.SupabaseClientWrapper.instance.auth.updateUser(
+        UserAttributes(
+          email: email,
+          password: password,
+        ),
+      );
+
+      _user = response.user;
+
+      // Update user in database
+      if (_user != null) {
+        await UserRepository.instance.convertAnonymousUser(_user!);
+      }
+
+      return _user;
+    } catch (e) {
+      logger.severe('Error converting anonymous user: $e');
       rethrow;
     } finally {
       _setLoading(false);

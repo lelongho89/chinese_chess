@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:fast_gbk/fast_gbk.dart';
 import 'package:flutter_document_picker/flutter_document_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:shirne_dialog/shirne_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,8 @@ import 'global.dart';
 import 'setting.dart';
 import 'components/game_bottom_bar.dart';
 import 'models/play_mode.dart';
+import 'models/supabase_auth_service.dart';
+import 'screens/profile_screen.dart';
 import 'widgets/game_wrapper.dart';
 import 'models/game_manager.dart';
 import 'components/play.dart';
@@ -236,6 +239,28 @@ class GameBoardState extends State<GameBoard> {
               onTap: () {
                 Navigator.pop(context);
                 MatchInvitationHandler.instance.showQRScanner(context);
+              },
+            ),
+            // Profile option - only show if user is authenticated
+            Consumer<SupabaseAuthService>(
+              builder: (context, authService, _) {
+                if (authService.isAuthenticated) {
+                  return ListTile(
+                    leading: const Icon(Icons.person),
+                    title: Text(context.l10n.profile),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => const ProfileScreen(),
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  return const SizedBox.shrink();
+                }
               },
             ),
             ListTile(

@@ -59,6 +59,33 @@ class UserRepository extends SupabaseBaseRepository<UserModel> {
     }
   }
 
+  // Create an anonymous user in Supabase
+  Future<void> createAnonymousUser(User supabaseUser, String displayName) async {
+    try {
+      final userModel = UserModel.fromSupabaseUserWithDisplayName(supabaseUser, displayName);
+      await set(supabaseUser.id, userModel);
+      logger.info('Anonymous user created in Supabase: ${supabaseUser.id}');
+    } catch (e) {
+      logger.severe('Error creating anonymous user in Supabase: $e');
+      rethrow;
+    }
+  }
+
+  // Convert anonymous user to permanent account
+  Future<void> convertAnonymousUser(User supabaseUser) async {
+    try {
+      await update(supabaseUser.id, {
+        'email': supabaseUser.email ?? '',
+        'is_anonymous': false,
+        'last_login_at': DateTime.now().toIso8601String(),
+      });
+      logger.info('Anonymous user converted to permanent account: ${supabaseUser.id}');
+    } catch (e) {
+      logger.severe('Error converting anonymous user: $e');
+      rethrow;
+    }
+  }
+
   // Get a user from Supabase
   Future<UserModel?> getUser(String uid) async {
     return get(uid);
