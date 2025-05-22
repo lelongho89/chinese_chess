@@ -28,21 +28,11 @@ class PlayPageState extends State<PlayPage> {
   final GameManager gamer = GameManager.instance;
   late final GameTimerManager timerManager;
   bool inited = false;
+  bool isInitializing = true;
 
   @override
   void initState() {
     super.initState();
-    // Initialize the timer manager
-    timerManager = GameTimerManager(
-      gameManager: gamer,
-      initialTimeSeconds: 180, // 3 minutes
-      incrementSeconds: 2,     // 2 seconds per move
-    );
-
-    // Listen for timer expiration
-    timerManager.redTimer.addListener(_checkRedTimer);
-    timerManager.blackTimer.addListener(_checkBlackTimer);
-
     initGame();
   }
 
@@ -61,26 +51,82 @@ class PlayPageState extends State<PlayPage> {
   }
 
   void initGame() async {
-    logger.info('初始化游戏 $inited');
+    logger.info('PlayPage: 初始化游戏 $inited');
     if (inited) return;
-    inited = true;
-    gamer.newGame(amyType: DriverType.robot);
 
-    // Reset timers for new game
-    timerManager.startNewGame();
+    try {
+      logger.info('PlayPage: Ensuring GameManager is initialized...');
+      // Ensure GameManager is initialized first
+      final initResult = await gamer.init();
+      if (!initResult) {
+        throw Exception('GameManager initialization failed');
+      }
+
+      logger.info('PlayPage: Creating timer manager...');
+      // Initialize the timer manager after GameManager is ready
+      timerManager = GameTimerManager(
+        gameManager: gamer,
+        initialTimeSeconds: 180, // 3 minutes
+        incrementSeconds: 2,     // 2 seconds per move
+      );
+
+      logger.info('PlayPage: Setting up timer listeners...');
+      // Listen for timer expiration
+      timerManager.redTimer.addListener(_checkRedTimer);
+      timerManager.blackTimer.addListener(_checkBlackTimer);
+
+      logger.info('PlayPage: Starting new game...');
+      inited = true;
+      gamer.newGame(amyType: DriverType.robot);
+
+      logger.info('PlayPage: Starting timers...');
+      // Reset timers for new game
+      timerManager.startNewGame();
+
+      logger.info('PlayPage: Initialization complete, updating UI...');
+      // Update UI state
+      if (mounted) {
+        setState(() {
+          isInitializing = false;
+        });
+      }
+    } catch (e) {
+      logger.severe('PlayPage: Error initializing game: $e');
+      if (mounted) {
+        setState(() {
+          isInitializing = false;
+        });
+        // Show error message to user
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to initialize game: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
+    }
   }
 
   @override
   void dispose() {
-    // Clean up timer listeners
-    timerManager.redTimer.removeListener(_checkRedTimer);
-    timerManager.blackTimer.removeListener(_checkBlackTimer);
-    timerManager.dispose();
+    // Clean up timer listeners if initialized
+    if (inited) {
+      timerManager.redTimer.removeListener(_checkRedTimer);
+      timerManager.blackTimer.removeListener(_checkBlackTimer);
+      timerManager.dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isInitializing) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     return MediaQuery.of(context).size.width < 980
         ? _mobileContainer()
         : _windowContainer();

@@ -54,6 +54,11 @@ class PlayPlayerState extends State<PlayPlayer> {
   }
 
   Widget switchRobot(int team) {
+    // Check if gamer is initialized before accessing hands
+    if (!gamer.isInitialized || team >= gamer.hands.length) {
+      return const SizedBox();
+    }
+
     if (gamer.hands[team].isUser) {
       return IconButton(
         icon: const Icon(Icons.android),
@@ -86,6 +91,13 @@ class PlayPlayerState extends State<PlayPlayer> {
 
   @override
   Widget build(BuildContext context) {
+    // Check if gamer is properly initialized before accessing players and manual
+    if (!gamer.isInitialized) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     BoxDecoration decoration = BoxDecoration(
       border: Border.all(color: Colors.grey, width: 0.5),
       borderRadius: const BorderRadius.all(Radius.circular(2)),

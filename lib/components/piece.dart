@@ -1,6 +1,7 @@
 import 'package:cchess/cchess.dart';
 import 'package:flutter/material.dart';
 
+import '../global.dart';
 import '../models/game_manager.dart';
 import '../widgets/game_wrapper.dart';
 
@@ -99,6 +100,28 @@ class Piece extends StatelessWidget {
                   team == 'r'
                       ? gamer.skin.getRedChess(item.code)
                       : gamer.skin.getBlackChess(item.code),
+                  errorBuilder: (context, error, stackTrace) {
+                    logger.warning('Failed to load chess piece image: $error');
+                    return Container(
+                      width: gamer.skin.size,
+                      height: gamer.skin.size,
+                      decoration: BoxDecoration(
+                        color: team == 'r' ? Colors.red.shade100 : Colors.grey.shade800,
+                        borderRadius: BorderRadius.circular(gamer.skin.size / 2),
+                        border: Border.all(color: Colors.black, width: 1),
+                      ),
+                      child: Center(
+                        child: Text(
+                          item.code.toUpperCase(),
+                          style: TextStyle(
+                            color: team == 'r' ? Colors.red.shade800 : Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: gamer.skin.size * 0.3,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

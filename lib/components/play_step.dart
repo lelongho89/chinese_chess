@@ -27,13 +27,18 @@ class PlayStepState extends State<PlayStep> {
     super.initState();
 
     gamer.on<GameStepEvent>(updateStep);
-    steps.addAll(gamer.getSteps());
-    currentStep = gamer.currentStep;
+    // Initialize steps only if gamer is ready
+    if (gamer.isInitialized) {
+      steps.addAll(gamer.getSteps());
+      currentStep = gamer.currentStep;
+    }
   }
 
   @override
   void dispose() {
-    gamer.off<GameStepEvent>(updateStep);
+    if (gamer.isInitialized) {
+      gamer.off<GameStepEvent>(updateStep);
+    }
     super.dispose();
   }
 
@@ -79,7 +84,7 @@ class PlayStepState extends State<PlayStep> {
         itemCount: steps.length,
         itemBuilder: (context, index) => GestureDetector(
           onTap: () {
-            if (!gamer.canBacktrace) return;
+            if (!gamer.isInitialized || !gamer.canBacktrace) return;
             gamer.loadHistory(index - 1);
             setState(() {
               currentStep = index;

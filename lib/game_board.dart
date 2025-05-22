@@ -38,7 +38,7 @@ class GameBoardState extends State<GameBoard> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero).then((value) => gamer.init());
+    // GameManager will initialize itself when needed
   }
 
   Widget selectMode() {

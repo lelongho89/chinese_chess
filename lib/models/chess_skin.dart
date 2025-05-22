@@ -89,7 +89,8 @@ class ChessSkin {
   String getRedChess(String code) {
     if (!redMap.containsKey(code.toUpperCase())) {
       logger.info('Code error: $code');
-      return "assets/skins/$folder/$blank";
+      // Return a fallback image path that exists
+      return "assets/skins/$folder/${redMap.values.first}";
     }
     return "assets/skins/$folder/${redMap[code.toUpperCase()]}";
   }
@@ -97,7 +98,8 @@ class ChessSkin {
   String getBlackChess(String code) {
     if (!blackMap.containsKey(code.toLowerCase())) {
       logger.info('Code error: $code');
-      return "assets/skins/$folder/$blank";
+      // Return a fallback image path that exists
+      return "assets/skins/$folder/${blackMap.values.first}";
     }
     return "assets/skins/$folder/${blackMap[code.toLowerCase()]}";
   }

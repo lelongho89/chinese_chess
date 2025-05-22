@@ -58,6 +58,11 @@ class PlaySinglePlayerState extends State<PlaySinglePlayer> {
   }
 
   Widget switchRobot(int team) {
+    // Check if gamer is initialized before accessing hands
+    if (!gamer.isInitialized || team >= gamer.hands.length) {
+      return const SizedBox();
+    }
+
     if (gamer.hands[team].isUser) {
       return IconButton(
         icon: const Icon(Icons.android),
@@ -89,6 +94,13 @@ class PlaySinglePlayerState extends State<PlaySinglePlayer> {
 
   @override
   Widget build(BuildContext context) {
+    // Check if gamer is properly initialized before accessing players
+    if (!gamer.isInitialized) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     Widget leading;
     Widget trailing;
     TextDirection tDirect;

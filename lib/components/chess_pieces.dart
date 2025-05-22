@@ -50,6 +50,14 @@ class _ChessPiecesState extends State<ChessPieces> {
   @override
   Widget build(BuildContext context) {
     initGamer();
+
+    // Check if gamer is properly initialized before accessing skin
+    if (!gamer.isInitialized) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     return Stack(
       alignment: Alignment.center,
       fit: StackFit.expand,
