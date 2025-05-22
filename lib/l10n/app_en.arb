@@ -14,8 +14,13 @@
   "featureNotAvailable": "Feature is not available",
 
   "modeRobot": "Robot Mode",
+  "modeRobotSubtitle": "Play against AI opponent",
   "modeOnline": "Online Mode",
+  "modeOnlineSubtitle": "Play with friends online",
   "modeFree": "Free Mode",
+  "modeFreeSubtitle": "Local multiplayer on same device",
+  "chooseGameMode": "Choose your game mode",
+  "comingSoon": "Coming Soon",
 
   "clearAll": "Clear All",
   "save": "Apply",

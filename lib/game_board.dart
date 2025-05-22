@@ -42,44 +42,159 @@ class GameBoardState extends State<GameBoard> {
   }
 
   Widget selectMode() {
-    final maxHeight = MediaQuery.of(context).size.height;
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        children: [
+          // Header Section
+          const SizedBox(height: 32),
+          Text(
+            context.l10n.appTitle,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            context.l10n.chooseGameMode,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 48),
 
-    return Center(
-      child: SizedBox(
-        height: maxHeight * 0.6,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            ElevatedButton.icon(
-              onPressed: () {
-                setState(() {
-                  mode = PlayMode.modeRobot;
-                });
-              },
-              icon: const Icon(Icons.android),
-              label: Text(context.l10n.modeRobot),
+          // Game Mode Cards
+          Expanded(
+            child: ListView(
+              children: [
+                _buildGameModeCard(
+                  icon: Icons.smart_toy,
+                  title: context.l10n.modeRobot,
+                  subtitle: context.l10n.modeRobotSubtitle,
+                  onTap: () {
+                    setState(() {
+                      mode = PlayMode.modeRobot;
+                    });
+                  },
+                  isEnabled: true,
+                ),
+                const SizedBox(height: 16),
+                _buildGameModeCard(
+                  icon: Icons.wifi,
+                  title: context.l10n.modeOnline,
+                  subtitle: context.l10n.modeOnlineSubtitle,
+                  onTap: () {
+                    MyDialog.toast(
+                      context.l10n.featureNotAvailable,
+                      iconType: IconType.error,
+                    );
+                  },
+                  isEnabled: false,
+                ),
+                const SizedBox(height: 16),
+                _buildGameModeCard(
+                  icon: Icons.people,
+                  title: context.l10n.modeFree,
+                  subtitle: context.l10n.modeFreeSubtitle,
+                  onTap: () {
+                    setState(() {
+                      mode = PlayMode.modeFree;
+                    });
+                  },
+                  isEnabled: true,
+                ),
+              ],
             ),
-            ElevatedButton.icon(
-              onPressed: () {
-                MyDialog.toast(
-                  context.l10n.featureNotAvailable,
-                  iconType: IconType.error,
-                );
-              },
-              icon: const Icon(Icons.wifi),
-              label: Text(context.l10n.modeOnline),
-            ),
-            ElevatedButton.icon(
-              onPressed: () {
-                setState(() {
-                  mode = PlayMode.modeFree;
-                });
-              },
-              icon: const Icon(Icons.map),
-              label: Text(context.l10n.modeFree),
-            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-          ],
+  Widget _buildGameModeCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    required bool isEnabled,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Card(
+      elevation: isEnabled ? 2 : 1,
+      child: InkWell(
+        onTap: isEnabled ? onTap : null,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Row(
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: isEnabled
+                    ? colorScheme.primaryContainer
+                    : colorScheme.surfaceVariant,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(
+                  icon,
+                  size: 32,
+                  color: isEnabled
+                    ? colorScheme.onPrimaryContainer
+                    : colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: isEnabled
+                          ? colorScheme.onSurface
+                          : colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: isEnabled
+                          ? colorScheme.onSurfaceVariant
+                          : colorScheme.onSurfaceVariant.withOpacity(0.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (!isEnabled)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceVariant,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    context.l10n.comingSoon,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

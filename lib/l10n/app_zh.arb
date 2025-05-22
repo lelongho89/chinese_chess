@@ -14,8 +14,13 @@
   "featureNotAvailable": "功能暂未实现",
 
   "modeRobot": "人机模式",
+  "modeRobotSubtitle": "与AI对手对战",
   "modeOnline": "联网模式",
+  "modeOnlineSubtitle": "与朋友在线对战",
   "modeFree": "自由模式",
+  "modeFreeSubtitle": "同设备本地多人游戏",
+  "chooseGameMode": "选择游戏模式",
+  "comingSoon": "即将推出",
 
   "clearAll": "清除全部",
   "save": "确定",

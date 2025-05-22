@@ -14,8 +14,13 @@
   "featureNotAvailable": "Tính năng chưa khả dụng",
 
   "modeRobot": "Chế Độ Máy",
+  "modeRobotSubtitle": "Chơi với đối thủ AI",
   "modeOnline": "Chế Độ Trực Tuyến",
+  "modeOnlineSubtitle": "Chơi với bạn bè trực tuyến",
   "modeFree": "Chế Độ Tự Do",
+  "modeFreeSubtitle": "Nhiều người chơi cục bộ trên cùng thiết bị",
+  "chooseGameMode": "Chọn chế độ trò chơi",
+  "comingSoon": "Sắp Ra Mắt",
 
   "clearAll": "Xóa Tất Cả",
   "save": "Áp Dụng",
