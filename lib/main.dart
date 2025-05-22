@@ -11,9 +11,9 @@ import 'models/game_manager.dart';
 import 'models/game_setting.dart';
 import 'models/locale_provider.dart';
 import 'screens/auth_wrapper.dart';
+import 'screens/main_screen.dart';
 import 'supabase_client.dart' as client;
 import 'widgets/game_wrapper.dart';
-import 'game_board.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -89,12 +89,12 @@ class _MainAppState extends State<MainApp> {
         isHighContrast: true,
       ),
       // Material 3 specific configurations
-      themeMode: ThemeMode.system, // Follow system theme
+      themeMode: ThemeMode.dark, // Use dark theme to match design
       debugShowCheckedModeBanner: false, // Remove debug banner
       home: AuthWrapper(
         child: GameWrapper(
           isMain: true,
-          child: GameBoard(),
+          child: const MainScreen(),
         ),
       ),
     );

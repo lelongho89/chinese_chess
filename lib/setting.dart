@@ -32,246 +32,260 @@ class _SettingPageState extends State<SettingPage> {
 
   @override
   Widget build(BuildContext context) {
-    double width = 500;
-    if (MediaQuery.of(context).size.width < width) {
-      width = MediaQuery.of(context).size.width;
-    }
-
-    // Ensure the width is not too small
-    width = width < 300 ? 300 : width;
-
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        title: Text(context.l10n.settingTitle),
-        actions: [
-          TextButton.icon(
-            onPressed: () {
-              setting?.save().then((v) {
-                Navigator.pop(context);
-                MyDialog.toast(context.l10n.saveSuccess, iconType: IconType.success);
-              });
-            },
-            icon: const Icon(Icons.save),
-            label: Text(context.l10n.save),
+        title: Text(
+          context.l10n.settings,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
           ),
-        ],
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      body: Center(
-        child: setting == null
-            ? const CircularProgressIndicator()
-            : Container(
-                width: width,
-                padding: const EdgeInsets.all(16),
-                child: SingleChildScrollView(
+      body: setting == null
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Sound Section
+                    _buildSectionTitle(context.l10n.sound),
+                    const SizedBox(height: 16),
+
+                    _buildSettingItem(
+                      title: context.l10n.soundEffects,
+                      subtitle: context.l10n.enableSoundEffectsForMovesAndGames,
+                      trailing: Switch(
+                        value: setting!.sound,
+                        onChanged: (value) {
+                          setState(() {
+                            setting!.sound = value;
+                            setting!.save();
+                          });
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    _buildSettingItem(
+                      title: context.l10n.soundVolume,
+                      subtitle: context.l10n.adjustTheVolumeOfSoundEffects,
+                      trailing: Text(
+                        '${(setting!.soundVolume * 100).toInt()}%',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                      ),
+                      child: Slider(
+                        value: setting!.soundVolume,
+                        min: 0,
+                        max: 1,
+                        divisions: 10,
+                        onChanged: (value) {
+                          setState(() {
+                            setting!.soundVolume = value;
+                          });
+                        },
+                        onChangeEnd: (value) {
+                          setting!.save();
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Appearance Section
+                    _buildSectionTitle(context.l10n.appearance),
+                    const SizedBox(height: 16),
+
+                    _buildSettingItem(
+                      title: context.l10n.pieceStyle,
+                      subtitle: context.l10n.chooseTheVisualStyleOfTheChessPieces,
+                      trailing: Text(
+                        context.l10n.classic,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    _buildSettingItem(
+                      title: context.l10n.boardStyle,
+                      subtitle: context.l10n.selectTheAppearanceOfTheChessboard,
+                      trailing: Text(
+                        setting!.skin == 'woods' ? context.l10n.wood : context.l10n.skinStones,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                      ),
+                      onTap: () {
+                        _showBoardStyleDialog();
+                      },
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Game Timer Section
+                    _buildSectionTitle(context.l10n.gameTimer),
+                    const SizedBox(height: 16),
+
+                    _buildSettingItem(
+                      title: context.l10n.turnTimeLimit,
+                      subtitle: context.l10n.setTheTimeLimitForEachPlayersMove,
+                      trailing: Text(
+                        '10 min',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    _buildSettingItem(
+                      title: context.l10n.enableTimer,
+                      subtitle: context.l10n.enableOrDisableTheGameTimer,
+                      trailing: Switch(
+                        value: true, // You might want to add this to GameSetting
+                        onChanged: (value) {
+                          // Handle timer enable/disable
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+                  ],
+                ),
+              ),
+            ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+        fontWeight: FontWeight.bold,
+        color: Theme.of(context).colorScheme.onBackground,
+      ),
+    );
+  }
+
+  Widget _buildSettingItem({
+    required String title,
+    required String subtitle,
+    Widget? trailing,
+    Widget? child,
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Card(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                context.l10n.aiType,
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const SizedBox(height: 12),
-                              SegmentedButton<EngineInfo>(
-                                segments: [
-                                  ButtonSegment<EngineInfo>(
-                                    value: builtInEngine,
-                                    label: Text(context.l10n.builtInEngine),
-                                  ),
-                                  ...Engine().getSupportedEngines().map(
-                                    (engine) => ButtonSegment<EngineInfo>(
-                                      value: engine,
-                                      label: Text(engine.name),
-                                    ),
-                                  ),
-                                ],
-                                selected: {setting!.info},
-                                onSelectionChanged: (Set<EngineInfo> selected) {
-                                  if (selected.isEmpty) return;
-                                  setState(() {
-                                    setting!.info = selected.first;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
-                      Card(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                context.l10n.aiLevel,
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const SizedBox(height: 12),
-                              SegmentedButton<int>(
-                                segments: [
-                                  ButtonSegment<int>(
-                                    value: 10,
-                                    label: Text(context.l10n.beginner),
-                                  ),
-                                  ButtonSegment<int>(
-                                    value: 11,
-                                    label: Text(context.l10n.intermediate),
-                                  ),
-                                  ButtonSegment<int>(
-                                    value: 12,
-                                    label: Text(context.l10n.master),
-                                  ),
-                                ],
-                                selected: {setting!.engineLevel},
-                                onSelectionChanged: (Set<int> selected) {
-                                  if (selected.isEmpty) return;
-                                  setState(() {
-                                    setting!.engineLevel = selected.first;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Card(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        child: SwitchListTile(
-                          title: Text(context.l10n.gameSound),
-                          value: setting!.sound,
-                          onChanged: (v) {
-                            setState(() {
-                              setting!.sound = v;
-                            });
-                          },
-                        ),
-                      ),
-                      Card(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                context.l10n.soundVolume,
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              Slider(
-                                value: setting!.soundVolume,
-                                min: 0,
-                                max: 1,
-                                divisions: 10,
-                                label: (setting!.soundVolume * 100).toInt().toString(),
-                                onChanged: (v) {
-                                  setState(() {
-                                    setting!.soundVolume = v;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Card(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                context.l10n.language,
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const SizedBox(height: 12),
-                              SegmentedButton<String>(
-                                segments: [
-                                  ButtonSegment<String>(
-                                    value: 'en',
-                                    label: Text(context.l10n.languageEnglish),
-                                  ),
-                                  ButtonSegment<String>(
-                                    value: 'zh',
-                                    label: Text(context.l10n.languageChinese),
-                                  ),
-                                  ButtonSegment<String>(
-                                    value: 'vi',
-                                    label: Text(context.l10n.languageVietnamese),
-                                  ),
-                                ],
-                                selected: {setting!.locale},
-                                onSelectionChanged: (Set<String> selected) {
-                                  if (selected.isEmpty) return;
-                                  final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
-                                  setState(() {
-                                    setting!.locale = selected.first;
-                                    // Update the locale provider
-                                    localeProvider.setLocale(selected.first);
-                                    // Save settings
-                                    setting!.save().then((_) {
-                                      print("Language saved: ${setting!.locale}");
-                                    });
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Card(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                context.l10n.chessSkin,
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const SizedBox(height: 12),
-                              SegmentedButton<String>(
-                                segments: [
-                                  ButtonSegment<String>(
-                                    value: 'woods',
-                                    label: Text(context.l10n.skinWoods),
-                                  ),
-                                  ButtonSegment<String>(
-                                    value: 'stones',
-                                    label: Text(context.l10n.skinStones),
-                                  ),
-                                ],
-                                selected: {setting!.skin},
-                                onSelectionChanged: (Set<String> selected) {
-                                  if (selected.isEmpty) return;
-                                  setState(() {
-                                    setting!.skin = selected.first;
-                                    // Update the skin in GameManager immediately
-                                    GameManager.instance.updateSkin(selected.first);
-                                    // Save settings
-                                    setting!.save().then((_) {
-                                      logger.info("Skin saved: ${setting!.skin}");
-                                    });
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         ),
                       ),
                     ],
                   ),
                 ),
+                if (trailing != null) trailing,
+              ],
+            ),
+            if (child != null) ...[
+              const SizedBox(height: 12),
+              child,
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showBoardStyleDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.l10n.boardStyle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(context.l10n.wood),
+              leading: Radio<String>(
+                value: 'woods',
+                groupValue: setting!.skin,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      setting!.skin = value;
+                      GameManager.instance.updateSkin(value);
+                      setting!.save();
+                    });
+                    Navigator.pop(context);
+                  }
+                },
               ),
+            ),
+            ListTile(
+              title: Text(context.l10n.skinStones),
+              leading: Radio<String>(
+                value: 'stones',
+                groupValue: setting!.skin,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      setting!.skin = value;
+                      GameManager.instance.updateSkin(value);
+                      setting!.save();
+                    });
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(context.l10n.save),
+          ),
+        ],
       ),
     );
   }

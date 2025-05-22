@@ -41,7 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _loadUserData() async {
     final authService = Provider.of<SupabaseAuthService>(context, listen: false);
     final user = authService.user;
-    
+
     if (user != null) {
       try {
         final userModel = await UserRepository.instance.getUser(user.id);
@@ -132,235 +132,255 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        title: Text(context.l10n.profile),
-        actions: [
-          TextButton.icon(
-            onPressed: _updateDisplayName,
-            icon: const Icon(Icons.save),
-            label: Text(context.l10n.saveProfile),
+        title: Text(
+          context.l10n.account,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
           ),
-        ],
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Consumer<SupabaseAuthService>(
         builder: (context, authService, _) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Profile Section
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            context.l10n.editProfile,
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          const SizedBox(height: 16),
+          final user = authService.user;
 
-                          // Display Name field
-                          TextFormField(
-                            controller: _displayNameController,
-                            decoration: InputDecoration(
-                              labelText: context.l10n.displayName,
-                              prefixIcon: const Icon(Icons.person),
-                              border: const OutlineInputBorder(),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return context.l10n.displayNameRequired;
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
+          if (user == null) {
+            return const Center(
+              child: Text('No user logged in'),
+            );
+          }
 
-                          // Show current status
-                          if (authService.isAnonymous)
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.orange.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.orange),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.info, color: Colors.orange),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      context.l10n.currentlyPlayingAsGuest,
-                                      style: const TextStyle(color: Colors.orange),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
+          return Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              children: [
+                // Profile Header
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    children: [
+                      // Avatar
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        child: Text(
+                          (_displayNameController.text.isNotEmpty
+                            ? _displayNameController.text[0].toUpperCase()
+                            : user.email?.isNotEmpty == true
+                              ? user.email![0].toUpperCase()
+                              : 'U'),
+                          style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Name
+                      Text(
+                        _displayNameController.text.isNotEmpty
+                          ? _displayNameController.text
+                          : authService.isAnonymous
+                            ? context.l10n.guestUser
+                            : user.email ?? 'User',
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+
+                      // Email or status
+                      Text(
+                        authService.isAnonymous
+                          ? context.l10n.joinedDate.replaceAll('{date}', '2021')
+                          : user.email ?? '',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Stats Section
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildStatCard(
+                        title: context.l10n.gamesPlayed,
+                        value: '120',
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Convert to Account Section (only for anonymous users)
-                  if (authService.isAnonymous) ...[
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              context.l10n.convertToAccount,
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              context.l10n.convertToAccountDescription,
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                            const SizedBox(height: 16),
-
-                            if (!_showConvertForm) ...[
-                              ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _showConvertForm = true;
-                                  });
-                                },
-                                child: Text(context.l10n.convertToAccount),
-                              ),
-                            ] else ...[
-                              // Email field
-                              TextFormField(
-                                controller: _emailController,
-                                decoration: InputDecoration(
-                                  labelText: context.l10n.email,
-                                  prefixIcon: const Icon(Icons.email),
-                                  border: const OutlineInputBorder(),
-                                ),
-                                keyboardType: TextInputType.emailAddress,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return context.l10n.emailRequired;
-                                  }
-                                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                                    return context.l10n.invalidEmail;
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 16),
-
-                              // Password field
-                              TextFormField(
-                                controller: _passwordController,
-                                decoration: InputDecoration(
-                                  labelText: context.l10n.password,
-                                  prefixIcon: const Icon(Icons.lock),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _isPasswordVisible
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _isPasswordVisible = !_isPasswordVisible;
-                                      });
-                                    },
-                                  ),
-                                  border: const OutlineInputBorder(),
-                                ),
-                                obscureText: !_isPasswordVisible,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return context.l10n.passwordRequired;
-                                  }
-                                  if (value.length < 6) {
-                                    return context.l10n.passwordTooShort;
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 16),
-
-                              // Confirm Password field
-                              TextFormField(
-                                controller: _confirmPasswordController,
-                                decoration: InputDecoration(
-                                  labelText: context.l10n.confirmPassword,
-                                  prefixIcon: const Icon(Icons.lock),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _isConfirmPasswordVisible
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
-                                      });
-                                    },
-                                  ),
-                                  border: const OutlineInputBorder(),
-                                ),
-                                obscureText: !_isConfirmPasswordVisible,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return context.l10n.confirmPasswordRequired;
-                                  }
-                                  if (value != _passwordController.text) {
-                                    return context.l10n.passwordsDoNotMatch;
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 16),
-
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: OutlinedButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          _showConvertForm = false;
-                                          _emailController.clear();
-                                          _passwordController.clear();
-                                          _confirmPasswordController.clear();
-                                        });
-                                      },
-                                      child: const Text('Cancel'),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: ElevatedButton(
-                                      onPressed: _convertToAccount,
-                                      child: Text(context.l10n.convertToAccount),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ],
-                        ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildStatCard(
+                        title: context.l10n.gamesWon,
+                        value: '80',
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildStatCard(
+                        title: context.l10n.gamesLost,
+                        value: '40',
                       ),
                     ),
                   ],
-                ],
-              ),
+                ),
+
+                const SizedBox(height: 32),
+
+                // Settings Section
+                _buildSettingItem(
+                  title: context.l10n.notifications,
+                  trailing: Switch(
+                    value: true,
+                    onChanged: (value) {
+                      // Handle notifications toggle
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                _buildSettingItem(
+                  title: context.l10n.sound,
+                  trailing: Switch(
+                    value: true,
+                    onChanged: (value) {
+                      // Handle sound toggle
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                _buildSettingItem(
+                  title: context.l10n.language,
+                  trailing: Text(
+                    'English',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                _buildSettingItem(
+                  title: context.l10n.changePassword,
+                  trailing: const Icon(Icons.chevron_right),
+                ),
+
+                const SizedBox(height: 16),
+
+                _buildSettingItem(
+                  title: context.l10n.logOut,
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: _signOut,
+                ),
+
+                const Spacer(),
+              ],
             ),
           );
         },
       ),
     );
+  }
+
+  Widget _buildStatCard({
+    required String title,
+    required String value,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingItem({
+    required String title,
+    Widget? trailing,
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ),
+            if (trailing != null) trailing,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _signOut() async {
+    try {
+      final authService = Provider.of<SupabaseAuthService>(context, listen: false);
+      await authService.signOut();
+
+      if (mounted) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
+    } catch (e) {
+      if (mounted) {
+        MyDialog.alert('Sign out failed: $e');
+      }
+    }
   }
 }
