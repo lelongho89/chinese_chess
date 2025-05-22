@@ -207,7 +207,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       // Email or status
                       Text(
                         authService.isAnonymous
-                          ? context.l10n.joinedDate.replaceAll('{date}', '2021')
+                          ? context.l10n.joinedDate('2021')
                           : user.email ?? '',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),

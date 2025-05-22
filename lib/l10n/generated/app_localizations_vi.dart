@@ -48,10 +48,25 @@ class AppLocalizationsVi extends AppLocalizations {
   String get modeRobot => 'Chế Độ Máy';
 
   @override
+  String get modeRobotSubtitle => 'Chơi với đối thủ AI';
+
+  @override
   String get modeOnline => 'Chế Độ Trực Tuyến';
 
   @override
+  String get modeOnlineSubtitle => 'Chơi với bạn bè trực tuyến';
+
+  @override
   String get modeFree => 'Chế Độ Tự Do';
+
+  @override
+  String get modeFreeSubtitle => 'Nhiều người chơi cục bộ trên cùng thiết bị';
+
+  @override
+  String get chooseGameMode => 'Chọn chế độ trò chơi';
+
+  @override
+  String get comingSoon => 'Sắp Ra Mắt';
 
   @override
   String get clearAll => 'Xóa Tất Cả';
@@ -482,6 +497,48 @@ class AppLocalizationsVi extends AppLocalizations {
   String get accountExistsWithDifferentCredential => 'Đã tồn tại tài khoản với thông tin đăng nhập khác';
 
   @override
+  String get continueAsGuest => 'Tiếp Tục Với Tư Cách Khách';
+
+  @override
+  String get guestMode => 'Chế Độ Khách';
+
+  @override
+  String get playAsGuest => 'Chơi Với Tư Cách Khách';
+
+  @override
+  String get guestUser => 'Người Dùng Khách';
+
+  @override
+  String get anonymousUser => 'Người Dùng Ẩn Danh';
+
+  @override
+  String get updateDisplayName => 'Cập Nhật Tên Hiển Thị';
+
+  @override
+  String get profile => 'Hồ Sơ';
+
+  @override
+  String get editProfile => 'Chỉnh Sửa Hồ Sơ';
+
+  @override
+  String get saveProfile => 'Lưu Hồ Sơ';
+
+  @override
+  String get profileUpdated => 'Hồ sơ đã được cập nhật thành công';
+
+  @override
+  String get profileUpdateFailed => 'Không thể cập nhật hồ sơ';
+
+  @override
+  String get convertToAccount => 'Tạo Tài Khoản';
+
+  @override
+  String get convertToAccountDescription => 'Tạo tài khoản vĩnh viễn để lưu tiến trình của bạn trên các thiết bị';
+
+  @override
+  String get currentlyPlayingAsGuest => 'Hiện đang chơi với tư cách khách';
+
+  @override
   String get timerEnabled => 'Đã Bật Bộ Hẹn Giờ';
 
   @override
@@ -489,4 +546,120 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get resetTimer => 'Đặt Lại Bộ Hẹn Giờ';
+
+  @override
+  String get account => 'Tài Khoản';
+
+  @override
+  String get home => 'Trang Chủ';
+
+  @override
+  String get play => 'Chơi';
+
+  @override
+  String get settings => 'Cài Đặt';
+
+  @override
+  String get gamesPlayed => 'Số Ván Đã Chơi';
+
+  @override
+  String get gamesWon => 'Số Ván Thắng';
+
+  @override
+  String get gamesLost => 'Số Ván Thua';
+
+  @override
+  String get notifications => 'Thông Báo';
+
+  @override
+  String get sound => 'Âm Thanh';
+
+  @override
+  String get soundEffects => 'Hiệu Ứng Âm Thanh';
+
+  @override
+  String get enableSoundEffectsForMovesAndGames => 'Bật hiệu ứng âm thanh cho nước đi và trò chơi';
+
+  @override
+  String get adjustTheVolumeOfSoundEffects => 'Điều chỉnh âm lượng hiệu ứng âm thanh';
+
+  @override
+  String get appearance => 'Giao Diện';
+
+  @override
+  String get pieceStyle => 'Kiểu Quân Cờ';
+
+  @override
+  String get chooseTheVisualStyleOfTheChessPieces => 'Chọn kiểu hiển thị của quân cờ';
+
+  @override
+  String get classic => 'Cổ Điển';
+
+  @override
+  String get boardStyle => 'Kiểu Bàn Cờ';
+
+  @override
+  String get selectTheAppearanceOfTheChessboard => 'Chọn giao diện của bàn cờ';
+
+  @override
+  String get wood => 'Gỗ';
+
+  @override
+  String get gameTimer => 'Bộ Hẹn Giờ Trò Chơi';
+
+  @override
+  String get turnTimeLimit => 'Giới Hạn Thời Gian Lượt';
+
+  @override
+  String get setTheTimeLimitForEachPlayersMove => 'Đặt giới hạn thời gian cho mỗi nước đi của người chơi';
+
+  @override
+  String get tenMinutes => '10 phút';
+
+  @override
+  String get enableTimer => 'Bật Bộ Hẹn Giờ';
+
+  @override
+  String get enableOrDisableTheGameTimer => 'Bật hoặc tắt bộ hẹn giờ trò chơi';
+
+  @override
+  String get singlePlayer => 'Một Người Chơi';
+
+  @override
+  String get playAgainstTheComputer => 'Chơi với máy tính';
+
+  @override
+  String get localMultiplayer => 'Nhiều Người Chơi Cục Bộ';
+
+  @override
+  String get playWithAFriendOnTheSameDevice => 'Chơi với bạn bè trên cùng thiết bị';
+
+  @override
+  String get gameMode => 'Chế Độ Trò Chơi';
+
+  @override
+  String get difficulty => 'Độ Khó';
+
+  @override
+  String get easy => 'Dễ';
+
+  @override
+  String get medium => 'Trung Bình';
+
+  @override
+  String get hard => 'Khó';
+
+  @override
+  String get startGame => 'Bắt Đầu Trò Chơi';
+
+  @override
+  String joinedDate(Object date) {
+    return 'Tham gia $date';
+  }
+
+  @override
+  String get changePassword => 'Đổi Mật Khẩu';
+
+  @override
+  String get logOut => 'Đăng Xuất';
 }

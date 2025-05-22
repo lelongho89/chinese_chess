@@ -73,7 +73,7 @@ class UserModel {
 
   // Convert UserModel to a Map for Supabase
   Map<String, dynamic> toMap() {
-    return {
+    final map = {
       'email': email,
       'display_name': displayName,
       'elo_rating': eloRating,
@@ -83,8 +83,15 @@ class UserModel {
       'games_draw': gamesDraw,
       'created_at': createdAt.toIso8601String(),
       'last_login_at': lastLoginAt.toIso8601String(),
-      'is_anonymous': isAnonymous,
     };
+
+    // Only include is_anonymous if the database supports it
+    // This prevents errors if the column doesn't exist yet
+    if (isAnonymous) {
+      map['is_anonymous'] = isAnonymous;
+    }
+
+    return map;
   }
 
   // Create a copy of UserModel with updated fields

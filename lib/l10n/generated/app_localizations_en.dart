@@ -48,10 +48,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get modeRobot => 'Robot Mode';
 
   @override
+  String get modeRobotSubtitle => 'Play against AI opponent';
+
+  @override
   String get modeOnline => 'Online Mode';
 
   @override
+  String get modeOnlineSubtitle => 'Play with friends online';
+
+  @override
   String get modeFree => 'Free Mode';
+
+  @override
+  String get modeFreeSubtitle => 'Local multiplayer on same device';
+
+  @override
+  String get chooseGameMode => 'Choose your game mode';
+
+  @override
+  String get comingSoon => 'Coming Soon';
 
   @override
   String get clearAll => 'Clear All';
@@ -482,6 +497,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountExistsWithDifferentCredential => 'An account already exists with a different credential';
 
   @override
+  String get continueAsGuest => 'Continue as Guest';
+
+  @override
+  String get guestMode => 'Guest Mode';
+
+  @override
+  String get playAsGuest => 'Play as Guest';
+
+  @override
+  String get guestUser => 'Guest User';
+
+  @override
+  String get anonymousUser => 'Anonymous User';
+
+  @override
+  String get updateDisplayName => 'Update Display Name';
+
+  @override
+  String get profile => 'Profile';
+
+  @override
+  String get editProfile => 'Edit Profile';
+
+  @override
+  String get saveProfile => 'Save Profile';
+
+  @override
+  String get profileUpdated => 'Profile updated successfully';
+
+  @override
+  String get profileUpdateFailed => 'Failed to update profile';
+
+  @override
+  String get convertToAccount => 'Create Account';
+
+  @override
+  String get convertToAccountDescription => 'Create a permanent account to save your progress across devices';
+
+  @override
+  String get currentlyPlayingAsGuest => 'Currently playing as guest';
+
+  @override
   String get timerEnabled => 'Timer Enabled';
 
   @override
@@ -489,4 +546,120 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resetTimer => 'Reset Timer';
+
+  @override
+  String get account => 'Account';
+
+  @override
+  String get home => 'Home';
+
+  @override
+  String get play => 'Play';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get gamesPlayed => 'Games Played';
+
+  @override
+  String get gamesWon => 'Games Won';
+
+  @override
+  String get gamesLost => 'Games Lost';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get sound => 'Sound';
+
+  @override
+  String get soundEffects => 'Sound Effects';
+
+  @override
+  String get enableSoundEffectsForMovesAndGames => 'Enable sound effects for moves and games';
+
+  @override
+  String get adjustTheVolumeOfSoundEffects => 'Adjust the volume of sound effects';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get pieceStyle => 'Piece Style';
+
+  @override
+  String get chooseTheVisualStyleOfTheChessPieces => 'Choose the visual style of the chess pieces';
+
+  @override
+  String get classic => 'Classic';
+
+  @override
+  String get boardStyle => 'Board Style';
+
+  @override
+  String get selectTheAppearanceOfTheChessboard => 'Select the appearance of the chessboard';
+
+  @override
+  String get wood => 'Wood';
+
+  @override
+  String get gameTimer => 'Game Timer';
+
+  @override
+  String get turnTimeLimit => 'Turn Time Limit';
+
+  @override
+  String get setTheTimeLimitForEachPlayersMove => 'Set the time limit for each player\'s move';
+
+  @override
+  String get tenMinutes => '10 min';
+
+  @override
+  String get enableTimer => 'Enable Timer';
+
+  @override
+  String get enableOrDisableTheGameTimer => 'Enable or disable the game timer';
+
+  @override
+  String get singlePlayer => 'Single Player';
+
+  @override
+  String get playAgainstTheComputer => 'Play against the computer';
+
+  @override
+  String get localMultiplayer => 'Local Multiplayer';
+
+  @override
+  String get playWithAFriendOnTheSameDevice => 'Play with a friend on the same device';
+
+  @override
+  String get gameMode => 'Game Mode';
+
+  @override
+  String get difficulty => 'Difficulty';
+
+  @override
+  String get easy => 'Easy';
+
+  @override
+  String get medium => 'Medium';
+
+  @override
+  String get hard => 'Hard';
+
+  @override
+  String get startGame => 'Start Game';
+
+  @override
+  String joinedDate(Object date) {
+    return 'Joined $date';
+  }
+
+  @override
+  String get changePassword => 'Change Password';
+
+  @override
+  String get logOut => 'Log Out';
 }

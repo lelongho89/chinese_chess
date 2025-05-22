@@ -67,27 +67,26 @@ class GameManager {
   late ChessRule rule;
 
   late GameSetting setting;
+  bool _initialized = false;
 
   static GameManager? _instance;
 
-  static GameManager get instance => _instance ??= GameManager();
+  static GameManager get instance => _instance ??= GameManager._();
 
   GameManager._() {
     gameEvent.stream.listen(_onGameEvent);
   }
 
-  factory GameManager() {
-    _instance ??= GameManager._();
-    return _instance!;
-  }
-
   Future<bool> init() async {
+    if (_initialized) return true;
+
     setting = await GameSetting.getInstance();
     try {
       await engine.init();
     } catch (_) {}
     rule = ChessRule(manual.currentFen);
 
+    hands.clear(); // Clear existing hands before adding new ones
     hands.add(Player('r', this, title: manual.red));
     hands.add(Player('b', this, title: manual.black));
     curHand = 0;
@@ -98,8 +97,12 @@ class GameManager {
       add(GameLoadEvent(0));
     });
 
-    listener = engine.listen(parseMessage);
+    // Only create listener if it doesn't exist
+    if (listener == null) {
+      listener = engine.listen(parseMessage);
+    }
 
+    _initialized = true;
     return true;
   }
 
@@ -510,9 +513,11 @@ class GameManager {
 
   void dispose() {
     listener?.cancel();
+    listener = null;
     engine.stop();
     engine.quit();
     hands.map((e) => e.dispose());
+    gameEvent.close();
   }
 
   /// Update the skin when it changes in settings

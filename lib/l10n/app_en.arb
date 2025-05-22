@@ -233,7 +233,7 @@
   "gameTimer": "Game Timer",
   "turnTimeLimit": "Turn Time Limit",
   "setTheTimeLimitForEachPlayersMove": "Set the time limit for each player's move",
-  "10min": "10 min",
+  "tenMinutes": "10 min",
   "enableTimer": "Enable Timer",
   "enableOrDisableTheGameTimer": "Enable or disable the game timer",
   "singlePlayer": "Single Player",

@@ -18,7 +18,7 @@ class GameWrapper extends StatefulWidget {
 }
 
 class GameWrapperState extends State<GameWrapper> {
-  final GameManager gamer = GameManager();
+  final GameManager gamer = GameManager.instance;
 
   @override
   void initState() {

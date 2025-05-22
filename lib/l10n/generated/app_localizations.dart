@@ -175,17 +175,47 @@ abstract class AppLocalizations {
   /// **'Robot Mode'**
   String get modeRobot;
 
+  /// No description provided for @modeRobotSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Play against AI opponent'**
+  String get modeRobotSubtitle;
+
   /// No description provided for @modeOnline.
   ///
   /// In en, this message translates to:
   /// **'Online Mode'**
   String get modeOnline;
 
+  /// No description provided for @modeOnlineSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Play with friends online'**
+  String get modeOnlineSubtitle;
+
   /// No description provided for @modeFree.
   ///
   /// In en, this message translates to:
   /// **'Free Mode'**
   String get modeFree;
+
+  /// No description provided for @modeFreeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Local multiplayer on same device'**
+  String get modeFreeSubtitle;
+
+  /// No description provided for @chooseGameMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your game mode'**
+  String get chooseGameMode;
+
+  /// No description provided for @comingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming Soon'**
+  String get comingSoon;
 
   /// No description provided for @clearAll.
   ///
@@ -1039,6 +1069,90 @@ abstract class AppLocalizations {
   /// **'An account already exists with a different credential'**
   String get accountExistsWithDifferentCredential;
 
+  /// No description provided for @continueAsGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue as Guest'**
+  String get continueAsGuest;
+
+  /// No description provided for @guestMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest Mode'**
+  String get guestMode;
+
+  /// No description provided for @playAsGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Play as Guest'**
+  String get playAsGuest;
+
+  /// No description provided for @guestUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest User'**
+  String get guestUser;
+
+  /// No description provided for @anonymousUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous User'**
+  String get anonymousUser;
+
+  /// No description provided for @updateDisplayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Display Name'**
+  String get updateDisplayName;
+
+  /// No description provided for @profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profile;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfile;
+
+  /// No description provided for @saveProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Profile'**
+  String get saveProfile;
+
+  /// No description provided for @profileUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully'**
+  String get profileUpdated;
+
+  /// No description provided for @profileUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update profile'**
+  String get profileUpdateFailed;
+
+  /// No description provided for @convertToAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get convertToAccount;
+
+  /// No description provided for @convertToAccountDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a permanent account to save your progress across devices'**
+  String get convertToAccountDescription;
+
+  /// No description provided for @currentlyPlayingAsGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Currently playing as guest'**
+  String get currentlyPlayingAsGuest;
+
   /// No description provided for @timerEnabled.
   ///
   /// In en, this message translates to:
@@ -1056,6 +1170,234 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reset Timer'**
   String get resetTimer;
+
+  /// No description provided for @account.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get account;
+
+  /// No description provided for @home.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get home;
+
+  /// No description provided for @play.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get play;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @gamesPlayed.
+  ///
+  /// In en, this message translates to:
+  /// **'Games Played'**
+  String get gamesPlayed;
+
+  /// No description provided for @gamesWon.
+  ///
+  /// In en, this message translates to:
+  /// **'Games Won'**
+  String get gamesWon;
+
+  /// No description provided for @gamesLost.
+  ///
+  /// In en, this message translates to:
+  /// **'Games Lost'**
+  String get gamesLost;
+
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// No description provided for @sound.
+  ///
+  /// In en, this message translates to:
+  /// **'Sound'**
+  String get sound;
+
+  /// No description provided for @soundEffects.
+  ///
+  /// In en, this message translates to:
+  /// **'Sound Effects'**
+  String get soundEffects;
+
+  /// No description provided for @enableSoundEffectsForMovesAndGames.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable sound effects for moves and games'**
+  String get enableSoundEffectsForMovesAndGames;
+
+  /// No description provided for @adjustTheVolumeOfSoundEffects.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust the volume of sound effects'**
+  String get adjustTheVolumeOfSoundEffects;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// No description provided for @pieceStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Piece Style'**
+  String get pieceStyle;
+
+  /// No description provided for @chooseTheVisualStyleOfTheChessPieces.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the visual style of the chess pieces'**
+  String get chooseTheVisualStyleOfTheChessPieces;
+
+  /// No description provided for @classic.
+  ///
+  /// In en, this message translates to:
+  /// **'Classic'**
+  String get classic;
+
+  /// No description provided for @boardStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Board Style'**
+  String get boardStyle;
+
+  /// No description provided for @selectTheAppearanceOfTheChessboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the appearance of the chessboard'**
+  String get selectTheAppearanceOfTheChessboard;
+
+  /// No description provided for @wood.
+  ///
+  /// In en, this message translates to:
+  /// **'Wood'**
+  String get wood;
+
+  /// No description provided for @gameTimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Game Timer'**
+  String get gameTimer;
+
+  /// No description provided for @turnTimeLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn Time Limit'**
+  String get turnTimeLimit;
+
+  /// No description provided for @setTheTimeLimitForEachPlayersMove.
+  ///
+  /// In en, this message translates to:
+  /// **'Set the time limit for each player\'s move'**
+  String get setTheTimeLimitForEachPlayersMove;
+
+  /// No description provided for @tenMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'10 min'**
+  String get tenMinutes;
+
+  /// No description provided for @enableTimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Timer'**
+  String get enableTimer;
+
+  /// No description provided for @enableOrDisableTheGameTimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable or disable the game timer'**
+  String get enableOrDisableTheGameTimer;
+
+  /// No description provided for @singlePlayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Single Player'**
+  String get singlePlayer;
+
+  /// No description provided for @playAgainstTheComputer.
+  ///
+  /// In en, this message translates to:
+  /// **'Play against the computer'**
+  String get playAgainstTheComputer;
+
+  /// No description provided for @localMultiplayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Local Multiplayer'**
+  String get localMultiplayer;
+
+  /// No description provided for @playWithAFriendOnTheSameDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Play with a friend on the same device'**
+  String get playWithAFriendOnTheSameDevice;
+
+  /// No description provided for @gameMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Game Mode'**
+  String get gameMode;
+
+  /// No description provided for @difficulty.
+  ///
+  /// In en, this message translates to:
+  /// **'Difficulty'**
+  String get difficulty;
+
+  /// No description provided for @easy.
+  ///
+  /// In en, this message translates to:
+  /// **'Easy'**
+  String get easy;
+
+  /// No description provided for @medium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get medium;
+
+  /// No description provided for @hard.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard'**
+  String get hard;
+
+  /// No description provided for @startGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Game'**
+  String get startGame;
+
+  /// No description provided for @joinedDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined {date}'**
+  String joinedDate(Object date);
+
+  /// No description provided for @changePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get changePassword;
+
+  /// No description provided for @logOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Out'**
+  String get logOut;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

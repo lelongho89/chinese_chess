@@ -48,10 +48,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get modeRobot => '人机模式';
 
   @override
+  String get modeRobotSubtitle => '与AI对手对战';
+
+  @override
   String get modeOnline => '联网模式';
 
   @override
+  String get modeOnlineSubtitle => '与朋友在线对战';
+
+  @override
   String get modeFree => '自由模式';
+
+  @override
+  String get modeFreeSubtitle => '同设备本地多人游戏';
+
+  @override
+  String get chooseGameMode => '选择游戏模式';
+
+  @override
+  String get comingSoon => '即将推出';
 
   @override
   String get clearAll => '清除全部';
@@ -482,6 +497,48 @@ class AppLocalizationsZh extends AppLocalizations {
   String get accountExistsWithDifferentCredential => '已存在使用不同凭证的账号';
 
   @override
+  String get continueAsGuest => '以游客身份继续';
+
+  @override
+  String get guestMode => '游客模式';
+
+  @override
+  String get playAsGuest => '以游客身份游戏';
+
+  @override
+  String get guestUser => '游客用户';
+
+  @override
+  String get anonymousUser => '匿名用户';
+
+  @override
+  String get updateDisplayName => '更新显示名称';
+
+  @override
+  String get profile => '个人资料';
+
+  @override
+  String get editProfile => '编辑个人资料';
+
+  @override
+  String get saveProfile => '保存个人资料';
+
+  @override
+  String get profileUpdated => '个人资料更新成功';
+
+  @override
+  String get profileUpdateFailed => '个人资料更新失败';
+
+  @override
+  String get convertToAccount => '创建账号';
+
+  @override
+  String get convertToAccountDescription => '创建永久账号以在设备间保存您的进度';
+
+  @override
+  String get currentlyPlayingAsGuest => '当前以游客身份游戏';
+
+  @override
   String get timerEnabled => '计时器已启用';
 
   @override
@@ -489,4 +546,120 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get resetTimer => '重置计时器';
+
+  @override
+  String get account => 'Account';
+
+  @override
+  String get home => 'Home';
+
+  @override
+  String get play => 'Play';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get gamesPlayed => 'Games Played';
+
+  @override
+  String get gamesWon => 'Games Won';
+
+  @override
+  String get gamesLost => 'Games Lost';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get sound => 'Sound';
+
+  @override
+  String get soundEffects => 'Sound Effects';
+
+  @override
+  String get enableSoundEffectsForMovesAndGames => 'Enable sound effects for moves and games';
+
+  @override
+  String get adjustTheVolumeOfSoundEffects => 'Adjust the volume of sound effects';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get pieceStyle => 'Piece Style';
+
+  @override
+  String get chooseTheVisualStyleOfTheChessPieces => 'Choose the visual style of the chess pieces';
+
+  @override
+  String get classic => 'Classic';
+
+  @override
+  String get boardStyle => 'Board Style';
+
+  @override
+  String get selectTheAppearanceOfTheChessboard => 'Select the appearance of the chessboard';
+
+  @override
+  String get wood => 'Wood';
+
+  @override
+  String get gameTimer => 'Game Timer';
+
+  @override
+  String get turnTimeLimit => 'Turn Time Limit';
+
+  @override
+  String get setTheTimeLimitForEachPlayersMove => 'Set the time limit for each player\'s move';
+
+  @override
+  String get tenMinutes => '10 min';
+
+  @override
+  String get enableTimer => 'Enable Timer';
+
+  @override
+  String get enableOrDisableTheGameTimer => 'Enable or disable the game timer';
+
+  @override
+  String get singlePlayer => 'Single Player';
+
+  @override
+  String get playAgainstTheComputer => 'Play against the computer';
+
+  @override
+  String get localMultiplayer => 'Local Multiplayer';
+
+  @override
+  String get playWithAFriendOnTheSameDevice => 'Play with a friend on the same device';
+
+  @override
+  String get gameMode => 'Game Mode';
+
+  @override
+  String get difficulty => 'Difficulty';
+
+  @override
+  String get easy => 'Easy';
+
+  @override
+  String get medium => 'Medium';
+
+  @override
+  String get hard => 'Hard';
+
+  @override
+  String get startGame => 'Start Game';
+
+  @override
+  String joinedDate(Object date) {
+    return 'Joined $date';
+  }
+
+  @override
+  String get changePassword => 'Change Password';
+
+  @override
+  String get logOut => 'Log Out';
 }

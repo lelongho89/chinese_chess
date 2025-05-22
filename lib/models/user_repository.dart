@@ -63,8 +63,25 @@ class UserRepository extends SupabaseBaseRepository<UserModel> {
   Future<void> createAnonymousUser(User supabaseUser, String displayName) async {
     try {
       final userModel = UserModel.fromSupabaseUserWithDisplayName(supabaseUser, displayName);
-      await set(supabaseUser.id, userModel);
-      logger.info('Anonymous user created in Supabase: ${supabaseUser.id}');
+
+      // Try to create the user, but handle database schema issues gracefully
+      try {
+        await set(supabaseUser.id, userModel);
+        logger.info('Anonymous user created in Supabase: ${supabaseUser.id}');
+      } catch (dbError) {
+        // If there's a database schema issue, try with minimal data
+        logger.warning('Failed to create full user record, trying minimal data: $dbError');
+
+        final minimalData = {
+          'email': supabaseUser.email ?? '',
+          'display_name': displayName,
+          'created_at': DateTime.now().toIso8601String(),
+          'last_login_at': DateTime.now().toIso8601String(),
+        };
+
+        await table.upsert(minimalData.map((key, value) => MapEntry(key, value))..['id'] = supabaseUser.id);
+        logger.info('Anonymous user created with minimal data: ${supabaseUser.id}');
+      }
     } catch (e) {
       logger.severe('Error creating anonymous user in Supabase: $e');
       rethrow;

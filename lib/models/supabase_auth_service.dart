@@ -151,7 +151,13 @@ class SupabaseAuthService extends ChangeNotifier {
 
       // Create user in database with random display name
       if (_user != null) {
-        await UserRepository.instance.createAnonymousUser(_user!, _generateRandomDisplayName());
+        try {
+          await UserRepository.instance.createAnonymousUser(_user!, _generateRandomDisplayName());
+        } catch (e) {
+          // If database creation fails, log the error but don't prevent anonymous login
+          logger.warning('Failed to create anonymous user in database: $e');
+          // The user can still use the app without database storage
+        }
       }
 
       return _user;
