@@ -17,7 +17,7 @@ dependencies:
   engine:
     path: plugins/engine
 
-  intl: ^0.20.2
+  intl: ^0.19.0
   cupertino_icons: ^1.0.6
   logging: ^1.2.0
   flutter_document_picker: ^5.2.0

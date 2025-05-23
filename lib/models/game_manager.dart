@@ -87,9 +87,11 @@ class GameManager {
   Future<bool> init() async {
     if (_initialized) return true;
 
+    print('GameManager: Starting initialization...');
     logger.info('GameManager: Starting initialization...');
 
     try {
+      print('GameManager: Loading settings...');
       logger.info('GameManager: Loading settings...');
       setting = await GameSetting.getInstance();
 
@@ -116,11 +118,13 @@ class GameManager {
       hands.add(Player('b', this, title: manual.black));
       curHand = 0;
 
+      print('GameManager: Loading skin...');
       logger.info('GameManager: Loading skin...');
       skin = ChessSkin(setting.skin, this);
 
       // Wait for skin to be ready
       if (!skin.readyNotifier.value) {
+        print('GameManager: Waiting for skin to load...');
         logger.info('GameManager: Waiting for skin to load...');
         final completer = Completer<void>();
         late VoidCallback listener;

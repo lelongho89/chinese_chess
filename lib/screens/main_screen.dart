@@ -93,7 +93,7 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 40),
-            
+
             // New Game Button
             SizedBox(
               width: double.infinity,
@@ -124,15 +124,16 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Local Multiplayer Button
             SizedBox(
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
                 onPressed: () {
+                  print('MainScreen: Local Multiplayer button pressed');
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -160,7 +161,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             const Spacer(),
           ],
         ),

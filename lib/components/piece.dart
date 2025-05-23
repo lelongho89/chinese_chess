@@ -32,8 +32,8 @@ class Piece extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    GameManager gamer =
-        context.findAncestorStateOfType<GameWrapperState>()!.gamer;
+    GameWrapperState? gameWrapper = context.findAncestorStateOfType<GameWrapperState>();
+    GameManager gamer = gameWrapper?.gamer ?? GameManager.instance;
     String team = item.team == 0 ? 'r' : 'b';
 
     return item.isBlank

@@ -38,6 +38,7 @@ class GameBoardState extends State<GameBoard> {
   @override
   void initState() {
     super.initState();
+    print('GameBoard: initState called');
     // GameManager will initialize itself when needed
   }
 

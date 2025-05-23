@@ -49,23 +49,41 @@ class ChessState extends State<Chess> {
   @override
   void initState() {
     super.initState();
+    print('Chess initState called');
     initGamer();
   }
 
   void initGamer() {
-    if (isInit) return;
+    print('Chess initGamer: isInit=$isInit, gamer=${gamer != null}');
+    if (isInit && gamer != null) return;
     isInit = true;
-    GameWrapperState? gameWrapper =
-        context.findAncestorStateOfType<GameWrapperState>();
-    if (gameWrapper == null) return;
-    gamer = gameWrapper.gamer;
+    try {
+      GameWrapperState? gameWrapper =
+          context.findAncestorStateOfType<GameWrapperState>();
+      print('Chess initGamer: gameWrapper=${gameWrapper != null}');
+      if (gameWrapper == null) {
+        print('Chess initGamer: GameWrapper not found, using GameManager.instance directly');
+        gamer = GameManager.instance;
+      } else {
+        gamer = gameWrapper.gamer;
+      }
+      print('Chess initGamer: gamer set to ${gamer != null}, isInitialized=${gamer?.isInitialized}');
+    } catch (e) {
+      print('Chess initGamer: Error occurred: $e');
+      gamer = GameManager.instance;
+      print('Chess initGamer: Fallback to GameManager.instance, isInitialized=${gamer?.isInitialized}');
+    }
 
-    gamer!.on<GameLoadEvent>(reloadGame);
-    gamer!.on<GameResultEvent>(onResult);
-    gamer!.on<GameMoveEvent>(onMove);
-    gamer!.on<GameFlipEvent>(onFlip);
+    if (gamer != null) {
+      gamer!.on<GameLoadEvent>(reloadGame);
+      gamer!.on<GameResultEvent>(onResult);
+      gamer!.on<GameMoveEvent>(onMove);
+      gamer!.on<GameFlipEvent>(onFlip);
 
-    reloadGame(GameLoadEvent(0));
+      reloadGame(GameLoadEvent(0));
+    } else {
+      print('Chess initGamer: gamer is still null after initialization attempt');
+    }
   }
 
   @override
@@ -444,6 +462,14 @@ class ChessState extends State<Chess> {
 
   @override
   Widget build(BuildContext context) {
+    print('Chess build: isLoading=$isLoading, isInit=$isInit, gamer=${gamer != null}, isInitialized=${gamer?.isInitialized}');
+
+    // If gamer is null, try to initialize it again
+    if (gamer == null) {
+      print('Chess build: gamer is null, calling initGamer again');
+      initGamer();
+    }
+
     if (isLoading || !isInit || gamer == null || !gamer!.isInitialized) {
       return const Center(
         child: CircularProgressIndicator(),

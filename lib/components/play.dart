@@ -33,6 +33,7 @@ class PlayPageState extends State<PlayPage> {
   @override
   void initState() {
     super.initState();
+    print('PlayPage: initState called');
     initGame();
   }
 
@@ -51,6 +52,7 @@ class PlayPageState extends State<PlayPage> {
   }
 
   void initGame() async {
+    print('PlayPage: 初始化游戏 $inited');
     logger.info('PlayPage: 初始化游戏 $inited');
     if (inited) return;
 

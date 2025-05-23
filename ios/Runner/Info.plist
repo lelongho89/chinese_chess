@@ -45,5 +45,7 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Your app needs local network access to enable debugging and communication with the Dart VM Service.</string>
 </dict>
 </plist>

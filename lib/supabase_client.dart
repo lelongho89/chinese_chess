@@ -22,11 +22,11 @@ class SupabaseClientWrapper {
   /// Initialize Supabase
   static Future<void> initialize() async {
     try {
-      final supabaseUrl = dotenv.env['SUPABASE_URL'];
-      final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
+      final supabaseUrl = dotenv.env['SUPABASE_URL'] ?? 'https://acweqgoipybexjlqanya.supabase.co';
+      final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'] ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjd2VxZ29pcHliZXhqbHFhbnlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc4MTE1ODgsImV4cCI6MjA2MzM4NzU4OH0.urd6Ly5Rb2SsEEut1O6BWCitRdNC_Gut10sjGMhwDzE';
 
-      if (supabaseUrl == null || supabaseAnonKey == null) {
-        throw Exception('Supabase URL or Anon Key not found in .env file');
+      if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) {
+        throw Exception('Supabase URL or Anon Key not found');
       }
 
       await Supabase.initialize(

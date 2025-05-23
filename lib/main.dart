@@ -23,8 +23,13 @@ void main() async {
   Logger.root.level = Level.ALL;
   hierarchicalLoggingEnabled = true;
 
-  // Load environment variables
-  await dotenv.load();
+  // Load environment variables from assets
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    logger.warning('Could not load .env file: $e');
+    // Continue without .env file - use default values
+  }
 
   // Initialize Supabase
   try {

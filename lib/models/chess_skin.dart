@@ -41,17 +41,22 @@ class ChessSkin {
   late ValueNotifier<bool> readyNotifier;
 
   ChessSkin(this.folder, this.manager) {
+    print('ChessSkin: Creating skin for folder: $folder');
     readyNotifier = ValueNotifier(false);
     String jsonfile = "assets/skins/$folder/config.json";
+    print('ChessSkin: Loading config from: $jsonfile');
     rootBundle.loadString(jsonfile).then((String fileContents) {
+      print('ChessSkin: Config loaded successfully, parsing JSON...');
       loadJson(fileContents);
     }).catchError((error) {
+      print('ChessSkin: Error loading config: $error');
       logger.warning('Skin file $jsonfile error', error);
       readyNotifier.value = true;
     });
   }
 
   void loadJson(String content) {
+    print('ChessSkin: Parsing JSON content...');
     Map<String, dynamic> json = jsonDecode(content);
     json.forEach((key, value) {
       switch (key) {
@@ -81,6 +86,7 @@ class ChessSkin {
           break;
       }
     });
+    print('ChessSkin: JSON parsed successfully, setting ready to true');
     readyNotifier.value = true;
   }
 

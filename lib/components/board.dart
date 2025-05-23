@@ -28,9 +28,12 @@ class BoardState extends State<Board> {
     isInit = true;
 
     GameWrapperState? gameWrapper = context.findAncestorStateOfType<GameWrapperState>();
-    if (gameWrapper == null) return;
-
-    gamer = gameWrapper.gamer;
+    if (gameWrapper == null) {
+      // Fallback to GameManager.instance if GameWrapper not found
+      gamer = GameManager.instance;
+    } else {
+      gamer = gameWrapper.gamer;
+    }
     // Listen for game load events which are triggered when skin changes
     gamer.on<GameLoadEvent>(_onGameLoad);
   }
@@ -57,8 +60,10 @@ class BoardState extends State<Board> {
       if (gameWrapper != null) {
         gamer = gameWrapper.gamer;
       } else {
-        return const SizedBox();
+        // Fallback to GameManager.instance if GameWrapper not found
+        gamer = GameManager.instance;
       }
+      isInit = true;
     }
 
     // Check if gamer is properly initialized before accessing skin
