@@ -125,6 +125,30 @@ class _SettingPageState extends State<SettingPage> {
 
                     const SizedBox(height: 32),
 
+                    // Language Section
+                    _buildSectionTitle(context.l10n.language),
+                    const SizedBox(height: 16),
+
+                    Consumer<LocaleProvider>(
+                      builder: (context, localeProvider, child) {
+                        return _buildSettingItem(
+                          title: context.l10n.language,
+                          subtitle: 'Choose your preferred language',
+                          trailing: Text(
+                            _getLanguageDisplayName(localeProvider.locale.languageCode),
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                            ),
+                          ),
+                          onTap: () {
+                            _showLanguageDialog();
+                          },
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 32),
+
                     // Appearance Section
                     _buildSectionTitle(context.l10n.appearance),
                     const SizedBox(height: 16),
@@ -324,6 +348,19 @@ class _SettingPageState extends State<SettingPage> {
     }
   }
 
+  String _getLanguageDisplayName(String languageCode) {
+    switch (languageCode) {
+      case 'en':
+        return context.l10n.languageEnglish;
+      case 'zh':
+        return context.l10n.languageChinese;
+      case 'vi':
+        return context.l10n.languageVietnamese;
+      default:
+        return context.l10n.languageEnglish;
+    }
+  }
+
   void _showDifficultyDialog() {
     showDialog(
       context: context,
@@ -388,6 +425,69 @@ class _SettingPageState extends State<SettingPage> {
             child: Text(context.l10n.cancel),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showLanguageDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => Consumer<LocaleProvider>(
+        builder: (context, localeProvider, child) {
+          return AlertDialog(
+            title: Text(context.l10n.language),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: Text(context.l10n.languageEnglish),
+                  leading: Radio<String>(
+                    value: 'en',
+                    groupValue: localeProvider.locale.languageCode,
+                    onChanged: (value) {
+                      if (value != null) {
+                        localeProvider.setLocale(value);
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
+                ),
+                ListTile(
+                  title: Text(context.l10n.languageChinese),
+                  leading: Radio<String>(
+                    value: 'zh',
+                    groupValue: localeProvider.locale.languageCode,
+                    onChanged: (value) {
+                      if (value != null) {
+                        localeProvider.setLocale(value);
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
+                ),
+                ListTile(
+                  title: Text(context.l10n.languageVietnamese),
+                  leading: Radio<String>(
+                    value: 'vi',
+                    groupValue: localeProvider.locale.languageCode,
+                    onChanged: (value) {
+                      if (value != null) {
+                        localeProvider.setLocale(value);
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(context.l10n.cancel),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

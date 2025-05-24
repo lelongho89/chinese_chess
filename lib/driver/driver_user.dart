@@ -5,7 +5,7 @@ import '../models/game_event.dart';
 import 'player_driver.dart';
 
 class DriverUser extends PlayerDriver {
-  late Completer<PlayerAction> requestMove;
+  Completer<PlayerAction>? requestMove;
 
   DriverUser(super.player);
 
@@ -19,7 +19,7 @@ class DriverUser extends PlayerDriver {
     requestMove = Completer<PlayerAction>();
     player.manager.add(GameLockEvent(false));
 
-    return requestMove.future;
+    return requestMove!.future;
   }
 
   @override
@@ -30,8 +30,8 @@ class DriverUser extends PlayerDriver {
 
   @override
   void completeMove(PlayerAction move) {
-    if (!requestMove.isCompleted) {
-      requestMove.complete(move);
+    if (requestMove != null && !requestMove!.isCompleted) {
+      requestMove!.complete(move);
     }
   }
 

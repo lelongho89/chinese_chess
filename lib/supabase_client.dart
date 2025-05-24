@@ -25,13 +25,13 @@ class SupabaseClientWrapper {
       final supabaseUrl = dotenv.env['SUPABASE_URL'];
       final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
 
-      if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) {
+      if (supabaseUrl?.isEmpty != false || supabaseAnonKey?.isEmpty != false) {
         throw Exception('Supabase URL or Anon Key not found');
       }
 
       await Supabase.initialize(
-        url: supabaseUrl,
-        anonKey: supabaseAnonKey,
+        url: supabaseUrl!,
+        anonKey: supabaseAnonKey!,
         debug: false, // Set to true for development
       );
 
