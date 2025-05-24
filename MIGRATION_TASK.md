@@ -37,7 +37,40 @@
 - [ ] Implement analytics
 - [ ] Implement push notifications
 - [ ] Implement in-app purchases
-- [ ] Implement achievements and leaderboards
+- [x] Implement achievements and leaderboards
+  - [x] Basic Elo rating system (K=32) implemented
+  - [x] Leaderboard repository and models
+  - [x] Integration with game completion flow
+  - [x] Comprehensive unit tests for Elo calculations
+- [x] Implement matchmaking queue with Elo proximity
+  - [x] Matchmaking queue database schema and migration
+  - [x] MatchmakingQueueModel with status tracking
+  - [x] MatchmakingQueueRepository with Supabase integration
+  - [x] MatchmakingService with Elo-based matching logic
+  - [x] Automatic queue expiration and cleanup
+  - [x] Color preference handling
+  - [x] Time control compatibility
+  - [x] Wait time expansion for better matching
+  - [x] Comprehensive unit tests for matching logic
+  - [x] Matchmaking UI screen for queue management
+- [x] Implement online multiplayer with Supabase real-time
+  - [x] Enhanced database schema for real-time game state
+  - [x] GameMoveModel for individual move tracking
+  - [x] GameMoveRepository with move history management
+  - [x] OnlineMultiplayerService with real-time subscriptions
+  - [x] Complete DriverOnline implementation for network players
+  - [x] Real-time move broadcasting and synchronization
+  - [x] Connection status tracking and management
+  - [x] Game state synchronization (active/paused/ended)
+  - [x] Automatic game state updates via database triggers
+  - [x] Network error handling and reconnection logic
+  - [x] OnlineGameManager for seamless integration with existing GameManager
+  - [x] Fixed compilation errors and code style issues
+  - [x] Added missing localization keys for matchmaking UI
+  - [x] Enabled online mode in game board (was previously disabled)
+  - [x] Verified online mode navigation to matchmaking screen
+  - [x] Comprehensive unit tests for all components (17 tests passing)
+  - [x] Complete documentation for online multiplayer system
 
 ## Phase 7: Testing and Deployment
 - [ ] Write unit tests

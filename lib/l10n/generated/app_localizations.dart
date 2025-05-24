@@ -1428,6 +1428,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Log Out'**
   String get logOut;
+
+  /// No description provided for @matchmaking.
+  ///
+  /// In en, this message translates to:
+  /// **'Matchmaking'**
+  String get matchmaking;
+
+  /// No description provided for @cancelSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Search'**
+  String get cancelSearch;
+
+  /// No description provided for @findMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Find Match'**
+  String get findMatch;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

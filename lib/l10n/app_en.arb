@@ -254,5 +254,9 @@
   "cancel": "Cancel",
   "joinedDate": "Joined {date}",
   "changePassword": "Change Password",
-  "logOut": "Log Out"
+  "logOut": "Log Out",
+
+  "matchmaking": "Matchmaking",
+  "cancelSearch": "Cancel Search",
+  "findMatch": "Find Match"
 }

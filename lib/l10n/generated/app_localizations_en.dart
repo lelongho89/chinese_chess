@@ -677,4 +677,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logOut => 'Log Out';
+
+  @override
+  String get matchmaking => 'Matchmaking';
+
+  @override
+  String get cancelSearch => 'Cancel Search';
+
+  @override
+  String get findMatch => 'Find Match';
 }

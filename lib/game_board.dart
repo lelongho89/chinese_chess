@@ -15,6 +15,7 @@ import 'setting.dart';
 import 'components/game_bottom_bar.dart';
 import 'models/play_mode.dart';
 import 'models/supabase_auth_service.dart';
+import 'screens/matchmaking_screen.dart';
 import 'screens/profile_screen.dart';
 import 'widgets/game_wrapper.dart';
 import 'models/game_manager.dart';
@@ -92,12 +93,9 @@ class GameBoardState extends State<GameBoard> {
                   title: context.l10n.modeOnline,
                   subtitle: context.l10n.modeOnlineSubtitle,
                   onTap: () {
-                    MyDialog.toast(
-                      context.l10n.featureNotAvailable,
-                      iconType: IconType.error,
-                    );
+                    _navigateToOnlineMode();
                   },
-                  isEnabled: false,
+                  isEnabled: true,
                 ),
                 // Free Mode - Hidden for MVP
                 // const SizedBox(height: 16),
@@ -202,6 +200,25 @@ class GameBoardState extends State<GameBoard> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  /// Navigate to online mode (matchmaking)
+  void _navigateToOnlineMode() {
+    // Check if user is authenticated
+    final authService = Provider.of<SupabaseAuthService>(context, listen: false);
+    if (!authService.isAuthenticated) {
+      // Show login dialog or navigate to login screen
+      MyDialog.alert('Please login first to play online');
+      return;
+    }
+
+    // Navigate to matchmaking screen
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const MatchmakingScreen(),
       ),
     );
   }

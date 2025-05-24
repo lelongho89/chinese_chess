@@ -677,4 +677,13 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get logOut => 'Đăng Xuất';
+
+  @override
+  String get matchmaking => 'Matchmaking';
+
+  @override
+  String get cancelSearch => 'Cancel Search';
+
+  @override
+  String get findMatch => 'Find Match';
 }
