@@ -653,6 +653,21 @@ class AppLocalizationsVi extends AppLocalizations {
   String get startGame => 'Bắt Đầu Trò Chơi';
 
   @override
+  String get gameSettings => 'Game Settings';
+
+  @override
+  String get aiDifficulty => 'AI Difficulty';
+
+  @override
+  String get setTheAIDifficultyLevel => 'Set the AI difficulty level';
+
+  @override
+  String get onlineMultiplayer => 'Online Multiplayer';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
   String joinedDate(Object date) {
     return 'Tham gia $date';
   }

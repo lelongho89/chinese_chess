@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'chess.dart';
-import 'game_timer_display.dart';
 import 'play_step.dart';
 import 'play_single_player.dart';
 import 'play_bot.dart';
@@ -60,6 +59,7 @@ class PlayPageState extends State<PlayPage> {
       logger.info('PlayPage: Ensuring GameManager is initialized...');
       // Ensure GameManager is initialized first
       final initResult = await gamer.init();
+      logger.info('PlayPage: GameManager init result: $initResult');
       if (!initResult) {
         throw Exception('GameManager initialization failed');
       }
@@ -79,10 +79,15 @@ class PlayPageState extends State<PlayPage> {
 
       logger.info('PlayPage: Starting new game...');
       inited = true;
+
+      // Enable timer before starting new game
+      timerManager.enabled = true;
+
+      // Start new game (this will set curHand and trigger events)
       gamer.newGame(amyType: DriverType.robot);
 
       logger.info('PlayPage: Starting timers...');
-      // Reset timers for new game
+      // Start new game for timer manager (this will start the active timer)
       timerManager.startNewGame();
 
       logger.info('PlayPage: Initialization complete, updating UI...');
@@ -135,44 +140,30 @@ class PlayPageState extends State<PlayPage> {
   }
 
   Widget _mobileContainer() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        // Black player info and timer
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Expanded(
-              child: PlaySinglePlayer(
-                team: 1,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: ChangeNotifierProvider.value(
-                value: timerManager,
-                child: const GameTimerDisplay(
-                  isCompact: true,
-                  showControls: false,
-                ),
-              ),
-            ),
-          ],
-        ),
+    return ChangeNotifierProvider.value(
+      value: timerManager,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          // Black player info with timer
+          const PlaySinglePlayer(
+            team: 1,
+          ),
 
-        // Chess board
-        SizedBox(
-          width: gamer.skin.width * gamer.scale,
-          height: gamer.skin.height * gamer.scale,
-          child: const Chess(),
-        ),
+          // Chess board
+          SizedBox(
+            width: gamer.skin.width * gamer.scale,
+            height: gamer.skin.height * gamer.scale,
+            child: const Chess(),
+          ),
 
-        // Red player info
-        const PlaySinglePlayer(
-          team: 0,
-          placeAt: Alignment.bottomCenter,
-        ),
-      ],
+          // Red player info with timer
+          const PlaySinglePlayer(
+            team: 0,
+            placeAt: Alignment.bottomCenter,
+          ),
+        ],
+      ),
     );
   }
 
@@ -219,31 +210,18 @@ class PlayPageState extends State<PlayPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Player info
-                      const PlayPlayer(),
+                      // Player info with timers
+                      ChangeNotifierProvider.value(
+                        value: timerManager,
+                        child: const PlayPlayer(),
+                      ),
                       const SizedBox(width: 10),
 
                       // Game steps
                       Expanded(
-                        child: Column(
-                          children: [
-                            // Timer display
-                            ChangeNotifierProvider.value(
-                              value: timerManager,
-                              child: const Padding(
-                                padding: EdgeInsets.only(bottom: 8.0),
-                                child: GameTimerDisplay(),
-                              ),
-                            ),
-
-                            // Steps
-                            Expanded(
-                              child: PlayStep(
-                                decoration: decoration,
-                                width: 180,
-                              ),
-                            ),
-                          ],
+                        child: PlayStep(
+                          decoration: decoration,
+                          width: 180,
                         ),
                       ),
                     ],

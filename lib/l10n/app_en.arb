@@ -246,6 +246,12 @@
   "medium": "Medium",
   "hard": "Hard",
   "startGame": "Start Game",
+  "gameSettings": "Game Settings",
+  "aiDifficulty": "AI Difficulty",
+  "setTheAIDifficultyLevel": "Set the AI difficulty level",
+  "onlineMultiplayer": "Online Multiplayer",
+  "comingSoon": "Coming Soon",
+  "cancel": "Cancel",
   "joinedDate": "Joined {date}",
   "changePassword": "Change Password",
   "logOut": "Log Out"

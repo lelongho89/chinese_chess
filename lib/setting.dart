@@ -8,6 +8,7 @@ import 'l10n/generated/app_localizations.dart';
 import 'models/game_manager.dart';
 import 'models/game_setting.dart';
 import 'models/locale_provider.dart';
+import 'models/play_mode.dart';
 
 /// 设置页
 class SettingPage extends StatefulWidget {
@@ -57,6 +58,26 @@ class _SettingPageState extends State<SettingPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Game Section
+                    _buildSectionTitle(context.l10n.gameSettings),
+                    const SizedBox(height: 16),
+
+                    _buildSettingItem(
+                      title: context.l10n.aiDifficulty,
+                      subtitle: context.l10n.setTheAIDifficultyLevel,
+                      trailing: Text(
+                        _getDifficultyDisplayName(setting!.difficulty),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                      ),
+                      onTap: () {
+                        _showDifficultyDialog();
+                      },
+                    ),
+
+                    const SizedBox(height: 32),
+
                     // Sound Section
                     _buildSectionTitle(context.l10n.sound),
                     const SizedBox(height: 16),
@@ -284,6 +305,87 @@ class _SettingPageState extends State<SettingPage> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(context.l10n.save),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getDifficultyDisplayName(int difficulty) {
+    switch (difficulty) {
+      case 0:
+        return context.l10n.easy;
+      case 1:
+        return context.l10n.medium;
+      case 2:
+        return context.l10n.hard;
+      default:
+        return context.l10n.easy;
+    }
+  }
+
+  void _showDifficultyDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.l10n.difficulty),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(context.l10n.easy),
+              leading: Radio<int>(
+                value: 0,
+                groupValue: setting!.difficulty,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      setting!.difficulty = value;
+                      setting!.save();
+                    });
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ),
+            ListTile(
+              title: Text(context.l10n.medium),
+              leading: Radio<int>(
+                value: 1,
+                groupValue: setting!.difficulty,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      setting!.difficulty = value;
+                      setting!.save();
+                    });
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ),
+            ListTile(
+              title: Text(context.l10n.hard),
+              leading: Radio<int>(
+                value: 2,
+                groupValue: setting!.difficulty,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      setting!.difficulty = value;
+                      setting!.save();
+                    });
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(context.l10n.cancel),
           ),
         ],
       ),

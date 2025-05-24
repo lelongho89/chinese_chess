@@ -653,6 +653,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get startGame => 'Start Game';
 
   @override
+  String get gameSettings => 'Game Settings';
+
+  @override
+  String get aiDifficulty => 'AI Difficulty';
+
+  @override
+  String get setTheAIDifficultyLevel => 'Set the AI difficulty level';
+
+  @override
+  String get onlineMultiplayer => 'Online Multiplayer';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
   String joinedDate(Object date) {
     return 'Joined $date';
   }

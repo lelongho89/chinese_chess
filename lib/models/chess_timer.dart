@@ -33,6 +33,9 @@ class ChessTimer extends ChangeNotifier {
   /// Current time remaining in seconds
   int _timeRemaining;
 
+  /// Accumulated fractional seconds for more accurate timing
+  double _fractionalSeconds = 0.0;
+
   /// Current state of the timer
   TimerState _state = TimerState.ready;
 
@@ -114,6 +117,7 @@ class ChessTimer extends ChangeNotifier {
   void reset() {
     _state = TimerState.ready;
     _timeRemaining = initialTime;
+    _fractionalSeconds = 0.0;
     _timer?.cancel();
     _timer = null;
 
@@ -147,22 +151,33 @@ class ChessTimer extends ChangeNotifier {
 
   /// Update the timer (called by the timer)
   void _updateTimer(Timer timer) {
+    if (_state != TimerState.running) return;
+
     final now = DateTime.now();
     final elapsed = now.difference(_lastUpdateTime!).inMilliseconds;
     _lastUpdateTime = now;
 
-    // Convert milliseconds to deciseconds (0.1 seconds)
-    final elapsedDeciSeconds = elapsed ~/ 100;
+    // Convert elapsed milliseconds to seconds
+    final elapsedSeconds = elapsed / 1000.0;
 
-    // Subtract elapsed time (in deciseconds)
-    _timeRemaining -= (elapsedDeciSeconds / 10).round();
+    // Add to fractional seconds accumulator
+    _fractionalSeconds += elapsedSeconds;
+
+    // If we've accumulated a full second or more, subtract from time remaining
+    if (_fractionalSeconds >= 1.0) {
+      final secondsToSubtract = _fractionalSeconds.floor();
+      _timeRemaining -= secondsToSubtract;
+      _fractionalSeconds -= secondsToSubtract;
+    }
 
     // Ensure time doesn't go below zero
     if (_timeRemaining <= 0) {
       _timeRemaining = 0;
+      _fractionalSeconds = 0.0;
       _state = TimerState.expired;
       _timer?.cancel();
       _timer = null;
+      logger.info('Timer expired');
     }
 
     notifyListeners();

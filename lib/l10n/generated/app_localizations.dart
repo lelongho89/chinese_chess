@@ -1381,6 +1381,36 @@ abstract class AppLocalizations {
   /// **'Start Game'**
   String get startGame;
 
+  /// No description provided for @gameSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Game Settings'**
+  String get gameSettings;
+
+  /// No description provided for @aiDifficulty.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Difficulty'**
+  String get aiDifficulty;
+
+  /// No description provided for @setTheAIDifficultyLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Set the AI difficulty level'**
+  String get setTheAIDifficultyLevel;
+
+  /// No description provided for @onlineMultiplayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Online Multiplayer'**
+  String get onlineMultiplayer;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
   /// No description provided for @joinedDate.
   ///
   /// In en, this message translates to:

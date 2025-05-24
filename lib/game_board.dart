@@ -24,7 +24,9 @@ import 'services/match_invitation_handler.dart';
 
 /// 游戏页面
 class GameBoard extends StatefulWidget {
-  const GameBoard({super.key});
+  final PlayMode? initialMode;
+
+  const GameBoard({super.key, this.initialMode});
 
   @override
   State<GameBoard> createState() => GameBoardState();
@@ -39,6 +41,8 @@ class GameBoardState extends State<GameBoard> {
   void initState() {
     super.initState();
     print('GameBoard: initState called');
+    // Set the initial mode if provided
+    mode = widget.initialMode;
     // GameManager will initialize itself when needed
   }
 

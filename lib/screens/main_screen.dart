@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import '../global.dart';
 import '../game_board.dart';
 import '../setting.dart';
+import '../test_timer_screen.dart';
+import '../models/game_setting.dart';
+import '../models/play_mode.dart';
 import 'profile_screen.dart';
 import 'new_game_screen.dart';
 
@@ -19,7 +22,6 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const NewGameScreen(),
     const SettingPage(),
   ];
 
@@ -44,10 +46,6 @@ class _MainScreenState extends State<MainScreen> {
             label: context.l10n.home,
           ),
           BottomNavigationBarItem(
-            icon: const Icon(Icons.play_arrow),
-            label: context.l10n.play,
-          ),
-          BottomNavigationBarItem(
             icon: const Icon(Icons.settings),
             label: context.l10n.settings,
           ),
@@ -57,8 +55,28 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  GameSetting? setting;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  void _loadSettings() async {
+    final gameSetting = await GameSetting.getInstance();
+    setState(() {
+      setting = gameSetting;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,19 +112,12 @@ class HomeScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 40),
 
-            // New Game Button
+            // Single Player (AI) Mode
             SizedBox(
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const NewGameScreen(),
-                    ),
-                  );
-                },
+                onPressed: () => _startGame(PlayMode.modeRobot),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -115,35 +126,67 @@ class HomeScreen extends StatelessWidget {
                   ),
                   elevation: 0,
                 ),
-                child: Text(
-                  context.l10n.newGame,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.smart_toy, size: 24),
+                    const SizedBox(width: 12),
+                    Text(
+                      context.l10n.singlePlayer,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
 
             const SizedBox(height: 16),
 
-            // Local Multiplayer Button
+            // Local Multiplayer Mode
             SizedBox(
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
-                onPressed: () {
-                  print('MainScreen: Local Multiplayer button pressed');
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const GameBoard(),
+                onPressed: () => _startGame(PlayMode.modeFree),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 0,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.people, size: 24),
+                    const SizedBox(width: 12),
+                    Text(
+                      context.l10n.localMultiplayer,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  );
-                },
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Online Multiplayer Mode (Coming Soon)
+            SizedBox(
+              width: double.infinity,
+              height: 60,
+              child: ElevatedButton(
+                onPressed: null, // Disabled for now
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.surface,
-                  foregroundColor: Theme.of(context).colorScheme.onSurface,
+                  foregroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -152,12 +195,71 @@ class HomeScreen extends StatelessWidget {
                     color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
                   ),
                 ),
-                child: Text(
-                  context.l10n.localMultiplayer,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.public, size: 24),
+                    const SizedBox(width: 12),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          context.l10n.onlineMultiplayer,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          context.l10n.comingSoon,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Timer Test Button (for debugging)
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const TestTimerScreen(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
+                  elevation: 0,
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.timer, size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      'Test Timer',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -165,6 +267,29 @@ class HomeScreen extends StatelessWidget {
             const Spacer(),
           ],
         ),
+      ),
+    );
+  }
+
+  void _startGame(PlayMode mode) async {
+    // Load settings to get difficulty
+    final gameSetting = setting ?? await GameSetting.getInstance();
+
+    // Apply the game mode and difficulty settings
+    if (mode == PlayMode.modeRobot) {
+      // Set the engine level based on difficulty from settings
+      final engineLevel = 10 + gameSetting.difficulty;
+      // TODO: Apply engine level to GameManager
+      print('Starting Single Player game with difficulty: ${gameSetting.difficulty} (engine level: $engineLevel)');
+    } else if (mode == PlayMode.modeFree) {
+      print('Starting Local Multiplayer game');
+    }
+
+    // Navigate to game board with the selected mode
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GameBoard(initialMode: mode),
       ),
     );
   }
