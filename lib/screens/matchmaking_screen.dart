@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:async';
 
 import '../models/matchmaking_queue_model.dart';
 import '../models/user_model.dart';
+import '../models/supabase_auth_service.dart';
 import '../services/matchmaking_service.dart';
 import '../repositories/user_repository.dart';
 import '../global.dart';
@@ -43,14 +45,34 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
 
   Future<void> _loadCurrentUser() async {
     try {
-      // Get current user from auth service
-      // This would typically come from your auth service
-      // For now, we'll simulate getting the current user
-      final users = await UserRepository.instance.getTopPlayers(limit: 1);
-      if (users.isNotEmpty) {
-        setState(() {
-          _currentUser = users.first;
-        });
+      // Get current authenticated user from Supabase
+      final authService = Provider.of<SupabaseAuthService>(context, listen: false);
+      if (authService.isAuthenticated && authService.user != null) {
+        final userId = authService.user!.id;
+        final user = await UserRepository.instance.get(userId);
+        if (user != null) {
+          setState(() {
+            _currentUser = user;
+          });
+        } else {
+          // User not found in database, create a new user record
+          final newUser = UserModel(
+            uid: userId,
+            displayName: authService.user!.userMetadata?['display_name'] ?? 'Anonymous User',
+            email: authService.user!.email ?? '',
+            eloRating: 1200,
+            gamesPlayed: 0,
+            gamesWon: 0,
+            gamesLost: 0,
+            gamesDraw: 0,
+            createdAt: DateTime.now(),
+            lastLoginAt: DateTime.now(),
+          );
+          await UserRepository.instance.add(newUser);
+          setState(() {
+            _currentUser = newUser;
+          });
+        }
       }
     } catch (e) {
       logger.severe('Error loading current user: $e');
@@ -414,13 +436,13 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           border: Border.all(
-            color: isSelected 
-                ? Theme.of(context).colorScheme.primary 
+            color: isSelected
+                ? Theme.of(context).colorScheme.primary
                 : Theme.of(context).colorScheme.outline,
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(12),
-          color: isSelected 
+          color: isSelected
               ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3)
               : null,
         ),
