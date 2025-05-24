@@ -99,18 +99,19 @@ class GameBoardState extends State<GameBoard> {
                   },
                   isEnabled: false,
                 ),
-                const SizedBox(height: 16),
-                _buildGameModeCard(
-                  icon: Icons.people,
-                  title: context.l10n.modeFree,
-                  subtitle: context.l10n.modeFreeSubtitle,
-                  onTap: () {
-                    setState(() {
-                      mode = PlayMode.modeFree;
-                    });
-                  },
-                  isEnabled: true,
-                ),
+                // Free Mode - Hidden for MVP
+                // const SizedBox(height: 16),
+                // _buildGameModeCard(
+                //   icon: Icons.people,
+                //   title: context.l10n.modeFree,
+                //   subtitle: context.l10n.modeFreeSubtitle,
+                //   onTap: () {
+                //     setState(() {
+                //       mode = PlayMode.modeFree;
+                //     });
+                //   },
+                //   isEnabled: true,
+                // ),
               ],
             ),
           ),

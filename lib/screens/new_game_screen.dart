@@ -43,7 +43,7 @@ class _NewGameScreenState extends State<NewGameScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Single Player Option
             _buildGameModeOption(
               title: context.l10n.singlePlayer,
@@ -55,23 +55,22 @@ class _NewGameScreenState extends State<NewGameScreen> {
                 });
               },
             ),
-            
-            const SizedBox(height: 12),
-            
-            // Local Multiplayer Option
-            _buildGameModeOption(
-              title: context.l10n.localMultiplayer,
-              subtitle: context.l10n.playWithAFriendOnTheSameDevice,
-              isSelected: _selectedMode == PlayMode.modeFree,
-              onTap: () {
-                setState(() {
-                  _selectedMode = PlayMode.modeFree;
-                });
-              },
-            ),
-            
+
+            // Local Multiplayer Option - Hidden for MVP
+            // const SizedBox(height: 12),
+            // _buildGameModeOption(
+            //   title: context.l10n.localMultiplayer,
+            //   subtitle: context.l10n.playWithAFriendOnTheSameDevice,
+            //   isSelected: _selectedMode == PlayMode.modeFree,
+            //   onTap: () {
+            //     setState(() {
+            //       _selectedMode = PlayMode.modeFree;
+            //     });
+            //   },
+            // ),
+
             const SizedBox(height: 32),
-            
+
             // Difficulty Section (only show for single player)
             if (_selectedMode == PlayMode.modeRobot) ...[
               Text(
@@ -82,7 +81,7 @@ class _NewGameScreenState extends State<NewGameScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               _buildDifficultyOption(
                 title: context.l10n.easy,
                 isSelected: _selectedDifficulty == 0,
@@ -92,9 +91,9 @@ class _NewGameScreenState extends State<NewGameScreen> {
                   });
                 },
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               _buildDifficultyOption(
                 title: context.l10n.medium,
                 isSelected: _selectedDifficulty == 1,
@@ -104,9 +103,9 @@ class _NewGameScreenState extends State<NewGameScreen> {
                   });
                 },
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               _buildDifficultyOption(
                 title: context.l10n.hard,
                 isSelected: _selectedDifficulty == 2,
@@ -117,9 +116,9 @@ class _NewGameScreenState extends State<NewGameScreen> {
                 },
               ),
             ],
-            
+
             const Spacer(),
-            
+
             // Start Game Button
             SizedBox(
               width: double.infinity,
@@ -163,7 +162,7 @@ class _NewGameScreenState extends State<NewGameScreen> {
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected 
+            color: isSelected
               ? Theme.of(context).colorScheme.primary
               : Theme.of(context).colorScheme.outline.withOpacity(0.3),
             width: isSelected ? 2 : 1,
@@ -217,7 +216,7 @@ class _NewGameScreenState extends State<NewGameScreen> {
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected 
+            color: isSelected
               ? Theme.of(context).colorScheme.primary
               : Theme.of(context).colorScheme.outline.withOpacity(0.3),
             width: isSelected ? 2 : 1,
@@ -254,7 +253,7 @@ class _NewGameScreenState extends State<NewGameScreen> {
         final engineLevel = 10 + _selectedDifficulty;
         // You might want to update the game setting here
       }
-      
+
       // Navigate to game board with selected mode
       Navigator.pushReplacement(
         context,

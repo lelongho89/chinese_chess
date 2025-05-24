@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../global.dart';
 import '../game_board.dart';
 import '../setting.dart';
-import '../test_timer_screen.dart';
+
 import '../models/game_setting.dart';
 import '../models/play_mode.dart';
 import 'profile_screen.dart';
@@ -145,38 +145,38 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 16),
 
-            // Local Multiplayer Mode
-            SizedBox(
-              width: double.infinity,
-              height: 60,
-              child: ElevatedButton(
-                onPressed: () => _startGame(PlayMode.modeFree),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.secondary,
-                  foregroundColor: Theme.of(context).colorScheme.onSecondary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 0,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.people, size: 24),
-                    const SizedBox(width: 12),
-                    Text(
-                      context.l10n.localMultiplayer,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // Local Multiplayer Mode - Hidden for MVP
+            // SizedBox(
+            //   width: double.infinity,
+            //   height: 60,
+            //   child: ElevatedButton(
+            //     onPressed: () => _startGame(PlayMode.modeFree),
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: Theme.of(context).colorScheme.secondary,
+            //       foregroundColor: Theme.of(context).colorScheme.onSecondary,
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(16),
+            //       ),
+            //       elevation: 0,
+            //     ),
+            //     child: Row(
+            //       mainAxisAlignment: MainAxisAlignment.center,
+            //       children: [
+            //         const Icon(Icons.people, size: 24),
+            //         const SizedBox(width: 12),
+            //         Text(
+            //           context.l10n.localMultiplayer,
+            //           style: const TextStyle(
+            //             fontSize: 18,
+            //             fontWeight: FontWeight.w600,
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
 
-            const SizedBox(height: 16),
+            // const SizedBox(height: 16),
 
             // Online Multiplayer Mode (Coming Soon)
             SizedBox(
@@ -218,46 +218,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Timer Test Button (for debugging)
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const TestTimerScreen(),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.timer, size: 20),
-                    SizedBox(width: 8),
-                    Text(
-                      'Test Timer',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
                     ),
                   ],
                 ),
