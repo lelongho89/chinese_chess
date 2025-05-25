@@ -22,6 +22,11 @@ class MatchmakingService {
   static const Duration _waitTimeExpansion = Duration(seconds: 30);
   static const Duration _maxWaitTime = Duration(minutes: 10);
 
+  // AI matching configuration
+  static const Duration _minWaitTimeForAI = Duration(seconds: 30);
+  static const bool _enableAIMatching = true;
+  static const int _maxAICandidates = 3; // Number of top AI candidates to randomly choose from
+
   Timer? _matchmakingTimer;
   bool _isMatchmakingActive = false;
 
@@ -159,7 +164,7 @@ class MatchmakingService {
 
   /// Process matches for a specific queue
   Future<void> _processQueueMatches(List<MatchmakingQueueModel> players) async {
-    if (players.length < 2) return;
+    if (players.isEmpty) return;
 
     // Sort players by join time (FIFO for fairness)
     players.sort((a, b) => a.joinedAt.compareTo(b.joinedAt));
@@ -170,12 +175,16 @@ class MatchmakingService {
       final player1 = players[i];
       if (matched.contains(player1.id)) continue;
 
-      // Find the best match for this player
+      // Find the best match for this player among other human players
       final bestMatch = await _findBestMatch(player1, players, matched);
       if (bestMatch != null) {
         await _createMatch(player1, bestMatch);
         matched.add(player1.id);
         matched.add(bestMatch.id);
+      } else if (_enableAIMatching) {
+        // No human opponent found, try to match with AI user
+        await _tryMatchWithAI(player1);
+        matched.add(player1.id);
       }
     }
   }
@@ -253,6 +262,124 @@ class MatchmakingService {
     }
   }
 
+  /// Try to match a player with an AI user when no human opponents are available
+  Future<void> _tryMatchWithAI(MatchmakingQueueModel player) async {
+    try {
+      // Check if player has been waiting long enough to match with AI
+      final waitTime = DateTime.now().difference(player.joinedAt);
+
+      if (waitTime < _minWaitTimeForAI) {
+        logger.info('Player ${player.userId} waiting ${waitTime.inSeconds}s, not yet eligible for AI match (min: ${_minWaitTimeForAI.inSeconds}s)');
+        return;
+      }
+
+      // Find suitable AI users
+      final aiOpponent = await _findSuitableAIOpponent(player);
+      if (aiOpponent == null) {
+        logger.info('No suitable AI opponent found for player ${player.userId} (Elo: ${player.eloRating})');
+        return;
+      }
+
+      // Determine colors (human player gets preference if specified)
+      final colors = _determineColorsWithAI(player, aiOpponent);
+      final redPlayerId = colors['red']!;
+      final blackPlayerId = colors['black']!;
+
+      // Create the game
+      final gameId = await GameService.instance.startGame(
+        redPlayerId: redPlayerId,
+        blackPlayerId: blackPlayerId,
+        isRanked: player.queueType == QueueType.ranked,
+        metadata: {
+          'matchmaking': true,
+          'ai_match': true,
+          'queue_type': player.queueType.name,
+          'time_control': player.timeControl,
+          'player_wait_time': player.waitTimeSeconds,
+          'elo_difference': (player.eloRating - aiOpponent.eloRating).abs(),
+          'ai_opponent_id': aiOpponent.uid,
+          'ai_opponent_name': aiOpponent.displayName,
+        },
+      );
+
+      // Mark queue entry as matched (only the human player's queue entry)
+      await MatchmakingQueueRepository.instance.markAsMatched(
+        queueId1: player.id,
+        queueId2: null, // AI doesn't have a queue entry
+        matchId: gameId,
+      );
+
+      logger.info('Created AI match: ${player.userId} (${player.eloRating}) vs AI ${aiOpponent.displayName} (${aiOpponent.eloRating})');
+    } catch (e) {
+      logger.severe('Error creating AI match: $e');
+    }
+  }
+
+  /// Find a suitable AI opponent based on Elo rating and preferences
+  Future<UserModel?> _findSuitableAIOpponent(MatchmakingQueueModel player) async {
+    try {
+      // Get all AI users
+      final allUsers = await UserRepository.instance.getAll();
+      final aiUsers = allUsers.where((user) =>
+        user.email.endsWith('@aitest.com')).toList();
+
+      if (aiUsers.isEmpty) {
+        logger.warning('No AI users available for matching');
+        return null;
+      }
+
+      // Calculate acceptable Elo range
+      final waitTime = DateTime.now().difference(player.joinedAt);
+      final maxEloDifference = _calculateExpandedEloDifference(player.eloRating, waitTime);
+
+      // Filter AI users by Elo proximity
+      final suitableAI = aiUsers.where((ai) {
+        final eloDifference = (player.eloRating - ai.eloRating).abs();
+        return eloDifference <= maxEloDifference;
+      }).toList();
+
+      if (suitableAI.isEmpty) {
+        logger.info('No AI users within Elo range ${player.eloRating} ± $maxEloDifference');
+        return null;
+      }
+
+      // Sort by Elo proximity and pick the closest one
+      suitableAI.sort((a, b) {
+        final diffA = (player.eloRating - a.eloRating).abs();
+        final diffB = (player.eloRating - b.eloRating).abs();
+        return diffA.compareTo(diffB);
+      });
+
+      // Add some randomness to avoid always picking the same AI
+      final random = Random();
+      final topCandidates = suitableAI.take(min(_maxAICandidates, suitableAI.length)).toList();
+      final selectedAI = topCandidates[random.nextInt(topCandidates.length)];
+
+      logger.info('Selected AI opponent: ${selectedAI.displayName} (Elo: ${selectedAI.eloRating}) for player ${player.userId} (Elo: ${player.eloRating})');
+      return selectedAI;
+    } catch (e) {
+      logger.severe('Error finding suitable AI opponent: $e');
+      return null;
+    }
+  }
+
+  /// Determine colors for human vs AI match
+  Map<String, String> _determineColorsWithAI(MatchmakingQueueModel player, UserModel aiOpponent) {
+    // Honor human player's color preference if specified
+    if (player.preferredColor != null) {
+      return {
+        'red': player.preferredColor == PreferredColor.red ? player.userId : aiOpponent.uid,
+        'black': player.preferredColor == PreferredColor.black ? player.userId : aiOpponent.uid,
+      };
+    }
+
+    // Default: human player gets red (slight advantage)
+    return {
+      'red': player.userId,
+      'black': aiOpponent.uid,
+    };
+  }
+
   /// Determine colors for the two players
   Map<String, String> _determineColors(MatchmakingQueueModel player1, MatchmakingQueueModel player2) {
     // If both have preferences and they're different, honor them
@@ -300,11 +427,11 @@ class MatchmakingService {
   /// Calculate expanded Elo difference based on wait time
   int _calculateExpandedEloDifference(int eloRating, Duration waitTime) {
     final baseMaxDiff = _calculateMaxEloDifference(eloRating);
-    
+
     // Expand search range every 30 seconds
     final expansions = waitTime.inSeconds ~/ _waitTimeExpansion.inSeconds;
     final expandedDiff = baseMaxDiff + (expansions * 50);
-    
+
     return min(expandedDiff, _maxEloDifference);
   }
 

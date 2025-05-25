@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../global.dart';
@@ -215,6 +216,97 @@ class UserRepository extends SupabaseBaseRepository<UserModel> {
       logger.info('Friend removed: $uid -> $friendId');
     } catch (e) {
       logger.severe('Error removing friend: $e');
+      rethrow;
+    }
+  }
+
+  // Add AI user using database function (bypasses RLS for testing)
+  Future<void> addAIUser(UserModel aiUser) async {
+    try {
+      // First ensure we have the necessary policies for AI users
+      await _ensureAIUserPolicies();
+
+      // Try direct insert first (should work with the new policy)
+      final data = aiUser.toMap();
+      data['id'] = aiUser.uid; // Ensure ID is set
+
+      await client.SupabaseClientWrapper.instance.database
+          .from('users')
+          .insert(data);
+
+      logger.info('AI user added: ${aiUser.displayName} (${aiUser.uid})');
+    } catch (e) {
+      logger.severe('Error adding AI user: $e');
+      rethrow;
+    }
+  }
+
+  // Ensure the AI user policies exist in the database
+  Future<void> _ensureAIUserPolicies() async {
+    try {
+      // For now, we'll skip policy creation since we can't execute SQL directly
+      // The AI users are created through anonymous auth which should work
+      logger.info('AI user policies check skipped (using anonymous auth approach)');
+    } catch (e) {
+      logger.info('Could not create AI user policies: $e');
+    }
+  }
+
+  // Add AI user to matchmaking queue (for testing)
+  Future<void> addAIUserToQueue(String userId, int eloRating, String queueType, int timeControl, String? preferredColor) async {
+    try {
+      // Create queue entry data
+      final queueData = {
+        'id': _generateUUID(),
+        'user_id': userId,
+        'elo_rating': eloRating,
+        'queue_type': queueType,
+        'time_control': timeControl,
+        'preferred_color': preferredColor,
+        'max_elo_difference': 200,
+        'status': 'waiting',
+        'joined_at': DateTime.now().toIso8601String(),
+        'expires_at': DateTime.now().add(const Duration(minutes: 10)).toIso8601String(),
+        'created_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toIso8601String(),
+        'is_deleted': false,
+      };
+
+      // Try direct insert (might work if RLS allows it)
+      await client.SupabaseClientWrapper.instance.database
+          .from('matchmaking_queue')
+          .insert(queueData);
+
+      logger.info('AI user added to queue: $userId');
+    } catch (e) {
+      logger.severe('Error adding AI user to queue: $e');
+      rethrow;
+    }
+  }
+
+  // Generate a simple UUID (basic implementation)
+  String _generateUUID() {
+    final random = math.Random();
+    final chars = '0123456789abcdef';
+    final uuid = List.generate(32, (index) => chars[random.nextInt(16)]).join();
+    return '${uuid.substring(0, 8)}-${uuid.substring(8, 12)}-${uuid.substring(12, 16)}-${uuid.substring(16, 20)}-${uuid.substring(20, 32)}';
+  }
+
+  // Remove all AI users (for cleanup)
+  Future<void> removeAllAIUsers() async {
+    try {
+      // Ensure we have the necessary policies for AI users
+      await _ensureAIUserPolicies();
+
+      // Delete all AI users directly
+      await client.SupabaseClientWrapper.instance.database
+          .from('users')
+          .delete()
+          .like('email', '%@aitest.com');
+
+      logger.info('All AI users removed');
+    } catch (e) {
+      logger.severe('Error removing AI users: $e');
       rethrow;
     }
   }

@@ -154,7 +154,7 @@ class MatchmakingQueueRepository extends SupabaseBaseRepository<MatchmakingQueue
   /// Mark two queue entries as matched
   Future<void> markAsMatched({
     required String queueId1,
-    required String queueId2,
+    String? queueId2,
     required String matchId,
   }) async {
     try {
@@ -166,27 +166,37 @@ class MatchmakingQueueRepository extends SupabaseBaseRepository<MatchmakingQueue
         'updated_at': now.toIso8601String(),
       };
 
-      // Get the queue entries to cross-reference matched users
-      final queue1 = await get(queueId1);
-      final queue2 = await get(queueId2);
+      if (queueId2 != null) {
+        // Human vs Human match
+        final queue1 = await get(queueId1);
+        final queue2 = await get(queueId2);
 
-      if (queue1 == null || queue2 == null) {
-        throw Exception('Queue entries not found');
+        if (queue1 == null || queue2 == null) {
+          throw Exception('Queue entries not found');
+        }
+
+        // Update first queue entry
+        await update(queueId1, {
+          ...updates,
+          'matched_with_user_id': queue2.userId,
+        });
+
+        // Update second queue entry
+        await update(queueId2, {
+          ...updates,
+          'matched_with_user_id': queue1.userId,
+        });
+
+        logger.info('Marked queue entries as matched: $queueId1 <-> $queueId2');
+      } else {
+        // Human vs AI match
+        await update(queueId1, {
+          ...updates,
+          'matched_with_user_id': null, // AI doesn't have a user ID in the queue
+        });
+
+        logger.info('Marked queue entry as matched with AI: $queueId1');
       }
-
-      // Update first queue entry
-      await update(queueId1, {
-        ...updates,
-        'matched_with_user_id': queue2.userId,
-      });
-
-      // Update second queue entry
-      await update(queueId2, {
-        ...updates,
-        'matched_with_user_id': queue1.userId,
-      });
-
-      logger.info('Marked queue entries as matched: $queueId1 <-> $queueId2');
     } catch (e) {
       logger.severe('Error marking queue entries as matched: $e');
       rethrow;

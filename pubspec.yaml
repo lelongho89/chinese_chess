@@ -50,6 +50,9 @@ dependencies:
   # Sharing
   share_plus: ^11.0.0
 
+  # UUID generation
+  uuid: ^4.3.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

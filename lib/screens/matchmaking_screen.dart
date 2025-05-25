@@ -7,6 +7,7 @@ import '../models/user_model.dart';
 import '../models/supabase_auth_service.dart';
 import '../services/matchmaking_service.dart';
 import '../repositories/user_repository.dart';
+import '../utils/populate_test_users.dart';
 import '../global.dart';
 import '../l10n/generated/app_localizations.dart';
 
@@ -367,6 +368,56 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
               ),
             ],
 
+            // Debug Section (for testing)
+            if (_currentQueue == null) ...[
+              const SizedBox(height: 24),
+              Card(
+                color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '🤖 Testing Tools',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: _populateAIUsers,
+                              icon: const Icon(Icons.smart_toy, size: 18),
+                              label: const Text('Add AI Users'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green.shade600,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: _clearAIUsers,
+                              icon: const Icon(Icons.clear_all, size: 18),
+                              label: const Text('Clear AI'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red.shade600,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+
             const Spacer(),
 
             // Queue Statistics
@@ -549,5 +600,123 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
         ),
       ],
     );
+  }
+
+  /// Populate database with AI test users
+  Future<void> _populateAIUsers() async {
+    try {
+      // Show loading indicator
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                SizedBox(width: 16),
+                Text('Creating AI users...'),
+              ],
+            ),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+
+      await PopulateTestUsers.populateAIUsers(count: 15);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Successfully created 15 AI users!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+
+      // Refresh queue stats to show new users
+      _loadQueueStats();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('❌ Error creating AI users: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Clear all AI test users from database
+  Future<void> _clearAIUsers() async {
+    try {
+      // Show confirmation dialog
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Clear AI Users'),
+          content: const Text('Are you sure you want to remove all AI test users?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Clear'),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed != true) return;
+
+      // Show loading indicator
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                SizedBox(width: 16),
+                Text('Clearing AI users...'),
+              ],
+            ),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+
+      await PopulateTestUsers.clearAIUsers();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ AI users cleared successfully!'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+
+      // Refresh queue stats
+      _loadQueueStats();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('❌ Error clearing AI users: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
