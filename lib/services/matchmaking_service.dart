@@ -23,7 +23,7 @@ class MatchmakingService {
   static const Duration _maxWaitTime = Duration(minutes: 10);
 
   // AI matching configuration
-  static const Duration _minWaitTimeForAI = Duration(seconds: 30);
+  static const Duration _minWaitTimeForAI = Duration(seconds: 10); // Reduced for testing
   static const bool _enableAIMatching = true;
   static const int _maxAICandidates = 3; // Number of top AI candidates to randomly choose from
 
@@ -166,6 +166,8 @@ class MatchmakingService {
   Future<void> _processQueueMatches(List<MatchmakingQueueModel> players) async {
     if (players.isEmpty) return;
 
+    logger.info('Processing ${players.length} players in queue');
+
     // Sort players by join time (FIFO for fairness)
     players.sort((a, b) => a.joinedAt.compareTo(b.joinedAt));
 
@@ -175,16 +177,22 @@ class MatchmakingService {
       final player1 = players[i];
       if (matched.contains(player1.id)) continue;
 
+      logger.info('Processing player ${player1.userId} (Elo: ${player1.eloRating})');
+
       // Find the best match for this player among other human players
       final bestMatch = await _findBestMatch(player1, players, matched);
       if (bestMatch != null) {
+        logger.info('Found human match for ${player1.userId}: ${bestMatch.userId}');
         await _createMatch(player1, bestMatch);
         matched.add(player1.id);
         matched.add(bestMatch.id);
       } else if (_enableAIMatching) {
+        logger.info('No human match found for ${player1.userId}, trying AI match');
         // No human opponent found, try to match with AI user
         await _tryMatchWithAI(player1);
         matched.add(player1.id);
+      } else {
+        logger.info('AI matching disabled, player ${player1.userId} remains in queue');
       }
     }
   }
@@ -265,6 +273,8 @@ class MatchmakingService {
   /// Try to match a player with an AI user when no human opponents are available
   Future<void> _tryMatchWithAI(MatchmakingQueueModel player) async {
     try {
+      logger.info('🤖 Attempting AI match for player ${player.userId}');
+
       // Check if player has been waiting long enough to match with AI
       final waitTime = DateTime.now().difference(player.joinedAt);
 
@@ -273,10 +283,12 @@ class MatchmakingService {
         return;
       }
 
+      logger.info('Player ${player.userId} eligible for AI match after ${waitTime.inSeconds}s wait');
+
       // Find suitable AI users
       final aiOpponent = await _findSuitableAIOpponent(player);
       if (aiOpponent == null) {
-        logger.info('No suitable AI opponent found for player ${player.userId} (Elo: ${player.eloRating})');
+        logger.warning('No suitable AI opponent found for player ${player.userId} (Elo: ${player.eloRating})');
         return;
       }
 
@@ -318,13 +330,19 @@ class MatchmakingService {
   /// Find a suitable AI opponent based on Elo rating and preferences
   Future<UserModel?> _findSuitableAIOpponent(MatchmakingQueueModel player) async {
     try {
+      logger.info('🔍 Searching for AI opponent for player ${player.userId}');
+
       // Get all AI users
       final allUsers = await UserRepository.instance.getAll();
+      logger.info('Found ${allUsers.length} total users in database');
+
       final aiUsers = allUsers.where((user) =>
         user.email.endsWith('@aitest.com')).toList();
 
+      logger.info('Found ${aiUsers.length} AI users available');
+
       if (aiUsers.isEmpty) {
-        logger.warning('No AI users available for matching');
+        logger.warning('No AI users available for matching - need to create AI users first!');
         return null;
       }
 

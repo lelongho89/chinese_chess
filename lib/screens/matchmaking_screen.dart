@@ -412,6 +412,19 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: _testAIMatching,
+                          icon: const Icon(Icons.psychology, size: 18),
+                          label: const Text('Test AI Matching'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.purple.shade600,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -713,6 +726,59 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('❌ Error clearing AI users: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Test AI matching by creating AI users and joining queue
+  Future<void> _testAIMatching() async {
+    if (_currentUser == null) return;
+
+    try {
+      // Show loading indicator
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                SizedBox(width: 16),
+                Text('Setting up AI matching test...'),
+              ],
+            ),
+            duration: Duration(seconds: 5),
+          ),
+        );
+      }
+
+      // Step 1: Ensure AI users exist
+      await PopulateTestUsers.populateAIUsers(count: 10);
+
+      // Step 2: Join the queue
+      await _joinQueue();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('🎮 AI matching test started! You should be matched with an AI opponent within 15 seconds.'),
+            backgroundColor: Colors.purple,
+            duration: Duration(seconds: 4),
+          ),
+        );
+      }
+
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('❌ Error setting up AI matching test: $e'),
             backgroundColor: Colors.red,
           ),
         );

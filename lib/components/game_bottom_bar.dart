@@ -80,17 +80,8 @@ class GameBottomBarState extends State<GameBottomBar> {
         // Stop the current game
         gamer.stop();
 
-        // Find the GameBoard's state to reset the mode
-        final gameBoardState = context.findAncestorStateOfType<GameBoardState>();
-        if (gameBoardState != null) {
-          // Reset the mode to null to show the mode selection screen
-          gameBoardState.setState(() {
-            gameBoardState.mode = null;
-          });
-        } else {
-          // If we can't find the GameBoard state, try to navigate back
-          Navigator.of(context).popUntil((route) => route.isFirst);
-        }
+        // Navigate back to the main screen instead of showing mode selection
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
     });
   }

@@ -7,8 +7,10 @@ import '../setting.dart';
 
 import '../models/game_setting.dart';
 import '../models/play_mode.dart';
+import '../models/supabase_auth_service.dart';
 import 'profile_screen.dart';
 import 'new_game_screen.dart';
+import 'matchmaking_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -178,15 +180,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // const SizedBox(height: 16),
 
-            // Online Multiplayer Mode (Coming Soon)
+            // Online Multiplayer Mode
             SizedBox(
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
-                onPressed: null, // Disabled for now
+                onPressed: _startOnlineMultiplayer,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.surface,
-                  foregroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -209,14 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
-                        ),
-                        Text(
-                          context.l10n.comingSoon,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
+                        )
                       ],
                     ),
                   ],
@@ -252,5 +247,35 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context) => GameBoard(initialMode: mode),
       ),
     );
+  }
+
+  void _startOnlineMultiplayer() async {
+    try {
+      final authService = Provider.of<SupabaseAuthService>(context, listen: false);
+
+      // Ensure user is authenticated
+      if (!authService.isAuthenticated) {
+        // Sign in anonymously
+        await authService.signInAnonymously();
+      }
+
+      // Navigate to matchmaking screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const MatchmakingScreen(),
+        ),
+      );
+    } catch (e) {
+      // Show error message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error starting online multiplayer: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

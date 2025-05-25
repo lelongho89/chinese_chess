@@ -83,10 +83,14 @@
     - [x] Confirmed complete end-to-end matchmaking functionality
     - [x] **Implemented AI opponent matching system**
     - [x] Auto-match with AI users when no human opponents available
-    - [x] Configurable wait time before AI matching (30 seconds)
+    - [x] Configurable wait time before AI matching (10 seconds for testing)
     - [x] Elo-based AI opponent selection with randomization
     - [x] Honor human player color preferences in AI matches
     - [x] Enhanced matchmaking repository for AI match handling
+    - [x] **Fixed Online Multiplayer button initialization issue**
+    - [x] Button now works immediately on app start (no need to go through Single Player first)
+    - [x] Maintained original "Coming Soon" visual style while making it functional
+    - [x] Automatic anonymous authentication when accessing online features
   - [x] Comprehensive unit tests for all components (17 tests passing)
   - [x] Complete documentation for online multiplayer system
 
