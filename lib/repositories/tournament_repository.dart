@@ -133,7 +133,7 @@ class TournamentRepository extends SupabaseBaseRepository<TournamentModel> {
         brackets[round] = [];
       }
 
-      List<String> roundMatches = List<String>.from(brackets[round]);
+      List<String> roundMatches = List<String>.from(brackets[round] ?? []);
       roundMatches.add(matchId);
       brackets[round] = roundMatches;
 

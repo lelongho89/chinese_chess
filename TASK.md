@@ -10,6 +10,7 @@
 | T1-005  | Implement blitz timer (3+2) in Flutter | Frontend Team | Completed | High | 1 week | Phase 1 |
 | T1-010  | Migrate from Firebase to Supabase | Backend/Frontend Team | Completed | High | 1 week | Phase 1 |
 | T1-011  | Implement QR code sharing for match invitations | Frontend Team | Completed | Medium | 0.5 weeks | Phase 1 |
+| T1-012  | Implement Robot Player AI for Online Matchmaking | Frontend/Backend Team | Completed | High | 1 week | Phase 1 |
 
 ### T1-011: Implement QR code sharing for match invitations (Completed)
 - ✅ Create database schema for match invitations
@@ -74,6 +75,16 @@
 - ✅ Update UI components to work with Supabase
 - ✅ Set up Supabase Realtime for real-time updates
 - ✅ Test Supabase integration
+
+### T1-012: Implement Robot Player AI for Online Matchmaking (Completed)
+- ✅ Create enhanced DriverRobotOnline class for online AI players
+- ✅ Integrate robot players with online game synchronization
+- ✅ Modify matchmaking system to spawn robot players after timeout
+- ✅ Update UI to display "Bot" labels for AI opponents
+- ✅ Implement move synchronization between robot AI and server
+- ✅ Add difficulty scaling based on human player Elo rating
+- ✅ Test robot player behavior in online matches
+- ✅ Ensure robot moves are properly validated and synchronized
 
 ## Notes
 - Assume existing Flutter code handles basic Chinese Chess gameplay; tasks focus on online integration.

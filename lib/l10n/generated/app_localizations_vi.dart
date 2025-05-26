@@ -302,7 +302,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get error => 'Lỗi';
 
   @override
-  String get invalidOrExpiredInvitation => 'Lời mời không hợp lệ hoặc đã hết hạn';
+  String get invalidOrExpiredInvitation =>
+      'Lời mời không hợp lệ hoặc đã hết hạn';
 
   @override
   String get invitationAlreadyUsed => 'Lời mời này đã được sử dụng';
@@ -326,7 +327,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get errorShowingQRGenerator => 'Error showing QR generator';
 
   @override
-  String get cannotJoinYourOwnInvitation => 'You cannot join your own invitation';
+  String get cannotJoinYourOwnInvitation =>
+      'You cannot join your own invitation';
 
   @override
   String get errorJoiningMatch => 'Error joining match';
@@ -341,7 +343,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get verificationEmailSent => 'Đã gửi email xác minh';
 
   @override
-  String get verificationEmailSentDescription => 'Chúng tôi đã gửi email xác minh đến địa chỉ của bạn. Vui lòng kiểm tra hộp thư đến và nhấp vào liên kết xác minh.';
+  String get verificationEmailSentDescription =>
+      'Chúng tôi đã gửi email xác minh đến địa chỉ của bạn. Vui lòng kiểm tra hộp thư đến và nhấp vào liên kết xác minh.';
 
   @override
   String get resendVerificationEmail => 'Gửi Lại Email Xác Minh';
@@ -368,7 +371,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get resetPassword => 'Đặt Lại Mật Khẩu';
 
   @override
-  String get resetPasswordDescription => 'Nhập địa chỉ email của bạn và chúng tôi sẽ gửi cho bạn một liên kết để đặt lại mật khẩu.';
+  String get resetPasswordDescription =>
+      'Nhập địa chỉ email của bạn và chúng tôi sẽ gửi cho bạn một liên kết để đặt lại mật khẩu.';
 
   @override
   String get sendResetLink => 'Gửi Liên Kết Đặt Lại';
@@ -380,7 +384,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get resetLinkSent => 'Đã Gửi Liên Kết Đặt Lại';
 
   @override
-  String get resetLinkSentDescription => 'Kiểm tra email của bạn để tìm liên kết đặt lại mật khẩu. Nếu nó không xuất hiện trong vài phút, hãy kiểm tra thư mục spam của bạn.';
+  String get resetLinkSentDescription =>
+      'Kiểm tra email của bạn để tìm liên kết đặt lại mật khẩu. Nếu nó không xuất hiện trong vài phút, hãy kiểm tra thư mục spam của bạn.';
 
   @override
   String get resetPasswordFailed => 'Không thể gửi liên kết đặt lại';
@@ -437,7 +442,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get invalidCredentials => 'Email hoặc mật khẩu không hợp lệ';
 
   @override
-  String get emailNotVerified => 'Vui lòng xác minh địa chỉ email của bạn trước khi đăng nhập. Kiểm tra hộp thư đến của bạn để tìm liên kết xác minh.';
+  String get emailNotVerified =>
+      'Vui lòng xác minh địa chỉ email của bạn trước khi đăng nhập. Kiểm tra hộp thư đến của bạn để tìm liên kết xác minh.';
 
   @override
   String get verificationRequired => 'Yêu Cầu Xác Minh';
@@ -470,10 +476,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get termsAndConditions => 'Điều Khoản và Điều Kiện';
 
   @override
-  String get termsAndConditionsText => 'Bằng cách sử dụng ứng dụng này, bạn đồng ý với điều khoản dịch vụ và chính sách bảo mật của chúng tôi.';
+  String get termsAndConditionsText =>
+      'Bằng cách sử dụng ứng dụng này, bạn đồng ý với điều khoản dịch vụ và chính sách bảo mật của chúng tôi.';
 
   @override
-  String get mustAgreeToTerms => 'Bạn phải đồng ý với điều khoản và điều kiện để đăng ký';
+  String get mustAgreeToTerms =>
+      'Bạn phải đồng ý với điều khoản và điều kiện để đăng ký';
 
   @override
   String get alreadyHaveAccount => 'Đã có tài khoản?';
@@ -494,7 +502,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get invalidCredential => 'Thông tin đăng nhập không hợp lệ';
 
   @override
-  String get accountExistsWithDifferentCredential => 'Đã tồn tại tài khoản với thông tin đăng nhập khác';
+  String get accountExistsWithDifferentCredential =>
+      'Đã tồn tại tài khoản với thông tin đăng nhập khác';
 
   @override
   String get continueAsGuest => 'Tiếp Tục Với Tư Cách Khách';
@@ -533,7 +542,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get convertToAccount => 'Tạo Tài Khoản';
 
   @override
-  String get convertToAccountDescription => 'Tạo tài khoản vĩnh viễn để lưu tiến trình của bạn trên các thiết bị';
+  String get convertToAccountDescription =>
+      'Tạo tài khoản vĩnh viễn để lưu tiến trình của bạn trên các thiết bị';
 
   @override
   String get currentlyPlayingAsGuest => 'Hiện đang chơi với tư cách khách';
@@ -578,10 +588,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get soundEffects => 'Hiệu Ứng Âm Thanh';
 
   @override
-  String get enableSoundEffectsForMovesAndGames => 'Bật hiệu ứng âm thanh cho nước đi và trò chơi';
+  String get enableSoundEffectsForMovesAndGames =>
+      'Bật hiệu ứng âm thanh cho nước đi và trò chơi';
 
   @override
-  String get adjustTheVolumeOfSoundEffects => 'Điều chỉnh âm lượng hiệu ứng âm thanh';
+  String get adjustTheVolumeOfSoundEffects =>
+      'Điều chỉnh âm lượng hiệu ứng âm thanh';
 
   @override
   String get appearance => 'Giao Diện';
@@ -590,7 +602,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get pieceStyle => 'Kiểu Quân Cờ';
 
   @override
-  String get chooseTheVisualStyleOfTheChessPieces => 'Chọn kiểu hiển thị của quân cờ';
+  String get chooseTheVisualStyleOfTheChessPieces =>
+      'Chọn kiểu hiển thị của quân cờ';
 
   @override
   String get classic => 'Cổ Điển';
@@ -611,7 +624,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get turnTimeLimit => 'Giới Hạn Thời Gian Lượt';
 
   @override
-  String get setTheTimeLimitForEachPlayersMove => 'Đặt giới hạn thời gian cho mỗi nước đi của người chơi';
+  String get setTheTimeLimitForEachPlayersMove =>
+      'Đặt giới hạn thời gian cho mỗi nước đi của người chơi';
 
   @override
   String get tenMinutes => '10 phút';
@@ -632,7 +646,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get localMultiplayer => 'Nhiều Người Chơi Cục Bộ';
 
   @override
-  String get playWithAFriendOnTheSameDevice => 'Chơi với bạn bè trên cùng thiết bị';
+  String get playWithAFriendOnTheSameDevice =>
+      'Chơi với bạn bè trên cùng thiết bị';
 
   @override
   String get gameMode => 'Chế Độ Trò Chơi';

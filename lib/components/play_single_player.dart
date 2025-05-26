@@ -69,7 +69,21 @@ class PlaySinglePlayerState extends State<PlaySinglePlayer> {
       return const SizedBox();
     }
 
-    if (gamer.hands[team].isUser) {
+    final player = gamer.hands[team];
+
+    // Don't show robot switch for online robot players (they're managed by the server)
+    if (player.isRobotOnline) {
+      return Container(
+        padding: const EdgeInsets.all(8),
+        child: const Icon(
+          Icons.smart_toy,
+          color: Colors.orange,
+          size: 20,
+        ),
+      );
+    }
+
+    if (player.isUser) {
       return IconButton(
         icon: const Icon(Icons.android),
         tooltip: context.l10n.trusteeshipToRobots,
@@ -77,7 +91,7 @@ class PlaySinglePlayerState extends State<PlaySinglePlayer> {
           changePlayDriver(team, DriverType.robot);
         },
       );
-    } else if (gamer.hands[team].isRobot) {
+    } else if (player.isRobot) {
       return IconButton(
         icon: const Icon(
           Icons.android,

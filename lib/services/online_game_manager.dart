@@ -7,7 +7,10 @@ import '../models/game_data_model.dart';
 import '../models/game_event.dart';
 import '../models/game_manager.dart';
 import '../models/game_move_model.dart';
+import '../models/user_model.dart';
+import '../repositories/user_repository.dart';
 import 'online_multiplayer_service.dart';
+import 'robot_player_service.dart';
 
 /// Service to manage online games and integrate with GameManager
 class OnlineGameManager {
@@ -45,6 +48,9 @@ class OnlineGameManager {
       // Set up the game manager for online play
       await _setupGameManager(gameData, isRedPlayer);
 
+      // Check if this is an AI game and initialize robot player
+      await _initializeRobotPlayerIfNeeded(gameData, currentUserId);
+
       // Set up online drivers with game information
       _setupOnlineDrivers(gameData.id, currentUserId);
 
@@ -69,11 +75,11 @@ class OnlineGameManager {
     _gameManager!.manual.initFen(gameData.currentFen);
     _gameManager!.rule = ChessRule(_gameManager!.manual.currentFen);
 
-    // Set player titles
+    // Set player titles (will be updated later if AI players are detected)
     _gameManager!.hands[0].title = 'Red Player';
     _gameManager!.hands[1].title = 'Black Player';
 
-    // Set driver types based on player role
+    // Set driver types based on player role (will be updated for AI players)
     if (isRedPlayer) {
       // Current user is red, opponent is black (online)
       _gameManager!.hands[0].driverType = DriverType.user;
@@ -88,6 +94,65 @@ class OnlineGameManager {
     _gameManager!.curHand = gameData.currentPlayer;
 
     logger.info('Game manager set up for online play');
+  }
+
+  /// Initialize robot player if this is an AI game
+  Future<void> _initializeRobotPlayerIfNeeded(GameDataModel gameData, String currentUserId) async {
+    if (_gameManager == null) return;
+
+    try {
+      // Get player information
+      final redPlayer = await UserRepository.instance.get(gameData.redPlayerId);
+      final blackPlayer = await UserRepository.instance.get(gameData.blackPlayerId);
+
+      if (redPlayer == null || blackPlayer == null) {
+        logger.warning('Could not fetch player information for robot initialization');
+        return;
+      }
+
+      final robotService = RobotPlayerService.instance;
+
+      // Check if this is an AI game
+      if (!robotService.isAIGame(gameData, [redPlayer, blackPlayer])) {
+        return; // Not an AI game, nothing to do
+      }
+
+      logger.info('🤖 Detected AI game, initializing robot player');
+
+      // Determine which player is the AI and which is human
+      final aiPlayer = robotService.getAIPlayer(gameData, [redPlayer, blackPlayer]);
+      final humanPlayer = robotService.getHumanPlayer(gameData, [redPlayer, blackPlayer]);
+
+      if (aiPlayer == null || humanPlayer == null) {
+        logger.warning('Could not identify AI and human players');
+        return;
+      }
+
+      // Determine if AI is red or black player
+      final isAIRedPlayer = aiPlayer.uid == gameData.redPlayerId;
+      final playerIndex = isAIRedPlayer ? 0 : 1;
+
+      // Update player title to show it's a bot
+      _gameManager!.hands[playerIndex].title = '${aiPlayer.displayName} (Bot)';
+
+      // Set the appropriate driver type for the AI player
+      _gameManager!.hands[playerIndex].driverType = DriverType.robotOnline;
+
+      // Initialize the robot player
+      await robotService.initializeRobotPlayer(
+        gameId: gameData.id,
+        robotPlayerId: aiPlayer.uid,
+        gameManager: _gameManager!,
+        isRedPlayer: isAIRedPlayer,
+        humanPlayerElo: humanPlayer.eloRating,
+        gameMetadata: gameData.metadata,
+      );
+
+      logger.info('🤖 Robot player initialized successfully');
+    } catch (e) {
+      logger.severe('🤖 Error initializing robot player: $e');
+      // Don't rethrow - game can continue without robot player
+    }
   }
 
   /// Set up online drivers with game information
@@ -271,8 +336,11 @@ class OnlineGameManager {
   }
 
   /// Clean up online game resources
-  void dispose() {
+  Future<void> dispose() async {
     if (_currentGameId != null) {
+      // Clean up robot player if exists
+      await RobotPlayerService.instance.cleanupRobotPlayer(_currentGameId!);
+
       OnlineMultiplayerService.instance.cleanupGame(_currentGameId!);
     }
 
