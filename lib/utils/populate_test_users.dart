@@ -180,8 +180,9 @@ class PopulateTestUsers {
 
       logger.info('🎉 Successfully created ${usersToCreate.length} AI test users!');
 
-      // Add some AI users to the matchmaking queue for testing
-      await _addAIUsersToQueue(usersToCreate);
+      // Skip adding AI users to queue due to RLS policy restrictions
+      // The matchmaking service will find AI users directly from the users table
+      logger.info('🎯 AI users created but not added to queue (RLS restrictions)');
 
       // Log summary statistics
       final avgElo = usersToCreate.map((u) => u.eloRating).reduce((a, b) => a + b) / usersToCreate.length;

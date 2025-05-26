@@ -13,6 +13,7 @@
 | T1-012  | Implement Robot Player AI for Online Matchmaking | Frontend/Backend Team | Completed | High | 1 week | Phase 1 |
 | T1-013  | Implement Side Alternation for Fair Online Matches | Frontend/Backend Team | Completed | High | 0.5 weeks | Phase 1 |
 | T1-014  | Simplify Matchmaking with Single Time Control | Frontend/Backend Team | Completed | Medium | 0.5 weeks | Phase 1 |
+| T1-015  | Fix Database Schema Compatibility and AI Matching | Frontend/Backend Team | Completed | High | 0.5 weeks | Phase 1 |
 
 ### T1-011: Implement QR code sharing for match invitations (Completed)
 - ✅ Create database schema for match invitations
@@ -109,6 +110,18 @@
 - ✅ Update matchmaking screen with simplified UI showing fixed time control
 - ✅ Create comprehensive unit tests for simplified matchmaking
 - ✅ Add environment variable support for configuration switching
+
+### T1-015: Fix Database Schema Compatibility and AI Matching (Completed)
+- ✅ Fix preferred_color column mismatch between model and database schema
+- ✅ Resolve RLS policy violations for AI user queue insertion
+- ✅ Update AI matching to find opponents directly from users table
+- ✅ Eliminate dependency on AI users being in matchmaking queue
+- ✅ Add backward compatibility for legacy database schemas
+- ✅ Improve error handling and debugging for matchmaking process
+- ✅ Reduce AI matching wait time to 5 seconds for faster testing
+- ✅ Add force AI matching method for immediate testing
+- ✅ Fix Online Multiplayer button initialization issue
+- ✅ Fix quit game navigation to return to main screen
 
 ## Notes
 - Assume existing Flutter code handles basic Chinese Chess gameplay; tasks focus on online integration.

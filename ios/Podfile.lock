@@ -13,6 +13,8 @@ PODS:
     - PromisesObjC (~> 2.4)
   - audioplayers_darwin (0.0.1):
     - Flutter
+  - device_info_plus (0.0.1):
+    - Flutter
   - FBAEMKit (17.0.3):
     - FBSDKCoreKit_Basics (= 17.0.3)
   - FBSDKCoreKit (17.0.3):
@@ -79,6 +81,7 @@ PODS:
 DEPENDENCIES:
   - app_links (from `.symlinks/plugins/app_links/ios`)
   - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/ios`)
+  - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
   - flutter_document_picker (from `.symlinks/plugins/flutter_document_picker/ios`)
   - flutter_facebook_auth (from `.symlinks/plugins/flutter_facebook_auth/ios`)
@@ -111,6 +114,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/app_links/ios"
   audioplayers_darwin:
     :path: ".symlinks/plugins/audioplayers_darwin/ios"
+  device_info_plus:
+    :path: ".symlinks/plugins/device_info_plus/ios"
   Flutter:
     :path: Flutter
   flutter_document_picker:
@@ -141,6 +146,7 @@ SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
   audioplayers_darwin: ccf9c770ee768abb07e26d90af093f7bab1c12ab
+  device_info_plus: 71ffc6ab7634ade6267c7a93088ed7e4f74e5896
   FBAEMKit: 9900b2edd99a2d21629a6277e6166f14c6215799
   FBSDKCoreKit: 0791f8f68a8630931a4c12aa23a56cc021551596
   FBSDKCoreKit_Basics: 46d6b472c0dd0a5a7e972c025033d1c567f54eb4

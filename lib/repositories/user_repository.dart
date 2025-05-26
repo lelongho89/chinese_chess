@@ -296,7 +296,6 @@ class UserRepository extends SupabaseBaseRepository<UserModel> {
         'elo_rating': eloRating,
         'queue_type': queueType,
         'time_control': timeControl,
-        'preferred_color': preferredColor,
         'max_elo_difference': 200,
         'status': 'waiting',
         'joined_at': DateTime.now().toIso8601String(),
@@ -306,12 +305,25 @@ class UserRepository extends SupabaseBaseRepository<UserModel> {
         'is_deleted': false,
       };
 
-      // Try direct insert (might work if RLS allows it)
-      await client.SupabaseClientWrapper.instance.database
-          .from('matchmaking_queue')
-          .insert(queueData);
-
-      logger.info('AI user added to queue: $userId');
+      // Try insert without preferred_color first (for new schema)
+      try {
+        await client.SupabaseClientWrapper.instance.database
+            .from('matchmaking_queue')
+            .insert(queueData);
+        logger.info('AI user added to queue (new schema): $userId');
+      } catch (e) {
+        // If that fails, try with preferred_color for backward compatibility
+        if (e.toString().contains('preferred_color')) {
+          final legacyQueueData = Map<String, dynamic>.from(queueData);
+          legacyQueueData['preferred_color'] = preferredColor; // Use the parameter value
+          await client.SupabaseClientWrapper.instance.database
+              .from('matchmaking_queue')
+              .insert(legacyQueueData);
+          logger.info('AI user added to queue (legacy schema): $userId');
+        } else {
+          rethrow;
+        }
+      }
     } catch (e) {
       logger.severe('Error adding AI user to queue: $e');
       rethrow;
