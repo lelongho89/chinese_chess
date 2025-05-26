@@ -12,6 +12,9 @@ import 'profile_screen.dart';
 import 'new_game_screen.dart';
 import 'matchmaking_screen.dart';
 
+// Global callback to reset MainScreen to home tab
+VoidCallback? resetMainScreenToHome;
+
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -19,7 +22,7 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with AutomaticKeepAliveClientMixin {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
@@ -28,9 +31,39 @@ class _MainScreenState extends State<MainScreen> {
   ];
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Always start with home tab
+    _currentIndex = 0;
+
+    // Set up global callback to reset to home tab
+    resetMainScreenToHome = () {
+      if (mounted && _currentIndex != 0) {
+        setState(() {
+          _currentIndex = 0;
+        });
+      }
+    };
+  }
+
+  @override
+  void dispose() {
+    resetMainScreenToHome = null;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
+
     return Scaffold(
-      body: _screens[_currentIndex],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {

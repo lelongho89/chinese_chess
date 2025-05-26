@@ -409,7 +409,7 @@ class GameBoardState extends State<GameBoard> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (BuildContext context) => const SettingPage(),
+                    builder: (BuildContext context) => const SettingPage(isEmbedded: false),
                   ),
                 );
               },

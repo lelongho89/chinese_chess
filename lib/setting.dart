@@ -9,10 +9,13 @@ import 'models/game_manager.dart';
 import 'models/game_setting.dart';
 import 'models/locale_provider.dart';
 import 'models/play_mode.dart';
+import 'screens/main_screen.dart';
 
 /// 设置页
 class SettingPage extends StatefulWidget {
-  const SettingPage({super.key});
+  final bool isEmbedded;
+
+  const SettingPage({super.key, this.isEmbedded = true});
 
   @override
   State<SettingPage> createState() => _SettingPageState();
@@ -45,10 +48,22 @@ class _SettingPageState extends State<SettingPage> {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: widget.isEmbedded
+          ? IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () {
+                // When embedded, reset to home tab instead of popping
+                resetMainScreenToHome?.call();
+              },
+            )
+          : IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context);
+                // Reset MainScreen to home tab when returning from pushed settings
+                resetMainScreenToHome?.call();
+              },
+            ),
       ),
       body: setting == null
           ? const Center(child: CircularProgressIndicator())
