@@ -12,6 +12,7 @@
 | T1-011  | Implement QR code sharing for match invitations | Frontend Team | Completed | Medium | 0.5 weeks | Phase 1 |
 | T1-012  | Implement Robot Player AI for Online Matchmaking | Frontend/Backend Team | Completed | High | 1 week | Phase 1 |
 | T1-013  | Implement Side Alternation for Fair Online Matches | Frontend/Backend Team | Completed | High | 0.5 weeks | Phase 1 |
+| T1-014  | Simplify Matchmaking with Single Time Control | Frontend/Backend Team | Completed | Medium | 0.5 weeks | Phase 1 |
 
 ### T1-011: Implement QR code sharing for match invitations (Completed)
 - ✅ Create database schema for match invitations
@@ -96,6 +97,18 @@
 - ✅ Update game service to track side history after games
 - ✅ Create comprehensive unit tests for side alternation logic
 - ✅ Add database functions for side statistics and history management
+
+### T1-014: Simplify Matchmaking with Single Time Control (Completed)
+- ✅ Create AppConfig class for centralized configuration management
+- ✅ Remove side preference selection from matchmaking UI
+- ✅ Remove time control selection from matchmaking UI
+- ✅ Update matchmaking queue model to remove preferred_color field
+- ✅ Update matchmaking service to use AppConfig for time control
+- ✅ Update side alternation service to work without preferences
+- ✅ Create database migration to remove preferred_color column
+- ✅ Update matchmaking screen with simplified UI showing fixed time control
+- ✅ Create comprehensive unit tests for simplified matchmaking
+- ✅ Add environment variable support for configuration switching
 
 ## Notes
 - Assume existing Flutter code handles basic Chinese Chess gameplay; tasks focus on online integration.

@@ -13,11 +13,7 @@ enum QueueType {
   tournament,
 }
 
-/// Preferred color for the player
-enum PreferredColor {
-  red,
-  black,
-}
+// Removed PreferredColor enum - side assignment is now handled by SideAlternationService
 
 /// Model for storing matchmaking queue data in Supabase
 class MatchmakingQueueModel {
@@ -25,8 +21,7 @@ class MatchmakingQueueModel {
   final String userId;
   final int eloRating;
   final QueueType queueType;
-  final int timeControl; // in seconds
-  final PreferredColor? preferredColor;
+  final int timeControl; // in seconds - now uses AppConfig.matchTimeControl
   final int maxEloDifference;
   final MatchmakingStatus status;
   final String? matchedWithUserId;
@@ -44,8 +39,7 @@ class MatchmakingQueueModel {
     required this.userId,
     required this.eloRating,
     this.queueType = QueueType.ranked,
-    this.timeControl = 180, // 3 minutes default
-    this.preferredColor,
+    required this.timeControl, // Now required and set from AppConfig
     this.maxEloDifference = 200,
     this.status = MatchmakingStatus.waiting,
     this.matchedWithUserId,
@@ -66,8 +60,7 @@ class MatchmakingQueueModel {
       userId: data['user_id'] ?? '',
       eloRating: data['elo_rating'] ?? 1200,
       queueType: _parseQueueType(data['queue_type']),
-      timeControl: data['time_control'] ?? 180,
-      preferredColor: _parsePreferredColor(data['preferred_color']),
+      timeControl: data['time_control'] ?? 300, // Default to 5 minutes if not specified
       maxEloDifference: data['max_elo_difference'] ?? 200,
       status: _parseStatus(data['status']),
       matchedWithUserId: data['matched_with_user_id'],
@@ -89,7 +82,7 @@ class MatchmakingQueueModel {
       'elo_rating': eloRating,
       'queue_type': queueType.name,
       'time_control': timeControl,
-      'preferred_color': preferredColor?.name,
+      // Removed preferred_color - side assignment handled by SideAlternationService
       'max_elo_difference': maxEloDifference,
       'status': status.name,
       'matched_with_user_id': matchedWithUserId,
@@ -110,7 +103,6 @@ class MatchmakingQueueModel {
     int? eloRating,
     QueueType? queueType,
     int? timeControl,
-    PreferredColor? preferredColor,
     int? maxEloDifference,
     MatchmakingStatus? status,
     String? matchedWithUserId,
@@ -129,7 +121,6 @@ class MatchmakingQueueModel {
       eloRating: eloRating ?? this.eloRating,
       queueType: queueType ?? this.queueType,
       timeControl: timeControl ?? this.timeControl,
-      preferredColor: preferredColor ?? this.preferredColor,
       maxEloDifference: maxEloDifference ?? this.maxEloDifference,
       status: status ?? this.status,
       matchedWithUserId: matchedWithUserId ?? this.matchedWithUserId,
@@ -183,17 +174,7 @@ class MatchmakingQueueModel {
     }
   }
 
-  /// Parse preferred color from string
-  static PreferredColor? _parsePreferredColor(String? value) {
-    switch (value) {
-      case 'red':
-        return PreferredColor.red;
-      case 'black':
-        return PreferredColor.black;
-      default:
-        return null;
-    }
-  }
+  // Removed _parsePreferredColor method - no longer needed
 
   /// Parse status from string
   static MatchmakingStatus _parseStatus(String? value) {

@@ -13,6 +13,7 @@ class SideAlternationService {
 
   /// Determine optimal side assignment for two players based on alternation history
   /// Returns a map with 'red' and 'black' player IDs
+  /// In simplified mode, preferences are optional and may be null
   Future<Map<String, String>> determineSideAssignment({
     required String player1Id,
     required String player2Id,
@@ -69,6 +70,7 @@ class SideAlternationService {
   }
 
   /// Determine side assignment for human vs AI match
+  /// In simplified mode, human preference is optional and may be null
   Future<Map<String, String>> determineSideAssignmentWithAI({
     required String humanPlayerId,
     required String aiPlayerId,
@@ -76,7 +78,7 @@ class SideAlternationService {
   }) async {
     try {
       final humanPlayer = await UserRepository.instance.get(humanPlayerId);
-      
+
       if (humanPlayer == null) {
         logger.warning('Could not fetch human player data for AI side assignment');
         return _defaultAssignment(humanPlayerId, aiPlayerId);
@@ -95,7 +97,7 @@ class SideAlternationService {
 
       // Apply alternation for human player
       final preferredSide = _getPreferredSideForAlternation(humanPlayer);
-      
+
       return {
         'red': preferredSide == 'red' ? humanPlayerId : aiPlayerId,
         'black': preferredSide == 'black' ? humanPlayerId : aiPlayerId,
@@ -187,7 +189,7 @@ class SideAlternationService {
 
     // Check if honoring preference would create imbalance
     final redRatio = _getRedRatio(player);
-    
+
     // Don't honor preference if it would increase an existing bias
     if (preferredSide == 'red' && redRatio >= 0.6) {
       return false;
@@ -241,7 +243,7 @@ class SideAlternationService {
   Map<String, dynamic> getPlayerSideStats(UserModel player) {
     final totalSideGames = player.redGamesPlayed + player.blackGamesPlayed;
     final redRatio = _getRedRatio(player);
-    
+
     return {
       'total_games': player.gamesPlayed,
       'total_side_tracked_games': totalSideGames,

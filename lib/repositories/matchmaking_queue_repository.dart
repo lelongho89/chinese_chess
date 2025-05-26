@@ -53,13 +53,12 @@ class MatchmakingQueueRepository extends SupabaseBaseRepository<MatchmakingQueue
     return model.toMap();
   }
 
-  /// Join the matchmaking queue
+  /// Join the matchmaking queue with simplified parameters
   Future<String> joinQueue({
     required String userId,
     required int eloRating,
     QueueType queueType = QueueType.ranked,
-    int timeControl = 180,
-    PreferredColor? preferredColor,
+    required int timeControl,
     int maxEloDifference = 200,
     Duration queueTimeout = const Duration(minutes: 10),
     Map<String, dynamic>? metadata,
@@ -75,7 +74,7 @@ class MatchmakingQueueRepository extends SupabaseBaseRepository<MatchmakingQueue
         eloRating: eloRating,
         queueType: queueType,
         timeControl: timeControl,
-        preferredColor: preferredColor,
+        // Removed preferredColor - side assignment handled by SideAlternationService
         maxEloDifference: maxEloDifference,
         status: MatchmakingStatus.waiting,
         joinedAt: now,

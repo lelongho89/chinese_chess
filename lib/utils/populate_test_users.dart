@@ -226,22 +226,18 @@ class PopulateTestUsers {
 
   /// Add AI user to queue using repository method
   static Future<void> _addAIUserToQueueDirectly(UserModel user) async {
-    // Random queue settings for variety
+    // Simplified queue settings - no color preferences, single time control
     final queueTypes = [QueueType.ranked, QueueType.casual];
-    final timeControls = [60, 180, 300, 600]; // 1, 3, 5, 10 minutes
-    final colors = [PreferredColor.red, PreferredColor.black, null];
 
     final queueType = queueTypes[_random.nextInt(queueTypes.length)];
-    final timeControl = timeControls[_random.nextInt(timeControls.length)];
-    final preferredColor = colors[_random.nextInt(colors.length)];
 
-    // Use repository method to add AI user to queue
+    // Use repository method to add AI user to queue (simplified)
     await UserRepository.instance.addAIUserToQueue(
       user.uid,
       user.eloRating,
       queueType.name,
-      timeControl,
-      preferredColor?.name,
+      300, // Use standard 5-minute time control
+      null, // No color preference in simplified mode
     );
   }
 

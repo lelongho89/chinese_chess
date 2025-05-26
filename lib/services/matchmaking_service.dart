@@ -6,6 +6,7 @@ import '../models/matchmaking_queue_model.dart';
 import '../models/user_model.dart';
 import '../repositories/matchmaking_queue_repository.dart';
 import '../repositories/user_repository.dart';
+import '../config/app_config.dart';
 import 'game_service.dart';
 import 'side_alternation_service.dart';
 
@@ -51,12 +52,10 @@ class MatchmakingService {
     logger.info('Matchmaking service stopped');
   }
 
-  /// Join the matchmaking queue
+  /// Join the matchmaking queue with simplified parameters
   Future<String> joinQueue({
     required String userId,
     QueueType queueType = QueueType.ranked,
-    int timeControl = 180,
-    PreferredColor? preferredColor,
     int? customMaxEloDifference,
     Map<String, dynamic>? metadata,
   }) async {
@@ -67,16 +66,17 @@ class MatchmakingService {
         throw Exception('User not found');
       }
 
-      final maxEloDifference = customMaxEloDifference ?? _calculateMaxEloDifference(user.eloRating);
+      final maxEloDifference = customMaxEloDifference ?? AppConfig.instance.maxEloDifference;
+      final timeControl = AppConfig.instance.matchTimeControl;
 
-      // Join the queue
+      // Join the queue with simplified parameters
       final queueId = await MatchmakingQueueRepository.instance.joinQueue(
         userId: userId,
         eloRating: user.eloRating,
         queueType: queueType,
         timeControl: timeControl,
-        preferredColor: preferredColor,
         maxEloDifference: maxEloDifference,
+        queueTimeout: AppConfig.instance.queueTimeout,
         metadata: metadata,
       );
 
@@ -237,12 +237,11 @@ class MatchmakingService {
   /// Create a match between two players
   Future<void> _createMatch(MatchmakingQueueModel player1, MatchmakingQueueModel player2) async {
     try {
-      // Determine colors using side alternation service
+      // Determine colors using side alternation service (no preferences in simplified mode)
       final colors = await SideAlternationService.instance.determineSideAssignment(
         player1Id: player1.userId,
         player2Id: player2.userId,
-        player1PreferredSide: player1.preferredColor?.name,
-        player2PreferredSide: player2.preferredColor?.name,
+        // No side preferences in simplified matchmaking
       );
       final redPlayerId = colors['red']!;
       final blackPlayerId = colors['black']!;
@@ -313,11 +312,11 @@ class MatchmakingService {
         return;
       }
 
-      // Determine colors using side alternation service for AI matches
+      // Determine colors using side alternation service for AI matches (no preferences)
       final colors = await SideAlternationService.instance.determineSideAssignmentWithAI(
         humanPlayerId: player.userId,
         aiPlayerId: aiOpponent.uid,
-        humanPreferredSide: player.preferredColor?.name,
+        // No side preferences in simplified matchmaking
       );
       final redPlayerId = colors['red']!;
       final blackPlayerId = colors['black']!;
@@ -419,57 +418,7 @@ class MatchmakingService {
     }
   }
 
-  /// Determine colors for human vs AI match
-  Map<String, String> _determineColorsWithAI(MatchmakingQueueModel player, UserModel aiOpponent) {
-    // Honor human player's color preference if specified
-    if (player.preferredColor != null) {
-      return {
-        'red': player.preferredColor == PreferredColor.red ? player.userId : aiOpponent.uid,
-        'black': player.preferredColor == PreferredColor.black ? player.userId : aiOpponent.uid,
-      };
-    }
-
-    // Default: human player gets red (slight advantage)
-    return {
-      'red': player.userId,
-      'black': aiOpponent.uid,
-    };
-  }
-
-  /// Determine colors for the two players
-  Map<String, String> _determineColors(MatchmakingQueueModel player1, MatchmakingQueueModel player2) {
-    // If both have preferences and they're different, honor them
-    if (player1.preferredColor != null && player2.preferredColor != null) {
-      if (player1.preferredColor != player2.preferredColor) {
-        return {
-          'red': player1.preferredColor == PreferredColor.red ? player1.userId : player2.userId,
-          'black': player1.preferredColor == PreferredColor.black ? player1.userId : player2.userId,
-        };
-      }
-    }
-
-    // If only one has a preference, honor it
-    if (player1.preferredColor != null && player2.preferredColor == null) {
-      return {
-        'red': player1.preferredColor == PreferredColor.red ? player1.userId : player2.userId,
-        'black': player1.preferredColor == PreferredColor.black ? player1.userId : player2.userId,
-      };
-    }
-
-    if (player2.preferredColor != null && player1.preferredColor == null) {
-      return {
-        'red': player2.preferredColor == PreferredColor.red ? player2.userId : player1.userId,
-        'black': player2.preferredColor == PreferredColor.black ? player2.userId : player1.userId,
-      };
-    }
-
-    // Default: higher Elo player gets red (traditional advantage)
-    if (player1.eloRating >= player2.eloRating) {
-      return {'red': player1.userId, 'black': player2.userId};
-    } else {
-      return {'red': player2.userId, 'black': player1.userId};
-    }
-  }
+  // Removed old color determination methods - now using SideAlternationService
 
   /// Calculate maximum Elo difference based on player's rating
   int _calculateMaxEloDifference(int eloRating) {

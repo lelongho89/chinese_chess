@@ -8,6 +8,7 @@ import '../models/supabase_auth_service.dart';
 import '../services/matchmaking_service.dart';
 import '../repositories/user_repository.dart';
 import '../utils/populate_test_users.dart';
+import '../config/app_config.dart';
 import '../global.dart';
 import '../l10n/generated/app_localizations.dart';
 
@@ -20,15 +21,12 @@ class MatchmakingScreen extends StatefulWidget {
 
 class _MatchmakingScreenState extends State<MatchmakingScreen> {
   QueueType _selectedQueueType = QueueType.ranked;
-  int _selectedTimeControl = 180; // 3 minutes
-  PreferredColor? _selectedColor;
+  // Removed time control and color preference - now using AppConfig
   bool _isSearching = false;
   MatchmakingQueueModel? _currentQueue;
   UserModel? _currentUser;
   Timer? _updateTimer;
   Map<String, dynamic>? _queueStats;
-
-  final List<int> _timeControlOptions = [60, 180, 300, 600]; // 1, 3, 5, 10 minutes
 
   @override
   void initState() {
@@ -101,8 +99,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
           _currentQueue = existingQueue;
           _isSearching = true;
           _selectedQueueType = existingQueue.queueType;
-          _selectedTimeControl = existingQueue.timeControl;
-          _selectedColor = existingQueue.preferredColor;
+          // Time control and color preference no longer stored in queue
         });
         _startUpdateTimer();
       }
@@ -146,8 +143,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       final queueId = await MatchmakingService.instance.joinQueue(
         userId: _currentUser!.uid,
         queueType: _selectedQueueType,
-        timeControl: _selectedTimeControl,
-        preferredColor: _selectedColor,
+        // Time control and color preference now handled by AppConfig and SideAlternationService
       );
 
       final queue = await MatchmakingService.instance.getUserActiveQueue(_currentUser!.uid);
@@ -301,7 +297,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           Text(
-                            '${_currentQueue!.queueType.name.toUpperCase()} • ${_formatTime(_currentQueue!.timeControl)}',
+                            '${_currentQueue!.queueType.name.toUpperCase()} • ${AppConfig.instance.matchTimeControlFormatted}',
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                         ],
@@ -323,7 +319,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                 ),
               ),
             ] else ...[
-              // Queue Configuration
+              // Simplified Queue Configuration
               Text(
                 'Game Settings',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -336,12 +332,8 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
               _buildQueueTypeSelector(),
               const SizedBox(height: 16),
 
-              // Time Control Selection
-              _buildTimeControlSelector(),
-              const SizedBox(height: 16),
-
-              // Color Preference
-              _buildColorPreferenceSelector(),
+              // Display configured time control (read-only)
+              _buildTimeControlDisplay(),
               const SizedBox(height: 24),
 
               // Start Search Button
@@ -531,7 +523,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
     );
   }
 
-  Widget _buildTimeControlSelector() {
+  Widget _buildTimeControlDisplay() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -542,71 +534,76 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          children: _timeControlOptions.map((timeControl) {
-            final isSelected = _selectedTimeControl == timeControl;
-            return ChoiceChip(
-              label: Text(_formatTime(timeControl)),
-              selected: isSelected,
-              onSelected: (selected) {
-                if (selected) {
-                  setState(() => _selectedTimeControl = timeControl);
-                }
-              },
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildColorPreferenceSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Color Preference (Optional)',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+            ),
+            borderRadius: BorderRadius.circular(12),
+            color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.timer,
+                color: Theme.of(context).colorScheme.primary,
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppConfig.instance.matchTimeControlFormatted,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    Text(
+                      'Standard time control for all matches',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'FIXED',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 8),
         Row(
           children: [
-            Expanded(
-              child: ChoiceChip(
-                label: const Text('Red'),
-                selected: _selectedColor == PreferredColor.red,
-                onSelected: (selected) {
-                  setState(() {
-                    _selectedColor = selected ? PreferredColor.red : null;
-                  });
-                },
-              ),
+            Icon(
+              Icons.info_outline,
+              size: 16,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: ChoiceChip(
-                label: const Text('Black'),
-                selected: _selectedColor == PreferredColor.black,
-                onSelected: (selected) {
-                  setState(() {
-                    _selectedColor = selected ? PreferredColor.black : null;
-                  });
-                },
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: ChoiceChip(
-                label: const Text('No Preference'),
-                selected: _selectedColor == null,
-                onSelected: (selected) {
-                  if (selected) {
-                    setState(() => _selectedColor = null);
-                  }
-                },
+              child: Text(
+                'Side assignment (Red/Black) is automatically balanced for fair play',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
           ],
