@@ -103,6 +103,40 @@ class UserRepository extends SupabaseBaseRepository<UserModel> {
     }
   }
 
+  // Update user's game statistics with side information
+  Future<void> updateGameStatsWithSide(String uid, bool isWin, bool isDraw, String side) async {
+    try {
+      final user = await get(uid);
+      if (user == null) return;
+
+      final updates = {
+        'games_played': user.gamesPlayed + 1,
+        'last_played_side': side,
+      };
+
+      // Update side-specific counters
+      if (side == 'red') {
+        updates['red_games_played'] = user.redGamesPlayed + 1;
+      } else if (side == 'black') {
+        updates['black_games_played'] = user.blackGamesPlayed + 1;
+      }
+
+      if (isDraw) {
+        updates['games_draw'] = user.gamesDraw + 1;
+      } else if (isWin) {
+        updates['games_won'] = user.gamesWon + 1;
+      } else {
+        updates['games_lost'] = user.gamesLost + 1;
+      }
+
+      await update(uid, updates);
+      logger.info('User game stats updated with side: $uid, Win: $isWin, Draw: $isDraw, Side: $side');
+    } catch (e) {
+      logger.severe('Error updating user game stats with side: $e');
+      rethrow;
+    }
+  }
+
   // Get top players by Elo rating
   Future<List<UserModel>> getTopPlayers({int limit = 10}) async {
     try {

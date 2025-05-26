@@ -14,6 +14,9 @@ class UserModel {
   final DateTime lastLoginAt;
   final bool isAnonymous;
   final String? deviceId; // Device ID for anonymous users
+  final String? lastPlayedSide; // 'red' or 'black' - tracks last side played for alternation
+  final int redGamesPlayed; // Count of games played as Red
+  final int blackGamesPlayed; // Count of games played as Black
 
   UserModel({
     required this.uid,
@@ -28,6 +31,9 @@ class UserModel {
     required this.lastLoginAt,
     this.isAnonymous = false,
     this.deviceId,
+    this.lastPlayedSide,
+    this.redGamesPlayed = 0,
+    this.blackGamesPlayed = 0,
   });
 
   // Create a UserModel from a Supabase User
@@ -72,6 +78,9 @@ class UserModel {
       lastLoginAt: DateTime.parse(data['last_login_at'] ?? DateTime.now().toIso8601String()),
       isAnonymous: data['is_anonymous'] ?? false,
       deviceId: data['device_id'],
+      lastPlayedSide: data['last_played_side'],
+      redGamesPlayed: data['red_games_played'] ?? 0,
+      blackGamesPlayed: data['black_games_played'] ?? 0,
     );
   }
 
@@ -87,6 +96,8 @@ class UserModel {
       'games_draw': gamesDraw,
       'created_at': createdAt.toIso8601String(),
       'last_login_at': lastLoginAt.toIso8601String(),
+      'red_games_played': redGamesPlayed,
+      'black_games_played': blackGamesPlayed,
     };
 
     // Only include is_anonymous if the database supports it
@@ -97,7 +108,12 @@ class UserModel {
 
     // Include device_id for anonymous users
     if (deviceId != null) {
-      map['device_id'] = deviceId;
+      map['device_id'] = deviceId!;
+    }
+
+    // Include last played side for alternation tracking
+    if (lastPlayedSide != null) {
+      map['last_played_side'] = lastPlayedSide!;
     }
 
     return map;
@@ -115,6 +131,9 @@ class UserModel {
     DateTime? lastLoginAt,
     bool? isAnonymous,
     String? deviceId,
+    String? lastPlayedSide,
+    int? redGamesPlayed,
+    int? blackGamesPlayed,
   }) {
     return UserModel(
       uid: uid,
@@ -129,6 +148,9 @@ class UserModel {
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
       isAnonymous: isAnonymous ?? this.isAnonymous,
       deviceId: deviceId ?? this.deviceId,
+      lastPlayedSide: lastPlayedSide ?? this.lastPlayedSide,
+      redGamesPlayed: redGamesPlayed ?? this.redGamesPlayed,
+      blackGamesPlayed: blackGamesPlayed ?? this.blackGamesPlayed,
     );
   }
 }

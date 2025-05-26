@@ -3,6 +3,7 @@ import '../models/game_data_model.dart';
 import '../repositories/game_repository.dart';
 import '../repositories/user_repository.dart';
 import 'elo_service.dart';
+import 'side_alternation_service.dart';
 
 /// Service for handling game operations
 class GameService {
@@ -90,18 +91,20 @@ class GameService {
   // Update player statistics
   Future<void> _updatePlayerStats(GameDataModel game, String? winnerId, bool isDraw) async {
     try {
-      // Update red player stats
-      await UserRepository.instance.updateGameStats(
+      // Update red player stats with side information
+      await UserRepository.instance.updateGameStatsWithSide(
         game.redPlayerId,
         winnerId == game.redPlayerId,
         isDraw,
+        'red',
       );
 
-      // Update black player stats
-      await UserRepository.instance.updateGameStats(
+      // Update black player stats with side information
+      await UserRepository.instance.updateGameStatsWithSide(
         game.blackPlayerId,
         winnerId == game.blackPlayerId,
         isDraw,
+        'black',
       );
     } catch (e) {
       logger.severe('Error updating player stats: $e');

@@ -7,6 +7,7 @@ import '../models/user_model.dart';
 import '../repositories/matchmaking_queue_repository.dart';
 import '../repositories/user_repository.dart';
 import 'game_service.dart';
+import 'side_alternation_service.dart';
 
 /// Service for handling matchmaking with Elo proximity
 class MatchmakingService {
@@ -236,8 +237,13 @@ class MatchmakingService {
   /// Create a match between two players
   Future<void> _createMatch(MatchmakingQueueModel player1, MatchmakingQueueModel player2) async {
     try {
-      // Determine colors based on preferences and Elo ratings
-      final colors = _determineColors(player1, player2);
+      // Determine colors using side alternation service
+      final colors = await SideAlternationService.instance.determineSideAssignment(
+        player1Id: player1.userId,
+        player2Id: player2.userId,
+        player1PreferredSide: player1.preferredColor?.name,
+        player2PreferredSide: player2.preferredColor?.name,
+      );
       final redPlayerId = colors['red']!;
       final blackPlayerId = colors['black']!;
 
@@ -253,7 +259,22 @@ class MatchmakingService {
           'player1_wait_time': player1.waitTimeSeconds,
           'player2_wait_time': player2.waitTimeSeconds,
           'elo_difference': (player1.eloRating - player2.eloRating).abs(),
+          'side_assignment': {
+            'red_player_id': redPlayerId,
+            'black_player_id': blackPlayerId,
+            'alternation_applied': true,
+          },
         },
+      );
+
+      // Update side history for both players
+      await SideAlternationService.instance.updatePlayerSideHistory(
+        playerId: redPlayerId,
+        side: 'red',
+      );
+      await SideAlternationService.instance.updatePlayerSideHistory(
+        playerId: blackPlayerId,
+        side: 'black',
       );
 
       // Mark queue entries as matched
@@ -292,8 +313,12 @@ class MatchmakingService {
         return;
       }
 
-      // Determine colors (human player gets preference if specified)
-      final colors = _determineColorsWithAI(player, aiOpponent);
+      // Determine colors using side alternation service for AI matches
+      final colors = await SideAlternationService.instance.determineSideAssignmentWithAI(
+        humanPlayerId: player.userId,
+        aiPlayerId: aiOpponent.uid,
+        humanPreferredSide: player.preferredColor?.name,
+      );
       final redPlayerId = colors['red']!;
       final blackPlayerId = colors['black']!;
 
@@ -311,7 +336,20 @@ class MatchmakingService {
           'elo_difference': (player.eloRating - aiOpponent.eloRating).abs(),
           'ai_opponent_id': aiOpponent.uid,
           'ai_opponent_name': aiOpponent.displayName,
+          'side_assignment': {
+            'red_player_id': redPlayerId,
+            'black_player_id': blackPlayerId,
+            'alternation_applied': true,
+            'human_player_id': player.userId,
+          },
         },
+      );
+
+      // Update side history for human player only (AI doesn't need tracking)
+      final humanSide = redPlayerId == player.userId ? 'red' : 'black';
+      await SideAlternationService.instance.updatePlayerSideHistory(
+        playerId: player.userId,
+        side: humanSide,
       );
 
       // Mark queue entry as matched (only the human player's queue entry)

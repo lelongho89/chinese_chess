@@ -11,6 +11,7 @@
 | T1-010  | Migrate from Firebase to Supabase | Backend/Frontend Team | Completed | High | 1 week | Phase 1 |
 | T1-011  | Implement QR code sharing for match invitations | Frontend Team | Completed | Medium | 0.5 weeks | Phase 1 |
 | T1-012  | Implement Robot Player AI for Online Matchmaking | Frontend/Backend Team | Completed | High | 1 week | Phase 1 |
+| T1-013  | Implement Side Alternation for Fair Online Matches | Frontend/Backend Team | Completed | High | 0.5 weeks | Phase 1 |
 
 ### T1-011: Implement QR code sharing for match invitations (Completed)
 - ✅ Create database schema for match invitations
@@ -85,6 +86,16 @@
 - ✅ Add difficulty scaling based on human player Elo rating
 - ✅ Test robot player behavior in online matches
 - ✅ Ensure robot moves are properly validated and synchronized
+
+### T1-013: Implement Side Alternation for Fair Online Matches (Completed)
+- ✅ Add side tracking fields to user model (lastPlayedSide, redGamesPlayed, blackGamesPlayed)
+- ✅ Create SideAlternationService for managing fair side assignment
+- ✅ Update matchmaking service to use side alternation logic
+- ✅ Implement alternation for both human vs human and human vs AI matches
+- ✅ Add database migration for side tracking fields
+- ✅ Update game service to track side history after games
+- ✅ Create comprehensive unit tests for side alternation logic
+- ✅ Add database functions for side statistics and history management
 
 ## Notes
 - Assume existing Flutter code handles basic Chinese Chess gameplay; tasks focus on online integration.

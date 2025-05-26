@@ -415,8 +415,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _deleteProfile() async {
     // Show confirmation dialog
     final confirmed = await MyDialog.confirm(
-      'Delete Profile',
-      content: 'Are you sure you want to delete your profile? This will permanently delete all your stats, game history, and progress. You will start fresh with a new profile on your next login.',
+      'Are you sure you want to delete your profile? This will permanently delete all your stats, game history, and progress. You will start fresh with a new profile on your next login.',
+      title: 'Delete Profile',
       buttonText: 'Delete',
       cancelText: 'Cancel',
     );
