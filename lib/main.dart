@@ -13,6 +13,7 @@ import 'models/game_setting.dart';
 import 'models/locale_provider.dart';
 import 'screens/auth_wrapper.dart';
 import 'screens/main_screen.dart';
+import 'services/device_id_service.dart';
 import 'supabase_client.dart' as client;
 import 'widgets/game_wrapper.dart';
 
@@ -44,6 +45,9 @@ void main() async {
 
   // Initialize locale provider
   final localeProvider = await LocaleProvider.getInstance();
+
+  // Initialize device ID service
+  await DeviceIdService.instance.initialize();
 
   // Initialize auth service
   final authService = await SupabaseAuthService.getInstance();

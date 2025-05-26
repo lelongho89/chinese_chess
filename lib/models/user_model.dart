@@ -13,6 +13,7 @@ class UserModel {
   final DateTime createdAt;
   final DateTime lastLoginAt;
   final bool isAnonymous;
+  final String? deviceId; // Device ID for anonymous users
 
   UserModel({
     required this.uid,
@@ -26,6 +27,7 @@ class UserModel {
     required this.createdAt,
     required this.lastLoginAt,
     this.isAnonymous = false,
+    this.deviceId,
   });
 
   // Create a UserModel from a Supabase User
@@ -42,7 +44,7 @@ class UserModel {
   }
 
   // Create a UserModel from a Supabase User with custom display name (for anonymous users)
-  factory UserModel.fromSupabaseUserWithDisplayName(User user, String displayName) {
+  factory UserModel.fromSupabaseUserWithDisplayName(User user, String displayName, {String? deviceId}) {
     final now = DateTime.now();
     return UserModel(
       uid: user.id,
@@ -51,6 +53,7 @@ class UserModel {
       createdAt: now,
       lastLoginAt: now,
       isAnonymous: user.isAnonymous,
+      deviceId: deviceId,
     );
   }
 
@@ -68,6 +71,7 @@ class UserModel {
       createdAt: DateTime.parse(data['created_at'] ?? DateTime.now().toIso8601String()),
       lastLoginAt: DateTime.parse(data['last_login_at'] ?? DateTime.now().toIso8601String()),
       isAnonymous: data['is_anonymous'] ?? false,
+      deviceId: data['device_id'],
     );
   }
 
@@ -91,6 +95,11 @@ class UserModel {
       map['is_anonymous'] = isAnonymous;
     }
 
+    // Include device_id for anonymous users
+    if (deviceId != null) {
+      map['device_id'] = deviceId;
+    }
+
     return map;
   }
 
@@ -105,6 +114,7 @@ class UserModel {
     int? gamesDraw,
     DateTime? lastLoginAt,
     bool? isAnonymous,
+    String? deviceId,
   }) {
     return UserModel(
       uid: uid,
@@ -118,6 +128,7 @@ class UserModel {
       createdAt: createdAt,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
       isAnonymous: isAnonymous ?? this.isAnonymous,
+      deviceId: deviceId ?? this.deviceId,
     );
   }
 }

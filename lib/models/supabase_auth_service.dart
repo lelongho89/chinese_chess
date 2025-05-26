@@ -6,6 +6,7 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../global.dart';
+import '../services/device_id_service.dart';
 import '../supabase_client.dart' as client;
 import 'user_model.dart';
 import 'user_repository.dart';
@@ -141,22 +142,54 @@ class SupabaseAuthService extends ChangeNotifier {
     }
   }
 
-  // Sign in anonymously
+  // Sign in anonymously with device ID-based persistence
   Future<User?> signInAnonymously() async {
     try {
       _setLoading(true);
-      final response = await client.SupabaseClientWrapper.instance.auth.signInAnonymously();
 
-      _user = response.user;
+      // Initialize device ID service if not already done
+      await DeviceIdService.instance.initialize();
 
-      // Create user in database with random display name
-      if (_user != null) {
-        try {
-          await UserRepository.instance.createAnonymousUser(_user!, _generateRandomDisplayName());
-        } catch (e) {
-          // If database creation fails, log the error but don't prevent anonymous login
-          logger.warning('Failed to create anonymous user in database: $e');
-          // The user can still use the app without database storage
+      // Get device ID for this device
+      final deviceId = await DeviceIdService.instance.getDeviceId();
+      logger.info('Anonymous login with device ID: ${deviceId.substring(0, 8)}...');
+
+      // Check if we already have an anonymous user for this device
+      final existingUser = await UserRepository.instance.getUserByDeviceId(deviceId);
+
+      if (existingUser != null) {
+        // Try to sign in with existing anonymous user
+        logger.info('Found existing anonymous user for device: ${existingUser.uid}');
+
+        // For existing anonymous users, we need to create a new Supabase session
+        // but link it to the existing user data
+        final response = await client.SupabaseClientWrapper.instance.auth.signInAnonymously();
+        _user = response.user;
+
+        if (_user != null) {
+          // Update the existing user record with the new Supabase user ID
+          await UserRepository.instance.linkDeviceToUser(_user!.id, deviceId, existingUser);
+          logger.info('Linked new session to existing user data');
+        }
+      } else {
+        // Create new anonymous user
+        final response = await client.SupabaseClientWrapper.instance.auth.signInAnonymously();
+        _user = response.user;
+
+        // Create user in database with random display name and device ID
+        if (_user != null) {
+          try {
+            await UserRepository.instance.createAnonymousUserWithDevice(
+              _user!,
+              _generateRandomDisplayName(),
+              deviceId,
+            );
+            logger.info('Created new anonymous user with device ID');
+          } catch (e) {
+            // If database creation fails, log the error but don't prevent anonymous login
+            logger.warning('Failed to create anonymous user in database: $e');
+            // The user can still use the app without database storage
+          }
         }
       }
 
@@ -282,6 +315,39 @@ class SupabaseAuthService extends ChangeNotifier {
   // Reset password (alias for sendPasswordResetEmail)
   Future<void> resetPassword(String email) async {
     return sendPasswordResetEmail(email);
+  }
+
+  // Delete anonymous profile and clear device data
+  Future<void> deleteAnonymousProfile() async {
+    if (!isAnonymous) {
+      throw Exception('Can only delete anonymous profiles');
+    }
+
+    try {
+      _setLoading(true);
+
+      final currentUser = _user;
+      if (currentUser == null) {
+        throw Exception('No user to delete');
+      }
+
+      // Delete user data from database
+      await UserRepository.instance.deleteAnonymousUserData(currentUser.id);
+
+      // Clear device ID from local storage
+      await DeviceIdService.instance.clearDeviceId();
+
+      // Sign out from Supabase
+      await client.SupabaseClientWrapper.instance.auth.signOut();
+      _user = null;
+
+      logger.info('Anonymous profile deleted successfully');
+    } catch (e) {
+      logger.severe('Error deleting anonymous profile: $e');
+      rethrow;
+    } finally {
+      _setLoading(false);
+    }
   }
 
   // Sign in with Google

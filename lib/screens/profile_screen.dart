@@ -297,6 +297,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onTap: _signOut,
                 ),
 
+                // Show delete profile option for anonymous users
+                if (authService.isAnonymous) ...[
+                  const SizedBox(height: 16),
+                  _buildSettingItem(
+                    title: 'Delete Profile',
+                    subtitle: 'Delete all stats and start fresh',
+                    trailing: const Icon(Icons.delete_forever, color: Colors.red),
+                    onTap: _deleteProfile,
+                    textColor: Colors.red,
+                  ),
+                ],
+
                 const Spacer(),
               ],
             ),
@@ -340,8 +352,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildSettingItem({
     required String title,
+    String? subtitle,
     Widget? trailing,
     VoidCallback? onTap,
+    Color? textColor,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -354,12 +368,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Row(
           children: [
             Expanded(
-              child: Text(
-                title,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: textColor ?? Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: (textColor ?? Theme.of(context).colorScheme.onSurface).withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
             if (trailing != null) trailing,
@@ -380,6 +408,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (e) {
       if (mounted) {
         MyDialog.alert('Sign out failed: $e');
+      }
+    }
+  }
+
+  Future<void> _deleteProfile() async {
+    // Show confirmation dialog
+    final confirmed = await MyDialog.confirm(
+      'Delete Profile',
+      content: 'Are you sure you want to delete your profile? This will permanently delete all your stats, game history, and progress. You will start fresh with a new profile on your next login.',
+      buttonText: 'Delete',
+      cancelText: 'Cancel',
+    );
+
+    if (confirmed != true) return;
+
+    final authService = Provider.of<SupabaseAuthService>(context, listen: false);
+    final loadingController = MyDialog.loading('Deleting profile...');
+
+    try {
+      await authService.deleteAnonymousProfile();
+
+      // Hide loading indicator
+      loadingController.close();
+
+      if (mounted) {
+        MyDialog.toast(
+          'Profile deleted successfully',
+          iconType: IconType.success,
+        );
+
+        // Navigate back to login/main screen
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
+    } catch (e) {
+      // Hide loading indicator
+      loadingController.close();
+
+      if (mounted) {
+        MyDialog.alert(
+          'Failed to delete profile: $e',
+          title: context.l10n.error,
+        );
       }
     }
   }
