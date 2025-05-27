@@ -195,18 +195,21 @@ class _SocialButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                icon,
+              SizedBox(
                 width: 24,
                 height: 24,
-                errorBuilder: (context, error, stackTrace) {
-                  logger.warning('Failed to load social login icon: $icon');
-                  return Icon(
+                child: Image.asset(
+                  icon,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    logger.warning('Failed to load social login icon: $icon');
+                    return Icon(
                     Icons.login,
                     size: 24,
                     color: Colors.grey.shade600,
                   );
-                },
+                  },
+                ),
               ),
               const SizedBox(width: 12),
               Text(
