@@ -59,6 +59,11 @@ class _AuthWrapperState extends State<AuthWrapper> {
           );
         }
 
+        // If user is authenticated and anonymous, show the main app directly
+        if (authService.isAuthenticated && authService.isAnonymous) {
+          return widget.child;
+        }
+
         // If user is authenticated but email is not verified, show verification screen
         if (authService.isAuthenticated && !authService.isEmailVerified) {
           return EmailVerificationScreen(

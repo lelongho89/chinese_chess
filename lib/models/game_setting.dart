@@ -20,6 +20,7 @@ class GameSetting {
   double soundVolume = 1;
   String locale = 'en';
   String skin = 'woods';
+  int difficulty = 0; // 0: Easy, 1: Medium, 2: Hard
 
   GameSetting({
     this.info = builtInEngine,
@@ -28,6 +29,7 @@ class GameSetting {
     this.soundVolume = 1,
     this.locale = 'en',
     this.skin = 'woods',
+    this.difficulty = 0,
   });
 
   GameSetting.fromJson(String? jsonStr) {
@@ -56,6 +58,12 @@ class GameSetting {
     }
     if (json.containsKey('skin')) {
       skin = json['skin'];
+    }
+    if (json.containsKey('difficulty')) {
+      difficulty = json['difficulty'];
+      if (difficulty < 0 || difficulty > 2) {
+        difficulty = 0;
+      }
     }
   }
 
@@ -111,5 +119,6 @@ class GameSetting {
         'sound_volume': soundVolume,
         'locale': locale,
         'skin': skin,
+        'difficulty': difficulty,
       });
 }

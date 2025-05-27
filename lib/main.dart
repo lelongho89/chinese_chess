@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:shirne_dialog/shirne_dialog.dart';
 
@@ -12,19 +12,29 @@ import 'models/game_manager.dart';
 import 'models/game_setting.dart';
 import 'models/locale_provider.dart';
 import 'screens/auth_wrapper.dart';
-import 'supabase_client.dart';
+import 'screens/main_screen.dart';
+import 'services/device_id_service.dart';
+import 'supabase_client.dart' as client;
 import 'widgets/game_wrapper.dart';
-import 'game_board.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load environment variables
-  await dotenv.load();
+  // Enable hierarchical logging for engine interface
+  Logger.root.level = Level.ALL;
+  hierarchicalLoggingEnabled = true;
+
+  // Load environment variables from assets
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    logger.warning('Could not load .env file: $e');
+    // Continue without .env file - use default values
+  }
 
   // Initialize Supabase
   try {
-    await SupabaseClient.initialize();
+    await client.SupabaseClientWrapper.initialize();
     logger.info('Supabase initialized successfully');
   } catch (e) {
     logger.severe('Failed to initialize Supabase: $e');
@@ -36,18 +46,19 @@ void main() async {
   // Initialize locale provider
   final localeProvider = await LocaleProvider.getInstance();
 
+  // Initialize device ID service
+  await DeviceIdService.instance.initialize();
+
   // Initialize auth service
   final authService = await SupabaseAuthService.getInstance();
 
   runApp(
-    ProviderScope(
-      child: MultiProvider(
-        providers: [
-          ChangeNotifierProvider.value(value: localeProvider),
-          ChangeNotifierProvider.value(value: authService),
-        ],
-        child: const MainApp(),
-      ),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: localeProvider),
+        ChangeNotifierProvider.value(value: authService),
+      ],
+      child: const MainApp(),
     ),
   );
 }
@@ -71,9 +82,9 @@ class _MainAppState extends State<MainApp> {
         return context.l10n.appTitle;
       },
       navigatorKey: MyDialog.navigatorKey,
-      localizationsDelegates: const [
+      localizationsDelegates: [
         AppLocalizations.delegate,
-        ShirneDialogLocalizations.delegate,
+        _FallbackShirneDialogDelegate(),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
@@ -84,6 +95,18 @@ class _MainAppState extends State<MainApp> {
         Locale('vi', ''),
       ],
       locale: localeProvider.locale,
+      localeResolutionCallback: (locale, supportedLocales) {
+        // Handle locale resolution for third-party packages that may not support all locales
+        if (locale != null) {
+          for (final supportedLocale in supportedLocales) {
+            if (supportedLocale.languageCode == locale.languageCode) {
+              return supportedLocale;
+            }
+          }
+        }
+        // Fallback to English if locale is not supported
+        return const Locale('en', '');
+      },
       theme: AppTheme.createTheme(),
       highContrastTheme: AppTheme.createTheme(isHighContrast: true),
       darkTheme: AppTheme.createTheme(isDark: true),
@@ -92,16 +115,42 @@ class _MainAppState extends State<MainApp> {
         isHighContrast: true,
       ),
       // Material 3 specific configurations
-      themeMode: ThemeMode.system, // Follow system theme
+      themeMode: ThemeMode.dark, // Use dark theme to match design
       debugShowCheckedModeBanner: false, // Remove debug banner
       home: AuthWrapper(
         child: GameWrapper(
           isMain: true,
-          child: GameBoard(),
+          child: const MainScreen(),
         ),
       ),
     );
   }
+}
+
+/// Custom delegate that wraps ShirneDialogLocalizations.delegate
+/// and provides fallback for unsupported locales
+class _FallbackShirneDialogDelegate extends LocalizationsDelegate<ShirneDialogLocalizations> {
+  const _FallbackShirneDialogDelegate();
+
+  @override
+  bool isSupported(Locale locale) {
+    // Always return true since we handle fallback internally
+    return true;
+  }
+
+  @override
+  Future<ShirneDialogLocalizations> load(Locale locale) async {
+    // Check if ShirneDialogLocalizations supports this locale
+    if (ShirneDialogLocalizations.delegate.isSupported(locale)) {
+      return await ShirneDialogLocalizations.delegate.load(locale);
+    } else {
+      // Fallback to English for unsupported locales
+      return await ShirneDialogLocalizations.delegate.load(const Locale('en'));
+    }
+  }
+
+  @override
+  bool shouldReload(_FallbackShirneDialogDelegate old) => false;
 }
 
 

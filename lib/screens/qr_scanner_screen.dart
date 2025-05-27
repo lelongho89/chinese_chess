@@ -25,9 +25,8 @@ class _QRScannerScreenState extends State<QRScannerScreen> with WidgetsBindingOb
   final MobileScannerController controller = MobileScannerController(
     detectionSpeed: DetectionSpeed.normal,
     facing: CameraFacing.back,
-    torchEnabled: false,
   );
-  
+
   bool _isProcessing = false;
 
   @override
@@ -54,15 +53,15 @@ class _QRScannerScreenState extends State<QRScannerScreen> with WidgetsBindingOb
 
   Future<void> _processQRCode(String data) async {
     if (_isProcessing) return;
-    
+
     setState(() {
       _isProcessing = true;
     });
-    
+
     try {
       // Parse the QR code data
       final invitation = await QRService.instance.parseInvitationQRData(data);
-      
+
       if (invitation == null) {
         if (mounted) {
           MyDialog.alert(
@@ -72,7 +71,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> with WidgetsBindingOb
         }
         return;
       }
-      
+
       // Check if the invitation is valid
       if (invitation.status != MatchInvitationStatus.pending) {
         if (mounted) {
@@ -83,7 +82,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> with WidgetsBindingOb
         }
         return;
       }
-      
+
       // Check if the invitation has expired
       if (invitation.expirationTime.isBefore(DateTime.now())) {
         if (mounted) {
@@ -94,10 +93,10 @@ class _QRScannerScreenState extends State<QRScannerScreen> with WidgetsBindingOb
         }
         return;
       }
-      
+
       // Call the callback
       widget.onInvitationScanned(invitation);
-      
+
       // Close the scanner
       if (mounted) {
         Navigator.of(context).pop();
@@ -126,31 +125,16 @@ class _QRScannerScreenState extends State<QRScannerScreen> with WidgetsBindingOb
         title: Text(context.l10n.scanQRCode),
         actions: [
           IconButton(
-            icon: ValueListenableBuilder(
-              valueListenable: controller.torchState,
-              builder: (context, state, child) {
-                switch (state) {
-                  case TorchState.off:
-                    return const Icon(Icons.flash_off);
-                  case TorchState.on:
-                    return const Icon(Icons.flash_on);
-                }
+            icon: ValueListenableBuilder<bool>(
+              valueListenable: ValueNotifier<bool>(false),
+              builder: (context, isOn, child) {
+                return Icon(isOn ? Icons.flash_on : Icons.flash_off);
               },
             ),
             onPressed: () => controller.toggleTorch(),
           ),
           IconButton(
-            icon: ValueListenableBuilder(
-              valueListenable: controller.cameraFacingState,
-              builder: (context, state, child) {
-                switch (state) {
-                  case CameraFacing.front:
-                    return const Icon(Icons.camera_front);
-                  case CameraFacing.back:
-                    return const Icon(Icons.camera_rear);
-                }
-              },
-            ),
+            icon: const Icon(Icons.flip_camera_ios),
             onPressed: () => controller.switchCamera(),
           ),
         ],

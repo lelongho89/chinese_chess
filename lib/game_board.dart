@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:fast_gbk/fast_gbk.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:flutter_document_picker/flutter_document_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:shirne_dialog/shirne_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,9 @@ import 'global.dart';
 import 'setting.dart';
 import 'components/game_bottom_bar.dart';
 import 'models/play_mode.dart';
+import 'models/supabase_auth_service.dart';
+import 'screens/matchmaking_screen.dart';
+import 'screens/profile_screen.dart';
 import 'widgets/game_wrapper.dart';
 import 'models/game_manager.dart';
 import 'components/play.dart';
@@ -21,7 +25,9 @@ import 'services/match_invitation_handler.dart';
 
 /// 游戏页面
 class GameBoard extends StatefulWidget {
-  const GameBoard({super.key});
+  final PlayMode? initialMode;
+
+  const GameBoard({super.key, this.initialMode});
 
   @override
   State<GameBoard> createState() => GameBoardState();
@@ -35,49 +41,184 @@ class GameBoardState extends State<GameBoard> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero).then((value) => gamer.init());
+    print('GameBoard: initState called');
+    // Set the initial mode if provided
+    mode = widget.initialMode;
+    // GameManager will initialize itself when needed
   }
 
   Widget selectMode() {
-    final maxHeight = MediaQuery.of(context).size.height;
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        children: [
+          // Header Section
+          const SizedBox(height: 32),
+          Text(
+            context.l10n.appTitle,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            context.l10n.chooseGameMode,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 48),
 
-    return Center(
-      child: SizedBox(
-        height: maxHeight * 0.6,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            ElevatedButton.icon(
-              onPressed: () {
-                setState(() {
-                  mode = PlayMode.modeRobot;
-                });
-              },
-              icon: const Icon(Icons.android),
-              label: Text(context.l10n.modeRobot),
+          // Game Mode Cards
+          Expanded(
+            child: ListView(
+              children: [
+                _buildGameModeCard(
+                  icon: Icons.smart_toy,
+                  title: context.l10n.modeRobot,
+                  subtitle: context.l10n.modeRobotSubtitle,
+                  onTap: () {
+                    setState(() {
+                      mode = PlayMode.modeRobot;
+                    });
+                  },
+                  isEnabled: true,
+                ),
+                const SizedBox(height: 16),
+                _buildGameModeCard(
+                  icon: Icons.wifi,
+                  title: context.l10n.modeOnline,
+                  subtitle: context.l10n.modeOnlineSubtitle,
+                  onTap: () {
+                    _navigateToOnlineMode();
+                  },
+                  isEnabled: true,
+                ),
+                // Free Mode - Hidden for MVP
+                // const SizedBox(height: 16),
+                // _buildGameModeCard(
+                //   icon: Icons.people,
+                //   title: context.l10n.modeFree,
+                //   subtitle: context.l10n.modeFreeSubtitle,
+                //   onTap: () {
+                //     setState(() {
+                //       mode = PlayMode.modeFree;
+                //     });
+                //   },
+                //   isEnabled: true,
+                // ),
+              ],
             ),
-            ElevatedButton.icon(
-              onPressed: () {
-                MyDialog.toast(
-                  context.l10n.featureNotAvailable,
-                  iconType: IconType.error,
-                );
-              },
-              icon: const Icon(Icons.wifi),
-              label: Text(context.l10n.modeOnline),
-            ),
-            ElevatedButton.icon(
-              onPressed: () {
-                setState(() {
-                  mode = PlayMode.modeFree;
-                });
-              },
-              icon: const Icon(Icons.map),
-              label: Text(context.l10n.modeFree),
-            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-          ],
+  Widget _buildGameModeCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    required bool isEnabled,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Card(
+      elevation: isEnabled ? 2 : 1,
+      child: InkWell(
+        onTap: isEnabled ? onTap : null,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Row(
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: isEnabled
+                    ? colorScheme.primaryContainer
+                    : colorScheme.surfaceVariant,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(
+                  icon,
+                  size: 32,
+                  color: isEnabled
+                    ? colorScheme.onPrimaryContainer
+                    : colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: isEnabled
+                          ? colorScheme.onSurface
+                          : colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: isEnabled
+                          ? colorScheme.onSurfaceVariant
+                          : colorScheme.onSurfaceVariant.withOpacity(0.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (!isEnabled)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceVariant,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    context.l10n.comingSoon,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  /// Navigate to online mode (matchmaking)
+  void _navigateToOnlineMode() {
+    // Check if user is authenticated
+    final authService = Provider.of<SupabaseAuthService>(context, listen: false);
+    if (!authService.isAuthenticated) {
+      // Show login dialog or navigate to login screen
+      MyDialog.alert('Please login first to play online');
+      return;
+    }
+
+    // Navigate to matchmaking screen
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const MatchmakingScreen(),
       ),
     );
   }
@@ -238,6 +379,28 @@ class GameBoardState extends State<GameBoard> {
                 MatchInvitationHandler.instance.showQRScanner(context);
               },
             ),
+            // Profile option - only show if user is authenticated
+            Consumer<SupabaseAuthService>(
+              builder: (context, authService, _) {
+                if (authService.isAuthenticated) {
+                  return ListTile(
+                    leading: const Icon(Icons.person),
+                    title: Text(context.l10n.profile),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => const ProfileScreen(),
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  return const SizedBox.shrink();
+                }
+              },
+            ),
             ListTile(
               leading: const Icon(Icons.settings),
               title: Text(context.l10n.setting),
@@ -246,7 +409,7 @@ class GameBoardState extends State<GameBoard> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (BuildContext context) => const SettingPage(),
+                    builder: (BuildContext context) => const SettingPage(isEmbedded: false),
                   ),
                 );
               },
@@ -342,30 +505,23 @@ class GameBoardState extends State<GameBoard> {
 
   Future<void> loadFile() async {
     try {
-      // Updated for file_picker 6.1.1
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pgn', 'PGN'],
-        withData: true,
+      // Use flutter_document_picker instead of file_picker
+      final filePath = await FlutterDocumentPicker.openDocument(
+        params: FlutterDocumentPickerParams(
+          allowedFileExtensions: ['pgn', 'PGN'],
+          allowedMimeTypes: ['application/octet-stream'],
+        ),
       );
 
-      if (result != null && result.files.isNotEmpty) {
-        final file = result.files.first;
-        if (file.bytes != null) {
-          String content = gbk.decode(file.bytes!);
-          if (gamer.isStop) {
-            gamer.newGame();
-          }
-          gamer.loadPGN(content);
-        } else if (file.path != null) {
-          // Handle file path if bytes are not available
-          final fileData = await File(file.path!).readAsBytes();
-          String content = gbk.decode(fileData);
-          if (gamer.isStop) {
-            gamer.newGame();
-          }
-          gamer.loadPGN(content);
+      if (filePath != null) {
+        // Read the file data
+        final fileData = await File(filePath).readAsBytes();
+        String content = gbk.decode(fileData);
+
+        if (gamer.isStop) {
+          gamer.newGame();
         }
+        gamer.loadPGN(content);
       } else {
         // User canceled the picker
       }

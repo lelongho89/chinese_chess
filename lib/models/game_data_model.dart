@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'game_move_model.dart';
 
-/// Model for storing game data in Firestore
+/// Model for storing game data in Supabase
 class GameDataModel {
   final String id;
   final String redPlayerId;
@@ -12,11 +12,19 @@ class GameDataModel {
   final String finalFen;
   final int redTimeRemaining; // in seconds
   final int blackTimeRemaining; // in seconds
-  final Timestamp startedAt;
-  final Timestamp? endedAt;
+  final DateTime startedAt;
+  final DateTime? endedAt;
   final bool isRanked;
   final int? tournamentId;
   final Map<String, dynamic>? metadata;
+
+  // Real-time game state fields
+  final String currentFen;
+  final int currentPlayer; // 0 for red, 1 for black
+  final GameStatus gameStatus;
+  final String? lastMove;
+  final DateTime? lastMoveAt;
+  final PlayerConnectionStatus connectionStatus;
 
   GameDataModel({
     required this.id,
@@ -34,47 +42,69 @@ class GameDataModel {
     this.isRanked = true,
     this.tournamentId,
     this.metadata,
+    // Real-time fields with defaults
+    this.currentFen = 'rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR',
+    this.currentPlayer = 0,
+    this.gameStatus = GameStatus.active,
+    this.lastMove,
+    this.lastMoveAt,
+    this.connectionStatus = const PlayerConnectionStatus(),
   });
 
-  // Create a GameDataModel from a Firestore document
-  factory GameDataModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+  // Create a GameDataModel from a Supabase record
+  factory GameDataModel.fromSupabase(Map<String, dynamic> data, String id) {
     return GameDataModel(
-      id: doc.id,
-      redPlayerId: data['redPlayerId'] ?? '',
-      blackPlayerId: data['blackPlayerId'] ?? '',
-      winnerId: data['winnerId'],
-      isDraw: data['isDraw'] ?? false,
-      moveCount: data['moveCount'] ?? 0,
+      id: id,
+      redPlayerId: data['red_player_id'] ?? '',
+      blackPlayerId: data['black_player_id'] ?? '',
+      winnerId: data['winner_id'],
+      isDraw: data['is_draw'] ?? false,
+      moveCount: data['move_count'] ?? 0,
       moves: List<String>.from(data['moves'] ?? []),
-      finalFen: data['finalFen'] ?? '',
-      redTimeRemaining: data['redTimeRemaining'] ?? 0,
-      blackTimeRemaining: data['blackTimeRemaining'] ?? 0,
-      startedAt: data['startedAt'] ?? Timestamp.now(),
-      endedAt: data['endedAt'],
-      isRanked: data['isRanked'] ?? true,
-      tournamentId: data['tournamentId'],
+      finalFen: data['final_fen'] ?? '',
+      redTimeRemaining: data['red_time_remaining'] ?? 0,
+      blackTimeRemaining: data['black_time_remaining'] ?? 0,
+      startedAt: DateTime.parse(data['started_at'] ?? DateTime.now().toIso8601String()),
+      endedAt: data['ended_at'] != null ? DateTime.parse(data['ended_at']) : null,
+      isRanked: data['is_ranked'] ?? true,
+      tournamentId: data['tournament_id'],
       metadata: data['metadata'],
+      // Real-time fields
+      currentFen: data['current_fen'] ?? 'rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR',
+      currentPlayer: data['current_player'] ?? 0,
+      gameStatus: parseGameStatus(data['game_status']),
+      lastMove: data['last_move'],
+      lastMoveAt: data['last_move_at'] != null ? DateTime.parse(data['last_move_at']) : null,
+      connectionStatus: data['connection_status'] != null
+          ? PlayerConnectionStatus.fromJson(data['connection_status'])
+          : const PlayerConnectionStatus(),
     );
   }
 
-  // Convert GameDataModel to a Map for Firestore
+  // Convert GameDataModel to a Map for Supabase
   Map<String, dynamic> toMap() {
     return {
-      'redPlayerId': redPlayerId,
-      'blackPlayerId': blackPlayerId,
-      'winnerId': winnerId,
-      'isDraw': isDraw,
-      'moveCount': moveCount,
+      'red_player_id': redPlayerId,
+      'black_player_id': blackPlayerId,
+      'winner_id': winnerId,
+      'is_draw': isDraw,
+      'move_count': moveCount,
       'moves': moves,
-      'finalFen': finalFen,
-      'redTimeRemaining': redTimeRemaining,
-      'blackTimeRemaining': blackTimeRemaining,
-      'startedAt': startedAt,
-      'endedAt': endedAt,
-      'isRanked': isRanked,
-      'tournamentId': tournamentId,
+      'final_fen': finalFen,
+      'red_time_remaining': redTimeRemaining,
+      'black_time_remaining': blackTimeRemaining,
+      'started_at': startedAt.toIso8601String(),
+      'ended_at': endedAt?.toIso8601String(),
+      'is_ranked': isRanked,
+      'tournament_id': tournamentId,
       'metadata': metadata,
+      // Real-time fields
+      'current_fen': currentFen,
+      'current_player': currentPlayer,
+      'game_status': gameStatus.name,
+      'last_move': lastMove,
+      'last_move_at': lastMoveAt?.toIso8601String(),
+      'connection_status': connectionStatus.toJson(),
     };
   }
 
@@ -89,11 +119,18 @@ class GameDataModel {
     String? finalFen,
     int? redTimeRemaining,
     int? blackTimeRemaining,
-    Timestamp? startedAt,
-    Timestamp? endedAt,
+    DateTime? startedAt,
+    DateTime? endedAt,
     bool? isRanked,
     int? tournamentId,
     Map<String, dynamic>? metadata,
+    // Real-time fields
+    String? currentFen,
+    int? currentPlayer,
+    GameStatus? gameStatus,
+    String? lastMove,
+    DateTime? lastMoveAt,
+    PlayerConnectionStatus? connectionStatus,
   }) {
     return GameDataModel(
       id: id,
@@ -111,6 +148,41 @@ class GameDataModel {
       isRanked: isRanked ?? this.isRanked,
       tournamentId: tournamentId ?? this.tournamentId,
       metadata: metadata ?? this.metadata,
+      // Real-time fields
+      currentFen: currentFen ?? this.currentFen,
+      currentPlayer: currentPlayer ?? this.currentPlayer,
+      gameStatus: gameStatus ?? this.gameStatus,
+      lastMove: lastMove ?? this.lastMove,
+      lastMoveAt: lastMoveAt ?? this.lastMoveAt,
+      connectionStatus: connectionStatus ?? this.connectionStatus,
     );
   }
+
+  // Helper methods for game state
+  bool get isRedTurn => currentPlayer == 0;
+  bool get isBlackTurn => currentPlayer == 1;
+  bool get isActive => gameStatus.isActive;
+  bool get isEnded => gameStatus.isEnded;
+  bool get isPaused => gameStatus.isPaused;
+
+  String get currentPlayerName => isRedTurn ? 'Red' : 'Black';
+
+  /// Check if a specific player is the current player
+  bool isPlayerTurn(String playerId) {
+    return (isRedTurn && playerId == redPlayerId) ||
+           (isBlackTurn && playerId == blackPlayerId);
+  }
+
+  /// Get the opponent's player ID for a given player
+  String? getOpponentId(String playerId) {
+    if (playerId == redPlayerId) return blackPlayerId;
+    if (playerId == blackPlayerId) return redPlayerId;
+    return null;
+  }
+
+  /// Check if both players are connected
+  bool get bothPlayersConnected => connectionStatus.bothConnected;
+
+  /// Check if any player is disconnected
+  bool get anyPlayerDisconnected => connectionStatus.anyDisconnected;
 }

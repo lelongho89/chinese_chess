@@ -1,12 +1,13 @@
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shirne_dialog/shirne_dialog.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../global.dart';
-import '../models/auth_service.dart';
+import '../models/supabase_auth_service.dart';
+import '../supabase_client.dart' as client;
 
 class EmailVerificationScreen extends StatefulWidget {
   final VoidCallback onVerificationComplete;
@@ -21,7 +22,7 @@ class EmailVerificationScreen extends StatefulWidget {
 }
 
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
-  late AuthService _authService;
+  late SupabaseAuthService _authService;
   Timer? _timer;
   bool _canResendEmail = true;
   int _resendCountdown = 0;
@@ -30,7 +31,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   @override
   void initState() {
     super.initState();
-    _authService = Provider.of<AuthService>(context, listen: false);
+    _authService = Provider.of<SupabaseAuthService>(context, listen: false);
     _startVerificationCheck();
   }
 
@@ -44,33 +45,48 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   void _startVerificationCheck() {
     // Check every 3 seconds if the email has been verified
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) async {
-      await _authService.reloadUser();
-      
-      if (_authService.isEmailVerified) {
-        _timer?.cancel();
-        widget.onVerificationComplete();
+      try {
+        // Refresh the session to check if email is verified
+        await _authService.refreshSession();
+
+        if (_authService.isEmailVerified) {
+          _timer?.cancel();
+          widget.onVerificationComplete();
+        }
+      } catch (e) {
+        logger.severe('Error checking email verification: $e');
       }
     });
   }
 
   Future<void> _resendVerificationEmail() async {
     if (!_canResendEmail) return;
-    
+
     setState(() {
       _canResendEmail = false;
       _resendCountdown = 60; // 60 seconds cooldown
     });
-    
+
     try {
-      await _authService.sendEmailVerification();
-      
+      // Get current user email
+      final email = _authService.user?.email;
+      if (email == null) {
+        throw Exception('User email is null');
+      }
+
+      // Resend verification email
+      await client.SupabaseClientWrapper.instance.auth.resend(
+        type: OtpType.email,
+        email: email,
+      );
+
       if (context.mounted) {
         MyDialog.toast(
           context.l10n.verificationEmailSent,
           iconType: IconType.success,
         );
       }
-      
+
       // Start countdown for resend button
       _resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
         setState(() {
@@ -86,10 +102,17 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       setState(() {
         _canResendEmail = true;
       });
-      
+
+      String errorMessage;
+      if (e is AuthException) {
+        errorMessage = '${context.l10n.failedToSendVerificationEmail}: ${e.message}';
+      } else {
+        errorMessage = '${context.l10n.failedToSendVerificationEmail}: $e';
+      }
+
       if (context.mounted) {
         MyDialog.alert(
-          '${context.l10n.failedToSendVerificationEmail}: $e',
+          errorMessage,
           title: context.l10n.error,
         );
       }
@@ -100,9 +123,16 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     try {
       await _authService.signOut();
     } catch (e) {
+      String errorMessage;
+      if (e is AuthException) {
+        errorMessage = '${context.l10n.signOutFailed}: ${e.message}';
+      } else {
+        errorMessage = '${context.l10n.signOutFailed}: $e';
+      }
+
       if (context.mounted) {
         MyDialog.alert(
-          '${context.l10n.signOutFailed}: $e',
+          errorMessage,
           title: context.l10n.error,
         );
       }
@@ -137,7 +167,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   color: Colors.blue,
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Title
                 Text(
                   context.l10n.verifyYourEmail,
@@ -145,14 +175,14 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Description
                 Text(
                   context.l10n.verificationEmailSentDescription,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
-                
+
                 // Email address
                 Text(
                   _authService.user?.email ?? '',
@@ -160,7 +190,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
-                
+
                 // Resend button
                 ElevatedButton.icon(
                   onPressed: _canResendEmail ? _resendVerificationEmail : null,
@@ -178,7 +208,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Sign out button
                 TextButton.icon(
                   onPressed: _signOut,

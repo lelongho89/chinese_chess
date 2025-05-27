@@ -24,13 +24,23 @@ class AppTheme extends ThemeExtension<AppTheme> {
     bool isDark = false,
     bool isHighContrast = false,
   }) {
-    // Define primary color for the app
-    const primaryColor = Color(0xFF1976D2); // Blue
+    // Define primary color for the app - dark green theme
+    const primaryColor = Color(0xFF2E7D32); // Dark green
+    const surfaceColor = Color(0xFF1B5E20); // Darker green for surfaces
+    const backgroundColor = Color(0xFF0D3F12); // Very dark green background
 
     // Create a color scheme from the primary color
     final colorScheme = ColorScheme.fromSeed(
       seedColor: primaryColor,
       brightness: isDark ? Brightness.dark : Brightness.light,
+    ).copyWith(
+      // Override specific colors for the dark green theme
+      primary: primaryColor,
+      surface: isDark ? surfaceColor : Colors.white,
+      background: isDark ? backgroundColor : const Color(0xFFF5F5F5),
+      onPrimary: Colors.white,
+      onSurface: isDark ? Colors.white : Colors.black87,
+      onBackground: isDark ? Colors.white : Colors.black87,
     );
 
     // Create the base theme
@@ -47,7 +57,7 @@ class AppTheme extends ThemeExtension<AppTheme> {
       ),
 
       // Card theme
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),

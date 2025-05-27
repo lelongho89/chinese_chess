@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'chess.dart';
-import 'game_timer_display.dart';
 import 'play_step.dart';
 import 'play_single_player.dart';
 import 'play_bot.dart';
@@ -27,21 +27,12 @@ class PlayPageState extends State<PlayPage> {
   final GameManager gamer = GameManager.instance;
   late final GameTimerManager timerManager;
   bool inited = false;
+  bool isInitializing = true;
 
   @override
   void initState() {
     super.initState();
-    // Initialize the timer manager
-    timerManager = GameTimerManager(
-      gameManager: gamer,
-      initialTimeSeconds: 180, // 3 minutes
-      incrementSeconds: 2,     // 2 seconds per move
-    );
-
-    // Listen for timer expiration
-    timerManager.redTimer.addListener(_checkRedTimer);
-    timerManager.blackTimer.addListener(_checkBlackTimer);
-
+    print('PlayPage: initState called');
     initGame();
   }
 
@@ -60,70 +51,119 @@ class PlayPageState extends State<PlayPage> {
   }
 
   void initGame() async {
-    logger.info('初始化游戏 $inited');
+    print('PlayPage: 初始化游戏 $inited');
+    logger.info('PlayPage: 初始化游戏 $inited');
     if (inited) return;
-    inited = true;
-    gamer.newGame(amyType: DriverType.robot);
 
-    // Reset timers for new game
-    timerManager.startNewGame();
+    try {
+      logger.info('PlayPage: Ensuring GameManager is initialized...');
+      // Ensure GameManager is initialized first
+      final initResult = await gamer.init();
+      logger.info('PlayPage: GameManager init result: $initResult');
+      if (!initResult) {
+        throw Exception('GameManager initialization failed');
+      }
+
+      logger.info('PlayPage: Creating timer manager...');
+      // Initialize the timer manager after GameManager is ready
+      timerManager = GameTimerManager(
+        gameManager: gamer,
+        initialTimeSeconds: 180, // 3 minutes
+        incrementSeconds: 2,     // 2 seconds per move
+      );
+
+      logger.info('PlayPage: Setting up timer listeners...');
+      // Listen for timer expiration
+      timerManager.redTimer.addListener(_checkRedTimer);
+      timerManager.blackTimer.addListener(_checkBlackTimer);
+
+      logger.info('PlayPage: Starting new game...');
+      inited = true;
+
+      // Enable timer before starting new game
+      timerManager.enabled = true;
+
+      // Start new game (this will set curHand and trigger events)
+      gamer.newGame(amyType: DriverType.robot);
+
+      logger.info('PlayPage: Starting timers...');
+      // Start new game for timer manager (this will start the active timer)
+      timerManager.startNewGame();
+
+      logger.info('PlayPage: Initialization complete, updating UI...');
+      // Update UI state
+      if (mounted) {
+        setState(() {
+          isInitializing = false;
+        });
+      }
+    } catch (e) {
+      logger.severe('PlayPage: Error initializing game: $e');
+      if (mounted) {
+        setState(() {
+          isInitializing = false;
+        });
+        // Show error message to user
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to initialize game: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
+    }
   }
 
   @override
   void dispose() {
-    // Clean up timer listeners
-    timerManager.redTimer.removeListener(_checkRedTimer);
-    timerManager.blackTimer.removeListener(_checkBlackTimer);
-    timerManager.dispose();
+    // Clean up timer listeners if initialized
+    if (inited) {
+      timerManager.redTimer.removeListener(_checkRedTimer);
+      timerManager.blackTimer.removeListener(_checkBlackTimer);
+      timerManager.dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isInitializing) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     return MediaQuery.of(context).size.width < 980
         ? _mobileContainer()
         : _windowContainer();
   }
 
   Widget _mobileContainer() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        // Black player info and timer
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Expanded(
-              child: PlaySinglePlayer(
-                team: 1,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: ChangeNotifierProvider.value(
-                value: timerManager,
-                child: const GameTimerDisplay(
-                  isCompact: true,
-                  showControls: false,
-                ),
-              ),
-            ),
-          ],
-        ),
+    return ChangeNotifierProvider.value(
+      value: timerManager,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          // Black player info with timer
+          const PlaySinglePlayer(
+            team: 1,
+          ),
 
-        // Chess board
-        SizedBox(
-          width: gamer.skin.width * gamer.scale,
-          height: gamer.skin.height * gamer.scale,
-          child: const Chess(),
-        ),
+          // Chess board
+          SizedBox(
+            width: gamer.skin.width * gamer.scale,
+            height: gamer.skin.height * gamer.scale,
+            child: const Chess(),
+          ),
 
-        // Red player info
-        const PlaySinglePlayer(
-          team: 0,
-          placeAt: Alignment.bottomCenter,
-        ),
-      ],
+          // Red player info with timer
+          const PlaySinglePlayer(
+            team: 0,
+            placeAt: Alignment.bottomCenter,
+          ),
+        ],
+      ),
     );
   }
 
@@ -170,31 +210,18 @@ class PlayPageState extends State<PlayPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Player info
-                      const PlayPlayer(),
+                      // Player info with timers
+                      ChangeNotifierProvider.value(
+                        value: timerManager,
+                        child: const PlayPlayer(),
+                      ),
                       const SizedBox(width: 10),
 
                       // Game steps
                       Expanded(
-                        child: Column(
-                          children: [
-                            // Timer display
-                            ChangeNotifierProvider.value(
-                              value: timerManager,
-                              child: const Padding(
-                                padding: EdgeInsets.only(bottom: 8.0),
-                                child: GameTimerDisplay(),
-                              ),
-                            ),
-
-                            // Steps
-                            Expanded(
-                              child: PlayStep(
-                                decoration: decoration,
-                                width: 180,
-                              ),
-                            ),
-                          ],
+                        child: PlayStep(
+                          decoration: decoration,
+                          width: 180,
                         ),
                       ),
                     ],

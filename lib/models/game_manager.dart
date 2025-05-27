@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cchess/cchess.dart';
 import 'package:engine/engine.dart';
 import 'package:fast_gbk/fast_gbk.dart';
+import 'package:flutter/material.dart';
 
 import '../driver/player_driver.dart';
 import '../global.dart';
@@ -60,47 +61,113 @@ class GameManager {
   // 回合数
   int round = 0;
 
-  final gameEvent = StreamController<GameEvent>();
+  final gameEvent = StreamController<GameEvent>.broadcast();
   final Map<GameEventType, List<void Function(GameEvent)>> listeners = {};
 
   // 走子规则
   late ChessRule rule;
 
   late GameSetting setting;
+  bool _initialized = false;
+  bool get isInitialized => _initialized;
+  static bool _gameEventListenerInitialized = false;
 
   static GameManager? _instance;
 
-  static GameManager get instance => _instance ??= GameManager();
+  static GameManager get instance => _instance ??= GameManager._();
 
   GameManager._() {
-    gameEvent.stream.listen(_onGameEvent);
-  }
-
-  factory GameManager() {
-    _instance ??= GameManager._();
-    return _instance!;
+    // Only listen to gameEvent stream once
+    if (!_gameEventListenerInitialized) {
+      gameEvent.stream.listen(_onGameEvent);
+      _gameEventListenerInitialized = true;
+    }
   }
 
   Future<bool> init() async {
-    setting = await GameSetting.getInstance();
+    if (_initialized) return true;
+
+    print('GameManager: Starting initialization...');
+    logger.info('GameManager: Starting initialization...');
+
     try {
-      await engine.init();
-    } catch (_) {}
-    rule = ChessRule(manual.currentFen);
+      print('GameManager: Loading settings...');
+      logger.info('GameManager: Loading settings...');
+      setting = await GameSetting.getInstance();
 
-    hands.add(Player('r', this, title: manual.red));
-    hands.add(Player('b', this, title: manual.black));
-    curHand = 0;
-    // map = ChessMap.fromFen(ChessManual.startFen);
+      logger.info('GameManager: Initializing engine...');
+      try {
+        // Add timeout to engine initialization
+        await engine.init().timeout(
+          const Duration(seconds: 5),
+          onTimeout: () {
+            logger.warning('Engine initialization timed out, continuing without engine');
+            return false;
+          },
+        );
+      } catch (e) {
+        logger.warning('Engine initialization failed: $e');
+      }
 
-    skin = ChessSkin(setting.skin, this);
-    skin.readyNotifier.addListener(() {
-      add(GameLoadEvent(0));
-    });
+      logger.info('GameManager: Setting up chess rule...');
+      rule = ChessRule(manual.currentFen);
 
-    listener = engine.listen(parseMessage);
+      logger.info('GameManager: Creating players...');
+      hands.clear(); // Clear existing hands before adding new ones
+      hands.add(Player('r', this, title: manual.red));
+      hands.add(Player('b', this, title: manual.black));
+      curHand = 0;
 
-    return true;
+      print('GameManager: Loading skin...');
+      logger.info('GameManager: Loading skin...');
+      skin = ChessSkin(setting.skin, this);
+
+      // Wait for skin to be ready
+      if (!skin.readyNotifier.value) {
+        print('GameManager: Waiting for skin to load...');
+        logger.info('GameManager: Waiting for skin to load...');
+        final completer = Completer<void>();
+        late VoidCallback listener;
+        listener = () {
+          if (skin.readyNotifier.value) {
+            skin.readyNotifier.removeListener(listener);
+            completer.complete();
+          }
+        };
+        skin.readyNotifier.addListener(listener);
+
+        try {
+          await completer.future.timeout(
+            const Duration(seconds: 3),
+            onTimeout: () {
+              logger.warning('Skin loading timed out, continuing anyway');
+              skin.readyNotifier.removeListener(listener);
+            },
+          );
+        } catch (e) {
+          logger.warning('Error waiting for skin: $e');
+          skin.readyNotifier.removeListener(listener);
+        }
+      }
+
+      skin.readyNotifier.addListener(() {
+        add(GameLoadEvent(0));
+      });
+
+      logger.info('GameManager: Setting up engine listener...');
+      // Only create listener if it doesn't exist
+      if (listener == null) {
+        listener = engine.listen(parseMessage);
+      }
+
+      _initialized = true;
+      logger.info('GameManager: Initialization completed successfully');
+      return true;
+    } catch (e) {
+      logger.severe('GameManager: Initialization failed: $e');
+      _initialized = false;
+      return false;
+    }
   }
 
   void on<T extends GameEvent>(void Function(GameEvent) listener) {
@@ -233,7 +300,10 @@ class GameManager {
     DriverType amyType = DriverType.user,
     int hand1 = 0,
     String fen = ChessManual.startFen,
-  }) {
+  }) async {
+    // Ensure GameManager is initialized before starting a new game
+    await init();
+
     stop();
 
     add(GameStepEvent('clear'));
@@ -510,9 +580,11 @@ class GameManager {
 
   void dispose() {
     listener?.cancel();
+    listener = null;
     engine.stop();
     engine.quit();
     hands.map((e) => e.dispose());
+    gameEvent.close();
   }
 
   /// Update the skin when it changes in settings

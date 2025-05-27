@@ -22,15 +22,19 @@ class Sound {
   static GameSetting? setting;
 
   static Future<bool> play(String id) async {
-    setting ??= await GameSetting.getInstance();
-    if (!setting!.sound) return false;
+    try {
+      setting ??= await GameSetting.getInstance();
+      if (!setting!.sound) return false;
 
-    // Updated for audioplayers 6.4.0
-    final source = AssetSource(id);
-    await audioPlayer.setVolume(setting!.soundVolume);
-    await audioPlayer.play(source);
-
-    return true;
+      // Use AudioCache with prefix for better asset handling
+      await audioPlayer.setVolume(setting!.soundVolume);
+      await audioPlayer.play(AssetSource('sounds/$id'));
+      return true;
+    } catch (e) {
+      // Log the error but don't crash the app
+      print('Sound.play error for $id: $e');
+      return false;
+    }
   }
 
   // static final Map<String, Completer<int>> _loaders = {};

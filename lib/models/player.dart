@@ -38,6 +38,10 @@ class Player {
 
   bool get isRobot => _driverType == DriverType.robot;
 
+  bool get isRobotOnline => _driverType == DriverType.robotOnline;
+
+  bool get isAnyRobot => isRobot || isRobotOnline;
+
   bool get canBacktrace => _driver?.canBacktrace ?? false;
 
   // 通知界面，从界面上过来的着法不需要调用

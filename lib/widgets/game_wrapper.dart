@@ -18,11 +18,12 @@ class GameWrapper extends StatefulWidget {
 }
 
 class GameWrapperState extends State<GameWrapper> {
-  final GameManager gamer = GameManager();
+  final GameManager gamer = GameManager.instance;
 
   @override
   void initState() {
     super.initState();
+    print('GameWrapper initState: gamer.isInitialized=${gamer.isInitialized}');
   }
 
   @override
@@ -35,6 +36,7 @@ class GameWrapperState extends State<GameWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    print('GameWrapper build: gamer.isInitialized=${gamer.isInitialized}');
     Size size = MediaQuery.of(context).size;
     if (size.width < 541) {
       gamer.scale = (size.width - 20) / 521;

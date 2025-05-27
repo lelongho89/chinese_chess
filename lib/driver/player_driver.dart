@@ -2,6 +2,7 @@ import '../models/player.dart';
 
 import 'driver_online.dart';
 import 'driver_robot.dart';
+import 'driver_robot_online.dart';
 import 'driver_user.dart';
 
 enum PlayerActionType {
@@ -41,6 +42,8 @@ abstract class PlayerDriver {
         return DriverRobot(manager);
       case DriverType.online:
         return DriverOnline(manager);
+      case DriverType.robotOnline:
+        return DriverRobotOnline(manager);
       default:
         return DriverUser(manager);
     }
@@ -68,7 +71,8 @@ abstract class PlayerDriver {
 enum DriverType {
   user('user'),
   robot('robot'),
-  online('online');
+  online('online'),
+  robotOnline('robot_online');
 
   final String type;
   const DriverType(this.type);

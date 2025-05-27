@@ -48,10 +48,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get modeRobot => 'Robot Mode';
 
   @override
+  String get modeRobotSubtitle => 'Play against AI opponent';
+
+  @override
   String get modeOnline => 'Online Mode';
 
   @override
+  String get modeOnlineSubtitle => 'Play with friends online';
+
+  @override
   String get modeFree => 'Free Mode';
+
+  @override
+  String get modeFreeSubtitle => 'Local multiplayer on same device';
+
+  @override
+  String get chooseGameMode => 'Choose your game mode';
+
+  @override
+  String get comingSoon => 'Coming Soon';
 
   @override
   String get clearAll => 'Clear All';
@@ -244,4 +259,431 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quitGame => 'Quit Game';
+
+  @override
+  String get inviteFriend => 'Invite Friend';
+
+  @override
+  String get scanQRCode => 'Scan QR Code';
+
+  @override
+  String get scanQRCodeInstructions => 'Point the camera at a QR code to scan it';
+
+  @override
+  String get scanQRCodeToJoinMatch => 'Scan this QR code to join the match';
+
+  @override
+  String get qrCodeValidFor24Hours => 'This QR code is valid for 24 hours';
+
+  @override
+  String get shareQRCode => 'Share QR Code';
+
+  @override
+  String get sharing => 'Sharing...';
+
+  @override
+  String get joinMyChineseChessMatch => 'Join my Chinese Chess match!';
+
+  @override
+  String get joinMatch => 'Join Match';
+
+  @override
+  String joinMatchConfirmation(Object name) {
+    return 'Do you want to join $name\'s match?';
+  }
+
+  @override
+  String get matchJoinedSuccessfully => 'Match joined successfully!';
+
+  @override
+  String get success => 'Success';
+
+  @override
+  String get error => 'Error';
+
+  @override
+  String get invalidOrExpiredInvitation => 'Invalid or expired invitation';
+
+  @override
+  String get invitationAlreadyUsed => 'This invitation has already been used';
+
+  @override
+  String get invitationExpired => 'This invitation has expired';
+
+  @override
+  String get errorProcessingQRCode => 'Error processing QR code';
+
+  @override
+  String get errorGeneratingQRCode => 'Error generating QR code';
+
+  @override
+  String get errorSharingQRCode => 'Error sharing QR code';
+
+  @override
+  String get errorShowingQRScanner => 'Error showing QR scanner';
+
+  @override
+  String get errorShowingQRGenerator => 'Error showing QR generator';
+
+  @override
+  String get cannotJoinYourOwnInvitation => 'You cannot join your own invitation';
+
+  @override
+  String get errorJoiningMatch => 'Error joining match';
+
+  @override
+  String get emailVerification => 'Email Verification';
+
+  @override
+  String get verifyYourEmail => 'Verify Your Email';
+
+  @override
+  String get verificationEmailSent => 'Verification email sent';
+
+  @override
+  String get verificationEmailSentDescription => 'We\'ve sent a verification email to your address. Please check your inbox and click the verification link.';
+
+  @override
+  String get resendVerificationEmail => 'Resend Verification Email';
+
+  @override
+  String get resendIn => 'Resend in';
+
+  @override
+  String get seconds => 'seconds';
+
+  @override
+  String get failedToSendVerificationEmail => 'Failed to send verification email';
+
+  @override
+  String get signOut => 'Sign Out';
+
+  @override
+  String get signOutFailed => 'Sign out failed';
+
+  @override
+  String get forgotPassword => 'Forgot Password';
+
+  @override
+  String get resetPassword => 'Reset Password';
+
+  @override
+  String get resetPasswordDescription => 'Enter your email address and we\'ll send you a link to reset your password.';
+
+  @override
+  String get sendResetLink => 'Send Reset Link';
+
+  @override
+  String get sendingResetLink => 'Sending reset link...';
+
+  @override
+  String get resetLinkSent => 'Reset Link Sent';
+
+  @override
+  String get resetLinkSentDescription => 'Check your email for a link to reset your password. If it doesn\'t appear within a few minutes, check your spam folder.';
+
+  @override
+  String get resetPasswordFailed => 'Failed to send reset link';
+
+  @override
+  String get backToLogin => 'Back to Login';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get emailRequired => 'Email is required';
+
+  @override
+  String get invalidEmail => 'Please enter a valid email address';
+
+  @override
+  String get userNotFound => 'User not found';
+
+  @override
+  String get tooManyRequests => 'Too many requests. Please try again later.';
+
+  @override
+  String get login => 'Login';
+
+  @override
+  String get welcomeBack => 'Welcome Back';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get passwordRequired => 'Password is required';
+
+  @override
+  String get rememberMe => 'Remember Me';
+
+  @override
+  String get dontHaveAccount => 'Don\'t have an account?';
+
+  @override
+  String get register => 'Register';
+
+  @override
+  String get loggingIn => 'Logging in...';
+
+  @override
+  String get loginFailed => 'Login failed';
+
+  @override
+  String get userDisabled => 'This account has been disabled';
+
+  @override
+  String get invalidCredentials => 'Invalid email or password';
+
+  @override
+  String get emailNotVerified => 'Please verify your email address before logging in. Check your inbox for a verification link.';
+
+  @override
+  String get verificationRequired => 'Verification Required';
+
+  @override
+  String get createAccount => 'Create Account';
+
+  @override
+  String get displayName => 'Display Name';
+
+  @override
+  String get displayNameRequired => 'Display name is required';
+
+  @override
+  String get confirmPassword => 'Confirm Password';
+
+  @override
+  String get confirmPasswordRequired => 'Please confirm your password';
+
+  @override
+  String get passwordTooShort => 'Password must be at least 6 characters';
+
+  @override
+  String get passwordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get iAgreeToThe => 'I agree to the';
+
+  @override
+  String get termsAndConditions => 'Terms and Conditions';
+
+  @override
+  String get termsAndConditionsText => 'By using this app, you agree to our terms of service and privacy policy.';
+
+  @override
+  String get mustAgreeToTerms => 'You must agree to the terms and conditions to register';
+
+  @override
+  String get alreadyHaveAccount => 'Already have an account?';
+
+  @override
+  String get creatingAccount => 'Creating account...';
+
+  @override
+  String get registrationFailed => 'Registration failed';
+
+  @override
+  String get emailAlreadyInUse => 'This email is already in use';
+
+  @override
+  String get orContinueWith => 'Or continue with';
+
+  @override
+  String get invalidCredential => 'Invalid credential';
+
+  @override
+  String get accountExistsWithDifferentCredential => 'An account already exists with a different credential';
+
+  @override
+  String get continueAsGuest => 'Continue as Guest';
+
+  @override
+  String get guestMode => 'Guest Mode';
+
+  @override
+  String get playAsGuest => 'Play as Guest';
+
+  @override
+  String get guestUser => 'Guest User';
+
+  @override
+  String get anonymousUser => 'Anonymous User';
+
+  @override
+  String get updateDisplayName => 'Update Display Name';
+
+  @override
+  String get profile => 'Profile';
+
+  @override
+  String get editProfile => 'Edit Profile';
+
+  @override
+  String get saveProfile => 'Save Profile';
+
+  @override
+  String get profileUpdated => 'Profile updated successfully';
+
+  @override
+  String get profileUpdateFailed => 'Failed to update profile';
+
+  @override
+  String get convertToAccount => 'Create Account';
+
+  @override
+  String get convertToAccountDescription => 'Create a permanent account to save your progress across devices';
+
+  @override
+  String get currentlyPlayingAsGuest => 'Currently playing as guest';
+
+  @override
+  String get timerEnabled => 'Timer Enabled';
+
+  @override
+  String get timerDisabled => 'Timer Disabled';
+
+  @override
+  String get resetTimer => 'Reset Timer';
+
+  @override
+  String get account => 'Account';
+
+  @override
+  String get home => 'Home';
+
+  @override
+  String get play => 'Play';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get gamesPlayed => 'Games Played';
+
+  @override
+  String get gamesWon => 'Games Won';
+
+  @override
+  String get gamesLost => 'Games Lost';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get sound => 'Sound';
+
+  @override
+  String get soundEffects => 'Sound Effects';
+
+  @override
+  String get enableSoundEffectsForMovesAndGames => 'Enable sound effects for moves and games';
+
+  @override
+  String get adjustTheVolumeOfSoundEffects => 'Adjust the volume of sound effects';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get pieceStyle => 'Piece Style';
+
+  @override
+  String get chooseTheVisualStyleOfTheChessPieces => 'Choose the visual style of the chess pieces';
+
+  @override
+  String get classic => 'Classic';
+
+  @override
+  String get boardStyle => 'Board Style';
+
+  @override
+  String get selectTheAppearanceOfTheChessboard => 'Select the appearance of the chessboard';
+
+  @override
+  String get wood => 'Wood';
+
+  @override
+  String get gameTimer => 'Game Timer';
+
+  @override
+  String get turnTimeLimit => 'Turn Time Limit';
+
+  @override
+  String get setTheTimeLimitForEachPlayersMove => 'Set the time limit for each player\'s move';
+
+  @override
+  String get tenMinutes => '10 min';
+
+  @override
+  String get enableTimer => 'Enable Timer';
+
+  @override
+  String get enableOrDisableTheGameTimer => 'Enable or disable the game timer';
+
+  @override
+  String get singlePlayer => 'Single Player';
+
+  @override
+  String get playAgainstTheComputer => 'Play against the computer';
+
+  @override
+  String get localMultiplayer => 'Local Multiplayer';
+
+  @override
+  String get playWithAFriendOnTheSameDevice => 'Play with a friend on the same device';
+
+  @override
+  String get gameMode => 'Game Mode';
+
+  @override
+  String get difficulty => 'Difficulty';
+
+  @override
+  String get easy => 'Easy';
+
+  @override
+  String get medium => 'Medium';
+
+  @override
+  String get hard => 'Hard';
+
+  @override
+  String get startGame => 'Start Game';
+
+  @override
+  String get gameSettings => 'Game Settings';
+
+  @override
+  String get aiDifficulty => 'AI Difficulty';
+
+  @override
+  String get setTheAIDifficultyLevel => 'Set the AI difficulty level';
+
+  @override
+  String get onlineMultiplayer => 'Online Multiplayer';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String joinedDate(Object date) {
+    return 'Joined $date';
+  }
+
+  @override
+  String get changePassword => 'Change Password';
+
+  @override
+  String get logOut => 'Log Out';
+
+  @override
+  String get matchmaking => 'Matchmaking';
+
+  @override
+  String get cancelSearch => 'Cancel Search';
+
+  @override
+  String get findMatch => 'Find Match';
 }

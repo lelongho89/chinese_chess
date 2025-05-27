@@ -8,10 +8,14 @@ import 'l10n/generated/app_localizations.dart';
 import 'models/game_manager.dart';
 import 'models/game_setting.dart';
 import 'models/locale_provider.dart';
+import 'models/play_mode.dart';
+import 'screens/main_screen.dart';
 
 /// 设置页
 class SettingPage extends StatefulWidget {
-  const SettingPage({super.key});
+  final bool isEmbedded;
+
+  const SettingPage({super.key, this.isEmbedded = true});
 
   @override
   State<SettingPage> createState() => _SettingPageState();
@@ -32,246 +36,473 @@ class _SettingPageState extends State<SettingPage> {
 
   @override
   Widget build(BuildContext context) {
-    double width = 500;
-    if (MediaQuery.of(context).size.width < width) {
-      width = MediaQuery.of(context).size.width;
-    }
-
-    // Ensure the width is not too small
-    width = width < 300 ? 300 : width;
-
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        title: Text(context.l10n.settingTitle),
-        actions: [
-          TextButton.icon(
-            onPressed: () {
-              setting?.save().then((v) {
-                Navigator.pop(context);
-                MyDialog.toast(context.l10n.saveSuccess, iconType: IconType.success);
-              });
-            },
-            icon: const Icon(Icons.save),
-            label: Text(context.l10n.save),
+        title: Text(
+          context.l10n.settings,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
           ),
-        ],
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: widget.isEmbedded
+          ? IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () {
+                // When embedded, reset to home tab instead of popping
+                resetMainScreenToHome?.call();
+              },
+            )
+          : IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context);
+                // Reset MainScreen to home tab when returning from pushed settings
+                resetMainScreenToHome?.call();
+              },
+            ),
       ),
-      body: Center(
-        child: setting == null
-            ? const CircularProgressIndicator()
-            : Container(
-                width: width,
-                padding: const EdgeInsets.all(16),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Card(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                context.l10n.aiType,
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const SizedBox(height: 12),
-                              SegmentedButton<EngineInfo>(
-                                segments: [
-                                  ButtonSegment<EngineInfo>(
-                                    value: builtInEngine,
-                                    label: Text(context.l10n.builtInEngine),
-                                  ),
-                                  ...Engine().getSupportedEngines().map(
-                                    (engine) => ButtonSegment<EngineInfo>(
-                                      value: engine,
-                                      label: Text(engine.name),
-                                    ),
-                                  ),
-                                ],
-                                selected: {setting!.info},
-                                onSelectionChanged: (Set<EngineInfo> selected) {
-                                  if (selected.isEmpty) return;
-                                  setState(() {
-                                    setting!.info = selected.first;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
+      body: setting == null
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Game Section
+                    _buildSectionTitle(context.l10n.gameSettings),
+                    const SizedBox(height: 16),
+
+                    _buildSettingItem(
+                      title: context.l10n.aiDifficulty,
+                      subtitle: context.l10n.setTheAIDifficultyLevel,
+                      trailing: Text(
+                        _getDifficultyDisplayName(setting!.difficulty),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         ),
                       ),
-                      Card(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                context.l10n.aiLevel,
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const SizedBox(height: 12),
-                              SegmentedButton<int>(
-                                segments: [
-                                  ButtonSegment<int>(
-                                    value: 10,
-                                    label: Text(context.l10n.beginner),
-                                  ),
-                                  ButtonSegment<int>(
-                                    value: 11,
-                                    label: Text(context.l10n.intermediate),
-                                  ),
-                                  ButtonSegment<int>(
-                                    value: 12,
-                                    label: Text(context.l10n.master),
-                                  ),
-                                ],
-                                selected: {setting!.engineLevel},
-                                onSelectionChanged: (Set<int> selected) {
-                                  if (selected.isEmpty) return;
-                                  setState(() {
-                                    setting!.engineLevel = selected.first;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
+                      onTap: () {
+                        _showDifficultyDialog();
+                      },
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Sound Section
+                    _buildSectionTitle(context.l10n.sound),
+                    const SizedBox(height: 16),
+
+                    _buildSettingItem(
+                      title: context.l10n.soundEffects,
+                      subtitle: context.l10n.enableSoundEffectsForMovesAndGames,
+                      trailing: Switch(
+                        value: setting!.sound,
+                        onChanged: (value) {
+                          setState(() {
+                            setting!.sound = value;
+                            setting!.save();
+                          });
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    _buildSettingItem(
+                      title: context.l10n.soundVolume,
+                      subtitle: context.l10n.adjustTheVolumeOfSoundEffects,
+                      trailing: Text(
+                        '${(setting!.soundVolume * 100).toInt()}%',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         ),
                       ),
-                      Card(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        child: SwitchListTile(
-                          title: Text(context.l10n.gameSound),
-                          value: setting!.sound,
-                          onChanged: (v) {
-                            setState(() {
-                              setting!.sound = v;
-                            });
+                      child: Slider(
+                        value: setting!.soundVolume,
+                        min: 0,
+                        max: 1,
+                        divisions: 10,
+                        onChanged: (value) {
+                          setState(() {
+                            setting!.soundVolume = value;
+                          });
+                        },
+                        onChangeEnd: (value) {
+                          setting!.save();
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Language Section
+                    _buildSectionTitle(context.l10n.language),
+                    const SizedBox(height: 16),
+
+                    Consumer<LocaleProvider>(
+                      builder: (context, localeProvider, child) {
+                        return _buildSettingItem(
+                          title: context.l10n.language,
+                          subtitle: 'Choose your preferred language',
+                          trailing: Text(
+                            _getLanguageDisplayName(localeProvider.locale.languageCode),
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                            ),
+                          ),
+                          onTap: () {
+                            _showLanguageDialog();
                           },
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Appearance Section
+                    _buildSectionTitle(context.l10n.appearance),
+                    const SizedBox(height: 16),
+
+                    _buildSettingItem(
+                      title: context.l10n.pieceStyle,
+                      subtitle: context.l10n.chooseTheVisualStyleOfTheChessPieces,
+                      trailing: Text(
+                        context.l10n.classic,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         ),
                       ),
-                      Card(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                context.l10n.soundVolume,
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              Slider(
-                                value: setting!.soundVolume,
-                                min: 0,
-                                max: 1,
-                                divisions: 10,
-                                label: (setting!.soundVolume * 100).toInt().toString(),
-                                onChanged: (v) {
-                                  setState(() {
-                                    setting!.soundVolume = v;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    _buildSettingItem(
+                      title: context.l10n.boardStyle,
+                      subtitle: context.l10n.selectTheAppearanceOfTheChessboard,
+                      trailing: Text(
+                        setting!.skin == 'woods' ? context.l10n.wood : context.l10n.skinStones,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         ),
                       ),
-                      Card(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                context.l10n.language,
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const SizedBox(height: 12),
-                              SegmentedButton<String>(
-                                segments: [
-                                  ButtonSegment<String>(
-                                    value: 'en',
-                                    label: Text(context.l10n.languageEnglish),
-                                  ),
-                                  ButtonSegment<String>(
-                                    value: 'zh',
-                                    label: Text(context.l10n.languageChinese),
-                                  ),
-                                  ButtonSegment<String>(
-                                    value: 'vi',
-                                    label: Text(context.l10n.languageVietnamese),
-                                  ),
-                                ],
-                                selected: {setting!.locale},
-                                onSelectionChanged: (Set<String> selected) {
-                                  if (selected.isEmpty) return;
-                                  final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
-                                  setState(() {
-                                    setting!.locale = selected.first;
-                                    // Update the locale provider
-                                    localeProvider.setLocale(selected.first);
-                                    // Save settings
-                                    setting!.save().then((_) {
-                                      print("Language saved: ${setting!.locale}");
-                                    });
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
+                      onTap: () {
+                        _showBoardStyleDialog();
+                      },
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Game Timer Section
+                    _buildSectionTitle(context.l10n.gameTimer),
+                    const SizedBox(height: 16),
+
+                    _buildSettingItem(
+                      title: context.l10n.turnTimeLimit,
+                      subtitle: context.l10n.setTheTimeLimitForEachPlayersMove,
+                      trailing: Text(
+                        '10 min',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         ),
                       ),
-                      Card(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                context.l10n.chessSkin,
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const SizedBox(height: 12),
-                              SegmentedButton<String>(
-                                segments: [
-                                  ButtonSegment<String>(
-                                    value: 'woods',
-                                    label: Text(context.l10n.skinWoods),
-                                  ),
-                                  ButtonSegment<String>(
-                                    value: 'stones',
-                                    label: Text(context.l10n.skinStones),
-                                  ),
-                                ],
-                                selected: {setting!.skin},
-                                onSelectionChanged: (Set<String> selected) {
-                                  if (selected.isEmpty) return;
-                                  setState(() {
-                                    setting!.skin = selected.first;
-                                    // Update the skin in GameManager immediately
-                                    GameManager.instance.updateSkin(selected.first);
-                                    // Save settings
-                                    setting!.save().then((_) {
-                                      logger.info("Skin saved: ${setting!.skin}");
-                                    });
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    _buildSettingItem(
+                      title: context.l10n.enableTimer,
+                      subtitle: context.l10n.enableOrDisableTheGameTimer,
+                      trailing: Switch(
+                        value: true, // You might want to add this to GameSetting
+                        onChanged: (value) {
+                          // Handle timer enable/disable
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+                  ],
+                ),
+              ),
+            ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+        fontWeight: FontWeight.bold,
+        color: Theme.of(context).colorScheme.onBackground,
+      ),
+    );
+  }
+
+  Widget _buildSettingItem({
+    required String title,
+    required String subtitle,
+    Widget? trailing,
+    Widget? child,
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         ),
                       ),
                     ],
                   ),
                 ),
+                if (trailing != null) trailing,
+              ],
+            ),
+            if (child != null) ...[
+              const SizedBox(height: 12),
+              child,
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showBoardStyleDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.l10n.boardStyle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(context.l10n.wood),
+              leading: Radio<String>(
+                value: 'woods',
+                groupValue: setting!.skin,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      setting!.skin = value;
+                      GameManager.instance.updateSkin(value);
+                      setting!.save();
+                    });
+                    Navigator.pop(context);
+                  }
+                },
               ),
+            ),
+            ListTile(
+              title: Text(context.l10n.skinStones),
+              leading: Radio<String>(
+                value: 'stones',
+                groupValue: setting!.skin,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      setting!.skin = value;
+                      GameManager.instance.updateSkin(value);
+                      setting!.save();
+                    });
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(context.l10n.save),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getDifficultyDisplayName(int difficulty) {
+    switch (difficulty) {
+      case 0:
+        return context.l10n.easy;
+      case 1:
+        return context.l10n.medium;
+      case 2:
+        return context.l10n.hard;
+      default:
+        return context.l10n.easy;
+    }
+  }
+
+  String _getLanguageDisplayName(String languageCode) {
+    switch (languageCode) {
+      case 'en':
+        return context.l10n.languageEnglish;
+      case 'zh':
+        return context.l10n.languageChinese;
+      case 'vi':
+        return context.l10n.languageVietnamese;
+      default:
+        return context.l10n.languageEnglish;
+    }
+  }
+
+  void _showDifficultyDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.l10n.difficulty),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(context.l10n.easy),
+              leading: Radio<int>(
+                value: 0,
+                groupValue: setting!.difficulty,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      setting!.difficulty = value;
+                      setting!.save();
+                    });
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ),
+            ListTile(
+              title: Text(context.l10n.medium),
+              leading: Radio<int>(
+                value: 1,
+                groupValue: setting!.difficulty,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      setting!.difficulty = value;
+                      setting!.save();
+                    });
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ),
+            ListTile(
+              title: Text(context.l10n.hard),
+              leading: Radio<int>(
+                value: 2,
+                groupValue: setting!.difficulty,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      setting!.difficulty = value;
+                      setting!.save();
+                    });
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(context.l10n.cancel),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLanguageDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => Consumer<LocaleProvider>(
+        builder: (context, localeProvider, child) {
+          return AlertDialog(
+            title: Text(context.l10n.language),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: Text(context.l10n.languageEnglish),
+                  leading: Radio<String>(
+                    value: 'en',
+                    groupValue: localeProvider.locale.languageCode,
+                    onChanged: (value) {
+                      if (value != null) {
+                        localeProvider.setLocale(value);
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
+                ),
+                ListTile(
+                  title: Text(context.l10n.languageChinese),
+                  leading: Radio<String>(
+                    value: 'zh',
+                    groupValue: localeProvider.locale.languageCode,
+                    onChanged: (value) {
+                      if (value != null) {
+                        localeProvider.setLocale(value);
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
+                ),
+                ListTile(
+                  title: Text(context.l10n.languageVietnamese),
+                  leading: Radio<String>(
+                    value: 'vi',
+                    groupValue: localeProvider.locale.languageCode,
+                    onChanged: (value) {
+                      if (value != null) {
+                        localeProvider.setLocale(value);
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(context.l10n.cancel),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

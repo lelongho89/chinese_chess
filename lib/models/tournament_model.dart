@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-/// Model for storing tournament data in Firestore
+/// Model for storing tournament data in Supabase
 class TournamentModel {
   final String id;
   final String name;
@@ -10,8 +8,8 @@ class TournamentModel {
   final int maxParticipants;
   final TournamentStatus status;
   final TournamentType type;
-  final Timestamp startTime;
-  final Timestamp? endTime;
+  final DateTime startTime;
+  final DateTime? endTime;
   final Map<String, List<String>> brackets; // Round -> List of match IDs
   final Map<String, dynamic>? settings;
   final Map<String, dynamic>? metadata;
@@ -32,11 +30,9 @@ class TournamentModel {
     this.metadata,
   });
 
-  // Create a TournamentModel from a Firestore document
-  factory TournamentModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    
-    // Convert brackets data from Firestore
+  // Create a TournamentModel from a Supabase record
+  factory TournamentModel.fromSupabase(Map<String, dynamic> data, String id) {
+    // Convert brackets data from Supabase
     Map<String, List<String>> brackets = {};
     if (data['brackets'] != null) {
       final Map<String, dynamic> bracketsData = data['brackets'];
@@ -44,36 +40,36 @@ class TournamentModel {
         brackets[key] = List<String>.from(value);
       });
     }
-    
+
     return TournamentModel(
-      id: doc.id,
+      id: id,
       name: data['name'] ?? '',
       description: data['description'] ?? '',
-      creatorId: data['creatorId'] ?? '',
-      participantIds: List<String>.from(data['participantIds'] ?? []),
-      maxParticipants: data['maxParticipants'] ?? 8,
+      creatorId: data['creator_id'] ?? '',
+      participantIds: List<String>.from(data['participant_ids'] ?? []),
+      maxParticipants: data['max_participants'] ?? 8,
       status: TournamentStatus.values[data['status'] ?? 0],
       type: TournamentType.values[data['type'] ?? 0],
-      startTime: data['startTime'] ?? Timestamp.now(),
-      endTime: data['endTime'],
+      startTime: DateTime.parse(data['start_time'] ?? DateTime.now().toIso8601String()),
+      endTime: data['end_time'] != null ? DateTime.parse(data['end_time']) : null,
       brackets: brackets,
       settings: data['settings'],
       metadata: data['metadata'],
     );
   }
 
-  // Convert TournamentModel to a Map for Firestore
+  // Convert TournamentModel to a Map for Supabase
   Map<String, dynamic> toMap() {
     return {
       'name': name,
       'description': description,
-      'creatorId': creatorId,
-      'participantIds': participantIds,
-      'maxParticipants': maxParticipants,
+      'creator_id': creatorId,
+      'participant_ids': participantIds,
+      'max_participants': maxParticipants,
       'status': status.index,
       'type': type.index,
-      'startTime': startTime,
-      'endTime': endTime,
+      'start_time': startTime.toIso8601String(),
+      'end_time': endTime?.toIso8601String(),
       'brackets': brackets,
       'settings': settings,
       'metadata': metadata,
@@ -89,8 +85,8 @@ class TournamentModel {
     int? maxParticipants,
     TournamentStatus? status,
     TournamentType? type,
-    Timestamp? startTime,
-    Timestamp? endTime,
+    DateTime? startTime,
+    DateTime? endTime,
     Map<String, List<String>>? brackets,
     Map<String, dynamic>? settings,
     Map<String, dynamic>? metadata,

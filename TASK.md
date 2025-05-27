@@ -10,6 +10,10 @@
 | T1-005  | Implement blitz timer (3+2) in Flutter | Frontend Team | Completed | High | 1 week | Phase 1 |
 | T1-010  | Migrate from Firebase to Supabase | Backend/Frontend Team | Completed | High | 1 week | Phase 1 |
 | T1-011  | Implement QR code sharing for match invitations | Frontend Team | Completed | Medium | 0.5 weeks | Phase 1 |
+| T1-012  | Implement Robot Player AI for Online Matchmaking | Frontend/Backend Team | Completed | High | 1 week | Phase 1 |
+| T1-013  | Implement Side Alternation for Fair Online Matches | Frontend/Backend Team | Completed | High | 0.5 weeks | Phase 1 |
+| T1-014  | Simplify Matchmaking with Single Time Control | Frontend/Backend Team | Completed | Medium | 0.5 weeks | Phase 1 |
+| T1-015  | Fix Database Schema Compatibility and AI Matching | Frontend/Backend Team | Completed | High | 0.5 weeks | Phase 1 |
 
 ### T1-011: Implement QR code sharing for match invitations (Completed)
 - ✅ Create database schema for match invitations
@@ -74,6 +78,50 @@
 - ✅ Update UI components to work with Supabase
 - ✅ Set up Supabase Realtime for real-time updates
 - ✅ Test Supabase integration
+
+### T1-012: Implement Robot Player AI for Online Matchmaking (Completed)
+- ✅ Create enhanced DriverRobotOnline class for online AI players
+- ✅ Integrate robot players with online game synchronization
+- ✅ Modify matchmaking system to spawn robot players after timeout
+- ✅ Update UI to display "Bot" labels for AI opponents
+- ✅ Implement move synchronization between robot AI and server
+- ✅ Add difficulty scaling based on human player Elo rating
+- ✅ Test robot player behavior in online matches
+- ✅ Ensure robot moves are properly validated and synchronized
+
+### T1-013: Implement Side Alternation for Fair Online Matches (Completed)
+- ✅ Add side tracking fields to user model (lastPlayedSide, redGamesPlayed, blackGamesPlayed)
+- ✅ Create SideAlternationService for managing fair side assignment
+- ✅ Update matchmaking service to use side alternation logic
+- ✅ Implement alternation for both human vs human and human vs AI matches
+- ✅ Add database migration for side tracking fields
+- ✅ Update game service to track side history after games
+- ✅ Create comprehensive unit tests for side alternation logic
+- ✅ Add database functions for side statistics and history management
+
+### T1-014: Simplify Matchmaking with Single Time Control (Completed)
+- ✅ Create AppConfig class for centralized configuration management
+- ✅ Remove side preference selection from matchmaking UI
+- ✅ Remove time control selection from matchmaking UI
+- ✅ Update matchmaking queue model to remove preferred_color field
+- ✅ Update matchmaking service to use AppConfig for time control
+- ✅ Update side alternation service to work without preferences
+- ✅ Create database migration to remove preferred_color column
+- ✅ Update matchmaking screen with simplified UI showing fixed time control
+- ✅ Create comprehensive unit tests for simplified matchmaking
+- ✅ Add environment variable support for configuration switching
+
+### T1-015: Fix Database Schema Compatibility and AI Matching (Completed)
+- ✅ Fix preferred_color column mismatch between model and database schema
+- ✅ Resolve RLS policy violations for AI user queue insertion
+- ✅ Update AI matching to find opponents directly from users table
+- ✅ Eliminate dependency on AI users being in matchmaking queue
+- ✅ Add backward compatibility for legacy database schemas
+- ✅ Improve error handling and debugging for matchmaking process
+- ✅ Reduce AI matching wait time to 5 seconds for faster testing
+- ✅ Add force AI matching method for immediate testing
+- ✅ Fix Online Multiplayer button initialization issue
+- ✅ Fix quit game navigation to return to main screen
 
 ## Notes
 - Assume existing Flutter code handles basic Chinese Chess gameplay; tasks focus on online integration.

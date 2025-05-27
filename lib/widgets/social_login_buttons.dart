@@ -1,10 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shirne_dialog/shirne_dialog.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../global.dart';
-import '../models/auth_service.dart';
+import '../models/supabase_auth_service.dart';
 import '../models/user_repository.dart';
 
 class SocialLoginButtons extends StatelessWidget {
@@ -18,61 +18,49 @@ class SocialLoginButtons extends StatelessWidget {
   });
 
   Future<void> _handleGoogleSignIn(BuildContext context) async {
-    final authService = Provider.of<AuthService>(context, listen: false);
-    
+    final authService = Provider.of<SupabaseAuthService>(context, listen: false);
+    final loadingController = MyDialog.loading(context.l10n.loggingIn);
+
     try {
-      // Show loading indicator
-      MyDialog.showLoading(context, message: context.l10n.loggingIn);
-      
       // Sign in with Google
       final user = await authService.signInWithGoogle();
-      
+
       // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
-      
+      loadingController.close();
+
       if (user != null) {
         // Call the onLoginSuccess callback
         onLoginSuccess();
       }
-    } on FirebaseAuthException catch (e) {
+    } catch (e) {
       // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
-      
+      loadingController.close();
+
       String errorMessage;
-      
-      switch (e.code) {
-        case 'account-exists-with-different-credential':
-          errorMessage = context.l10n.accountExistsWithDifferentCredential;
-          break;
-        case 'invalid-credential':
-          errorMessage = context.l10n.invalidCredential;
-          break;
-        case 'operation-not-allowed':
-          errorMessage = context.l10n.operationNotAllowed;
-          break;
-        case 'user-disabled':
-          errorMessage = context.l10n.userDisabled;
-          break;
-        case 'user-not-found':
-          errorMessage = context.l10n.userNotFound;
-          break;
-        default:
-          errorMessage = '${context.l10n.loginFailed}: ${e.message}';
+      if (e is AuthException) {
+        switch (e.statusCode) {
+          case '400':
+            errorMessage = context.l10n.invalidCredential;
+            break;
+          case '403':
+            errorMessage = context.l10n.userDisabled;
+            break;
+          case '409':
+            errorMessage = context.l10n.accountExistsWithDifferentCredential;
+            break;
+          case '429':
+            errorMessage = context.l10n.tooManyRequests;
+            break;
+          default:
+            errorMessage = '${context.l10n.loginFailed}: ${e.message}';
+        }
+      } else {
+        errorMessage = '${context.l10n.loginFailed}: $e';
       }
-      
+
       if (context.mounted) {
         MyDialog.alert(
           errorMessage,
-          title: context.l10n.error,
-        );
-      }
-    } catch (e) {
-      // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
-      
-      if (context.mounted) {
-        MyDialog.alert(
-          '${context.l10n.loginFailed}: $e',
           title: context.l10n.error,
         );
       }
@@ -80,61 +68,49 @@ class SocialLoginButtons extends StatelessWidget {
   }
 
   Future<void> _handleFacebookSignIn(BuildContext context) async {
-    final authService = Provider.of<AuthService>(context, listen: false);
-    
+    final authService = Provider.of<SupabaseAuthService>(context, listen: false);
+    final loadingController = MyDialog.loading(context.l10n.loggingIn);
+
     try {
-      // Show loading indicator
-      MyDialog.showLoading(context, message: context.l10n.loggingIn);
-      
       // Sign in with Facebook
       final user = await authService.signInWithFacebook();
-      
+
       // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
-      
+      loadingController.close();
+
       if (user != null) {
         // Call the onLoginSuccess callback
         onLoginSuccess();
       }
-    } on FirebaseAuthException catch (e) {
+    } catch (e) {
       // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
-      
+      loadingController.close();
+
       String errorMessage;
-      
-      switch (e.code) {
-        case 'account-exists-with-different-credential':
-          errorMessage = context.l10n.accountExistsWithDifferentCredential;
-          break;
-        case 'invalid-credential':
-          errorMessage = context.l10n.invalidCredential;
-          break;
-        case 'operation-not-allowed':
-          errorMessage = context.l10n.operationNotAllowed;
-          break;
-        case 'user-disabled':
-          errorMessage = context.l10n.userDisabled;
-          break;
-        case 'user-not-found':
-          errorMessage = context.l10n.userNotFound;
-          break;
-        default:
-          errorMessage = '${context.l10n.loginFailed}: ${e.message}';
+      if (e is AuthException) {
+        switch (e.statusCode) {
+          case '400':
+            errorMessage = context.l10n.invalidCredential;
+            break;
+          case '403':
+            errorMessage = context.l10n.userDisabled;
+            break;
+          case '409':
+            errorMessage = context.l10n.accountExistsWithDifferentCredential;
+            break;
+          case '429':
+            errorMessage = context.l10n.tooManyRequests;
+            break;
+          default:
+            errorMessage = '${context.l10n.loginFailed}: ${e.message}';
+        }
+      } else {
+        errorMessage = '${context.l10n.loginFailed}: $e';
       }
-      
+
       if (context.mounted) {
         MyDialog.alert(
           errorMessage,
-          title: context.l10n.error,
-        );
-      }
-    } catch (e) {
-      // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
-      
-      if (context.mounted) {
-        MyDialog.alert(
-          '${context.l10n.loginFailed}: $e',
           title: context.l10n.error,
         );
       }
@@ -162,7 +138,7 @@ class SocialLoginButtons extends StatelessWidget {
           ),
           const SizedBox(height: 16),
         ],
-        
+
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -172,7 +148,7 @@ class SocialLoginButtons extends StatelessWidget {
               onPressed: () => _handleGoogleSignIn(context),
             ),
             const SizedBox(width: 16),
-            
+
             // Facebook Sign In Button
             _SocialButton(
               icon: 'assets/images/facebook_logo.png',

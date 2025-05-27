@@ -40,7 +40,7 @@ class ChessState extends State<Chess> {
   // 可落点，包括吃子点
   List<String> movePoints = [];
   bool isInit = false;
-  late GameManager gamer;
+  GameManager? gamer;
   bool isLoading = true;
 
   // 棋局初始化时所有的子力
@@ -49,30 +49,50 @@ class ChessState extends State<Chess> {
   @override
   void initState() {
     super.initState();
+    print('Chess initState called');
     initGamer();
   }
 
   void initGamer() {
-    if (isInit) return;
+    print('Chess initGamer: isInit=$isInit, gamer=${gamer != null}');
+    if (isInit && gamer != null) return;
     isInit = true;
-    GameWrapperState? gameWrapper =
-        context.findAncestorStateOfType<GameWrapperState>();
-    if (gameWrapper == null) return;
-    gamer = gameWrapper.gamer;
+    try {
+      GameWrapperState? gameWrapper =
+          context.findAncestorStateOfType<GameWrapperState>();
+      print('Chess initGamer: gameWrapper=${gameWrapper != null}');
+      if (gameWrapper == null) {
+        print('Chess initGamer: GameWrapper not found, using GameManager.instance directly');
+        gamer = GameManager.instance;
+      } else {
+        gamer = gameWrapper.gamer;
+      }
+      print('Chess initGamer: gamer set to ${gamer != null}, isInitialized=${gamer?.isInitialized}');
+    } catch (e) {
+      print('Chess initGamer: Error occurred: $e');
+      gamer = GameManager.instance;
+      print('Chess initGamer: Fallback to GameManager.instance, isInitialized=${gamer?.isInitialized}');
+    }
 
-    gamer.on<GameLoadEvent>(reloadGame);
-    gamer.on<GameResultEvent>(onResult);
-    gamer.on<GameMoveEvent>(onMove);
-    gamer.on<GameFlipEvent>(onFlip);
+    if (gamer != null) {
+      gamer!.on<GameLoadEvent>(reloadGame);
+      gamer!.on<GameResultEvent>(onResult);
+      gamer!.on<GameMoveEvent>(onMove);
+      gamer!.on<GameFlipEvent>(onFlip);
 
-    reloadGame(GameLoadEvent(0));
+      reloadGame(GameLoadEvent(0));
+    } else {
+      print('Chess initGamer: gamer is still null after initialization attempt');
+    }
   }
 
   @override
   void dispose() {
-    gamer.off<GameLoadEvent>(reloadGame);
-    gamer.off<GameResultEvent>(onResult);
-    gamer.off<GameMoveEvent>(onMove);
+    if (isInit && gamer != null) {
+      gamer!.off<GameLoadEvent>(reloadGame);
+      gamer!.off<GameResultEvent>(onResult);
+      gamer!.off<GameMoveEvent>(onMove);
+    }
     super.dispose();
   }
 
@@ -122,12 +142,12 @@ class ChessState extends State<Chess> {
       return;
     }
     setState(() {
-      items = gamer.manual.getChessItems();
+      items = gamer!.manual.getChessItems();
       isLoading = false;
       lastPosition = '';
       activeItem = null;
     });
-    String position = gamer.lastMove;
+    String position = gamer!.lastMove;
     if (position.isNotEmpty) {
       logger.info('last move $position');
       Future.delayed(const Duration(milliseconds: 32)).then((value) {
@@ -147,12 +167,12 @@ class ChessState extends State<Chess> {
   }
 
   void addStep(ChessPos chess, ChessPos next) {
-    gamer.addStep(chess, next);
+    gamer!.addStep(chess, next);
   }
 
   Future<void> fetchMovePoints() async {
     setState(() {
-      movePoints = gamer.rule.movePoints(activeItem!.position);
+      movePoints = gamer!.rule.movePoints(activeItem!.position);
       // print('move points: $movePoints');
     });
   }
@@ -170,7 +190,7 @@ class ChessState extends State<Chess> {
           SnackBarAction(
             label: context.l10n.agreeToDraw,
             onPressed: () {
-              gamer.player.completeMove(
+              gamer!.player.completeMove(
                 PlayerAction(type: PlayerActionType.rstDraw),
               );
             },
@@ -184,7 +204,7 @@ class ChessState extends State<Chess> {
           context.l10n.agreeRetract,
           context.l10n.disagreeRetract,
         ).then((bool? isAgree) {
-          gamer.player.completeMove(
+          gamer!.player.completeMove(
             PlayerAction(
               type: isAgree == true
                   ? PlayerActionType.rstRetract
@@ -264,16 +284,16 @@ class ChessState extends State<Chess> {
       return false;
     }
     String move = activePos + toPosition.toCode();
-    ChessRule rule = ChessRule(gamer.fen.copy());
+    ChessRule rule = ChessRule(gamer!.fen.copy());
     rule.fen.move(move);
-    if (rule.isKingMeet(gamer.curHand)) {
+    if (rule.isKingMeet(gamer!.curHand)) {
       toast(context.l10n.cantSendCheck);
       return false;
     }
 
     // 区分应将和送将
-    if (rule.isCheck(gamer.curHand)) {
-      if (gamer.isCheckMate) {
+    if (rule.isCheck(gamer!.curHand)) {
+      if (gamer!.isCheckMate) {
         toast(context.l10n.plsParryCheck);
       } else {
         toast(context.l10n.cantSendCheck);
@@ -293,7 +313,7 @@ class ChessState extends State<Chess> {
     int ticker = DateTime.now().millisecondsSinceEpoch;
     // 走子
     if (newActive.isBlank) {
-      if (activeItem != null && activeItem!.team == gamer.curHand) {
+      if (activeItem != null && activeItem!.team == gamer!.curHand) {
         String activePos = activeItem!.position.toCode();
         animateMove(toPosition);
         checkCanMove(activePos, toPosition).then((canMove) {
@@ -332,7 +352,7 @@ class ChessState extends State<Chess> {
         lastPosition = '';
         movePoints = [];
       });
-    } else if (newActive.team == gamer.curHand) {
+    } else if (newActive.team == gamer!.curHand) {
       Sound.play(Sound.click);
       // 切换选中的子
       setState(() {
@@ -344,7 +364,7 @@ class ChessState extends State<Chess> {
       return true;
     } else {
       // 吃对方的子
-      if (activeItem != null && activeItem!.team == gamer.curHand) {
+      if (activeItem != null && activeItem!.team == gamer!.curHand) {
         String activePos = activeItem!.position.toCode();
         animateMove(toPosition);
         checkCanMove(activePos, toPosition, newActive).then((canMove) {
@@ -384,12 +404,12 @@ class ChessState extends State<Chess> {
   }
 
   ChessPos pointTrans(Offset tapPoint) {
-    int x = (tapPoint.dx - gamer.skin.offset.dx * gamer.scale) ~/
-        (gamer.skin.size * gamer.scale);
+    int x = (tapPoint.dx - gamer!.skin.offset.dx * gamer!.scale) ~/
+        (gamer!.skin.size * gamer!.scale);
     int y = 9 -
-        (tapPoint.dy - gamer.skin.offset.dy * gamer.scale) ~/
-            (gamer.skin.size * gamer.scale);
-    return ChessPos(gamer.isFlip ? 8 - x : x, gamer.isFlip ? 9 - y : y);
+        (tapPoint.dy - gamer!.skin.offset.dy * gamer!.scale) ~/
+            (gamer!.skin.size * gamer!.scale);
+    return ChessPos(gamer!.isFlip ? 8 - x : x, gamer!.isFlip ? 9 - y : y);
   }
 
   void toast(String message, [SnackBarAction? action, int duration = 3]) {
@@ -404,7 +424,7 @@ class ChessState extends State<Chess> {
     confirm(message, context.l10n.oneMoreGame, context.l10n.letMeSee)
         .then((isConfirm) {
       if (isConfirm ?? false) {
-        gamer.newGame();
+        gamer!.newGame();
       }
     });
   }
@@ -442,7 +462,15 @@ class ChessState extends State<Chess> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    print('Chess build: isLoading=$isLoading, isInit=$isInit, gamer=${gamer != null}, isInitialized=${gamer?.isInitialized}');
+
+    // If gamer is null, try to initialize it again
+    if (gamer == null) {
+      print('Chess build: gamer is null, calling initGamer again');
+      initGamer();
+    }
+
+    if (isLoading || !isInit || gamer == null || !gamer!.isInitialized) {
       return const Center(
         child: CircularProgressIndicator(),
       );
@@ -454,7 +482,7 @@ class ChessState extends State<Chess> {
     if (dieFlash != null) {
       layer0.add(
         Align(
-          alignment: gamer.skin.getAlign(dieFlash!.position),
+          alignment: gamer!.skin.getAlign(dieFlash!.position),
           child: Piece(item: dieFlash!, isActive: false, isAblePoint: false),
         ),
       );
@@ -464,9 +492,9 @@ class ChessState extends State<Chess> {
           ChessItem('0', position: ChessPos.fromCode(lastPosition));
       layer0.add(
         Align(
-          alignment: gamer.skin.getAlign(emptyItem.position),
+          alignment: gamer!.skin.getAlign(emptyItem.position),
           child: MarkComponent(
-            size: gamer.skin.size * gamer.scale,
+            size: gamer!.skin.size * gamer!.scale,
           ),
         ),
       );
@@ -492,8 +520,8 @@ class ChessState extends State<Chess> {
           ChessItem('0', position: ChessPos.fromCode(element));
       layer2.add(
         Align(
-          alignment: gamer.skin.getAlign(emptyItem.position),
-          child: PointComponent(size: gamer.skin.size * gamer.scale),
+          alignment: gamer!.skin.getAlign(emptyItem.position),
+          child: PointComponent(size: gamer!.skin.size * gamer!.scale),
         ),
       );
     }
@@ -507,14 +535,14 @@ class ChessState extends State<Chess> {
 
     return GestureDetector(
       onTapUp: (detail) {
-        if (gamer.isLock) return;
+        if (gamer!.isLock) return;
         setState(() {
           onPointer(pointTrans(detail.localPosition));
         });
       },
       child: SizedBox(
-        width: gamer.skin.width,
-        height: gamer.skin.height,
+        width: gamer!.skin.width,
+        height: gamer!.skin.height,
         child: Stack(
           alignment: Alignment.center,
           fit: StackFit.expand,

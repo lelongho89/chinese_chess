@@ -1,11 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
 import 'package:shirne_dialog/shirne_dialog.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../global.dart';
-import '../models/auth_service.dart';
+import '../models/supabase_auth_service.dart';
 import '../models/user_repository.dart';
 import '../widgets/social_login_buttons.dart';
 
@@ -53,12 +53,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    final authService = Provider.of<AuthService>(context, listen: false);
+    final authService = Provider.of<SupabaseAuthService>(context, listen: false);
+    final loadingController = MyDialog.loading(context.l10n.creatingAccount);
 
     try {
-      // Show loading indicator
-      MyDialog.showLoading(context, message: context.l10n.creatingAccount);
-
       // Register with email and password
       final user = await authService.registerWithEmailAndPassword(
         _emailController.text.trim(),
@@ -66,14 +64,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
 
       if (user != null) {
-        // Update display name
-        await authService.updateDisplayName(_displayNameController.text.trim());
-
-        // Create user in Firestore
-        await UserRepository.instance.createUser(user);
+        // Create or update user in Supabase
+        await UserRepository.instance.createOrUpdateUser(user,
+          displayName: _displayNameController.text.trim());
 
         // Hide loading indicator
-        if (context.mounted) Navigator.of(context).pop();
+        loadingController.close();
 
         // Show verification email sent dialog
         if (context.mounted) {
@@ -86,42 +82,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
           });
         }
       }
-    } on FirebaseAuthException catch (e) {
+    } catch (e) {
       // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
+      loadingController.close();
 
       String errorMessage;
-
-      switch (e.code) {
-        case 'email-already-in-use':
-          errorMessage = context.l10n.emailAlreadyInUse;
-          break;
-        case 'invalid-email':
-          errorMessage = context.l10n.invalidEmail;
-          break;
-        case 'weak-password':
-          errorMessage = context.l10n.weakPassword;
-          break;
-        case 'operation-not-allowed':
-          errorMessage = context.l10n.operationNotAllowed;
-          break;
-        default:
-          errorMessage = '${context.l10n.registrationFailed}: ${e.message}';
+      if (e is AuthException) {
+        switch (e.statusCode) {
+          case '400':
+            errorMessage = context.l10n.invalidCredentials;
+            break;
+          case '422':
+            errorMessage = context.l10n.emailAlreadyInUse;
+            break;
+          case '429':
+            errorMessage = context.l10n.tooManyRequests;
+            break;
+          default:
+            errorMessage = '${context.l10n.registrationFailed}: ${e.message}';
+        }
+      } else {
+        errorMessage = '${context.l10n.registrationFailed}: $e';
       }
 
       if (context.mounted) {
         MyDialog.alert(
           errorMessage,
-          title: context.l10n.error,
-        );
-      }
-    } catch (e) {
-      // Hide loading indicator
-      if (context.mounted) Navigator.of(context).pop();
-
-      if (context.mounted) {
-        MyDialog.alert(
-          '${context.l10n.registrationFailed}: $e',
           title: context.l10n.error,
         );
       }
