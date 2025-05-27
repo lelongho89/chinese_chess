@@ -75,18 +75,20 @@ class _ChessPiecesState extends State<ChessPieces> {
           }
         }
 
-        return AnimatedAlign(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeOutQuint,
-          alignment: gamer.skin.getAlign(item.position),
-          child: SizedBox(
-            width: gamer.skin.size * gamer.scale,
-            height: gamer.skin.size * gamer.scale,
-            //transform: isActive && lastPosition.isEmpty ? Matrix4(1, 0, 0, 0.0, -0.105 * skewStepper, 1 - skewStepper*0.1, 0, -0.004 * skewStepper, 0, 0, 1, 0, 0, 0, 0, 1) : Matrix4.identity(),
-            child: Piece(
-              item: item,
-              isHover: isHover,
-              isActive: isActive,
+        return RepaintBoundary(
+          child: AnimatedAlign(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutQuint,
+            alignment: gamer.skin.getAlign(item.position),
+            child: SizedBox(
+              width: gamer.skin.size * gamer.scale,
+              height: gamer.skin.size * gamer.scale,
+              //transform: isActive && lastPosition.isEmpty ? Matrix4(1, 0, 0, 0.0, -0.105 * skewStepper, 1 - skewStepper*0.1, 0, -0.004 * skewStepper, 0, 0, 1, 0, 0, 0, 0, 1) : Matrix4.identity(),
+              child: Piece(
+                item: item,
+                isHover: isHover,
+                isActive: isActive,
+              ),
             ),
           ),
         );

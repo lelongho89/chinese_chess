@@ -78,7 +78,8 @@ class ChessTimer extends ChangeNotifier {
     _lastUpdateTime = DateTime.now();
 
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(milliseconds: 100), _updateTimer);
+    // Reduced frequency from 100ms to 1000ms for better performance
+    _timer = Timer.periodic(const Duration(milliseconds: 1000), _updateTimer);
 
     notifyListeners();
     logger.info('Timer started: $_timeRemaining seconds');
@@ -166,21 +167,26 @@ class ChessTimer extends ChangeNotifier {
     // If we've accumulated a full second or more, subtract from time remaining
     if (_fractionalSeconds >= 1.0) {
       final secondsToSubtract = _fractionalSeconds.floor();
+      final previousTime = _timeRemaining;
       _timeRemaining -= secondsToSubtract;
       _fractionalSeconds -= secondsToSubtract;
-    }
 
-    // Ensure time doesn't go below zero
-    if (_timeRemaining <= 0) {
-      _timeRemaining = 0;
-      _fractionalSeconds = 0.0;
-      _state = TimerState.expired;
-      _timer?.cancel();
-      _timer = null;
-      logger.info('Timer expired');
-    }
+      // Only notify listeners if the displayed time actually changed
+      final timeChanged = previousTime != _timeRemaining;
 
-    notifyListeners();
+      // Ensure time doesn't go below zero
+      if (_timeRemaining <= 0) {
+        _timeRemaining = 0;
+        _fractionalSeconds = 0.0;
+        _state = TimerState.expired;
+        _timer?.cancel();
+        _timer = null;
+        logger.info('Timer expired');
+        notifyListeners(); // Always notify on expiration
+      } else if (timeChanged) {
+        notifyListeners(); // Only notify if time display changed
+      }
+    }
   }
 
   @override

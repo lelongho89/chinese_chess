@@ -268,9 +268,9 @@ class _HomeScreenState extends State<HomeScreen> {
       // Set the engine level based on difficulty from settings
       final engineLevel = 10 + gameSetting.difficulty;
       // TODO: Apply engine level to GameManager
-      print('Starting Single Player game with difficulty: ${gameSetting.difficulty} (engine level: $engineLevel)');
+      logger.info('Starting Single Player game with difficulty: ${gameSetting.difficulty} (engine level: $engineLevel)');
     } else if (mode == PlayMode.modeFree) {
-      print('Starting Local Multiplayer game');
+      logger.info('Starting Local Multiplayer game');
     }
 
     // Navigate to game board with the selected mode

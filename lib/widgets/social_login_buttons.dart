@@ -55,7 +55,12 @@ class SocialLoginButtons extends StatelessWidget {
             errorMessage = '${context.l10n.loginFailed}: ${e.message}';
         }
       } else {
-        errorMessage = '${context.l10n.loginFailed}: $e';
+        // Check if it's a Google Play Services issue
+        if (e.toString().contains('Google Play') || e.toString().contains('GooglePlayServicesUtil')) {
+          errorMessage = 'Google Play Services is required for Google Sign-In. Please use a device with Google Play Services installed.';
+        } else {
+          errorMessage = '${context.l10n.loginFailed}: $e';
+        }
       }
 
       if (context.mounted) {

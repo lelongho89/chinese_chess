@@ -32,7 +32,6 @@ class PlayPageState extends State<PlayPage> {
   @override
   void initState() {
     super.initState();
-    print('PlayPage: initState called');
     initGame();
   }
 
@@ -51,7 +50,6 @@ class PlayPageState extends State<PlayPage> {
   }
 
   void initGame() async {
-    print('PlayPage: 初始化游戏 $inited');
     logger.info('PlayPage: 初始化游戏 $inited');
     if (inited) return;
 
@@ -151,10 +149,12 @@ class PlayPageState extends State<PlayPage> {
           ),
 
           // Chess board
-          SizedBox(
-            width: gamer.skin.width * gamer.scale,
-            height: gamer.skin.height * gamer.scale,
-            child: const Chess(),
+          RepaintBoundary(
+            child: SizedBox(
+              width: gamer.skin.width * gamer.scale,
+              height: gamer.skin.height * gamer.scale,
+              child: const Chess(),
+            ),
           ),
 
           // Red player info with timer
@@ -181,9 +181,11 @@ class PlayPageState extends State<PlayPage> {
         mainAxisSize: MainAxisSize.max,
         children: [
           // Chess board
-          const SizedBox(
-            width: 521,
-            child: Chess(),
+          RepaintBoundary(
+            child: const SizedBox(
+              width: 521,
+              child: Chess(),
+            ),
           ),
 
           // Right panel

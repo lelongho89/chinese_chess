@@ -462,11 +462,8 @@ class ChessState extends State<Chess> {
 
   @override
   Widget build(BuildContext context) {
-    print('Chess build: isLoading=$isLoading, isInit=$isInit, gamer=${gamer != null}, isInitialized=${gamer?.isInitialized}');
-
     // If gamer is null, try to initialize it again
     if (gamer == null) {
-      print('Chess build: gamer is null, calling initGamer again');
       initGamer();
     }
 
@@ -476,14 +473,18 @@ class ChessState extends State<Chess> {
       );
     }
 
-    List<Widget> widgets = [const Board()];
+    List<Widget> widgets = [
+      const RepaintBoundary(child: Board()),
+    ];
 
     List<Widget> layer0 = [];
     if (dieFlash != null) {
       layer0.add(
         Align(
           alignment: gamer!.skin.getAlign(dieFlash!.position),
-          child: Piece(item: dieFlash!, isActive: false, isAblePoint: false),
+          child: RepaintBoundary(
+            child: Piece(item: dieFlash!, isActive: false, isAblePoint: false),
+          ),
         ),
       );
     }

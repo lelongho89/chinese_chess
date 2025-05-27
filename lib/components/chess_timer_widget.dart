@@ -28,12 +28,14 @@ class ChessTimerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: timer,
-      child: Consumer<ChessTimer>(
-        builder: (context, timer, child) {
-          return _buildTimerWidget(context, timer);
-        },
+    return RepaintBoundary(
+      child: ChangeNotifierProvider.value(
+        value: timer,
+        child: Consumer<ChessTimer>(
+          builder: (context, timer, child) {
+            return _buildTimerWidget(context, timer);
+          },
+        ),
       ),
     );
   }
@@ -199,11 +201,13 @@ class _PulsingDotState extends State<_PulsingDot> with SingleTickerProviderState
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 1),
+      duration: const Duration(seconds: 2), // Slower animation for better performance
       vsync: this,
     )..repeat(reverse: true);
 
-    _animation = Tween<double>(begin: 0.5, end: 1.0).animate(_controller);
+    _animation = Tween<double>(begin: 0.3, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -214,18 +218,20 @@ class _PulsingDotState extends State<_PulsingDot> with SingleTickerProviderState
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _animation,
-      builder: (context, child) {
-        return Container(
-          width: 8.0,
-          height: 8.0,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: widget.color.withOpacity(_animation.value),
-          ),
-        );
-      },
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _animation,
+        builder: (context, child) {
+          return Container(
+            width: 8.0,
+            height: 8.0,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: widget.color.withOpacity(_animation.value),
+            ),
+          );
+        },
+      ),
     );
   }
 }

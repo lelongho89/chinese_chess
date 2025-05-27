@@ -42,7 +42,6 @@ class GameBoardState extends State<GameBoard> {
   @override
   void initState() {
     super.initState();
-    print('GameBoard: initState called');
     // Set the initial mode if provided
     mode = widget.initialMode;
     // GameManager will initialize itself when needed
