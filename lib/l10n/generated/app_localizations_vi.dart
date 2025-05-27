@@ -261,7 +261,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get quitGame => 'Thoát Trò Chơi';
 
   @override
-  String get inviteFriend => 'Invite Friend';
+  String get inviteFriend => 'Mời Bạn Bè';
 
   @override
   String get scanQRCode => 'Quét Mã QR';
@@ -270,33 +270,33 @@ class AppLocalizationsVi extends AppLocalizations {
   String get scanQRCodeInstructions => 'Hướng máy ảnh vào mã QR để quét';
 
   @override
-  String get scanQRCodeToJoinMatch => 'Scan this QR code to join the match';
+  String get scanQRCodeToJoinMatch => 'Quét Mã QR Để Tham Gia Trận Đấu';
 
   @override
-  String get qrCodeValidFor24Hours => 'This QR code is valid for 24 hours';
+  String get qrCodeValidFor24Hours => 'Mã QR có hiệu lực trong 24 giờ';
 
   @override
-  String get shareQRCode => 'Share QR Code';
+  String get shareQRCode => 'Chia Sẻ Mã QR';
 
   @override
-  String get sharing => 'Sharing...';
+  String get sharing => 'Đang Chia Sẻ';
 
   @override
-  String get joinMyChineseChessMatch => 'Join my Chinese Chess match!';
+  String get joinMyChineseChessMatch => 'Tham gia trận Cờ Tướng của tôi!';
 
   @override
-  String get joinMatch => 'Join Match';
+  String get joinMatch => 'Tham Gia Trận Đấu';
 
   @override
-  String joinMatchConfirmation(Object name) {
-    return 'Do you want to join $name\'s match?';
+  String joinMatchConfirmation(String creatorName) {
+    return 'Bạn có muốn tham gia trận đấu của $creatorName không?';
   }
 
   @override
-  String get matchJoinedSuccessfully => 'Match joined successfully!';
+  String get matchJoinedSuccessfully => 'Tham gia trận đấu thành công';
 
   @override
-  String get success => 'Success';
+  String get success => 'Thành Công';
 
   @override
   String get error => 'Lỗi';
@@ -315,23 +315,23 @@ class AppLocalizationsVi extends AppLocalizations {
   String get errorProcessingQRCode => 'Lỗi khi xử lý mã QR';
 
   @override
-  String get errorGeneratingQRCode => 'Error generating QR code';
+  String get errorGeneratingQRCode => 'Lỗi tạo mã QR';
 
   @override
-  String get errorSharingQRCode => 'Error sharing QR code';
+  String get errorSharingQRCode => 'Lỗi chia sẻ mã QR';
 
   @override
-  String get errorShowingQRScanner => 'Error showing QR scanner';
+  String get errorShowingQRScanner => 'Lỗi hiển thị máy quét QR';
 
   @override
-  String get errorShowingQRGenerator => 'Error showing QR generator';
+  String get errorShowingQRGenerator => 'Lỗi hiển thị trình tạo QR';
 
   @override
   String get cannotJoinYourOwnInvitation =>
-      'You cannot join your own invitation';
+      'Không thể tham gia lời mời của chính bạn';
 
   @override
-  String get errorJoiningMatch => 'Error joining match';
+  String get errorJoiningMatch => 'Lỗi tham gia trận đấu';
 
   @override
   String get emailVerification => 'Xác Minh Email';
@@ -583,7 +583,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get enablePushNotifications =>
-      'Enable push notifications for game updates';
+      'Bật thông báo đẩy cho cập nhật trò chơi';
 
   @override
   String get sound => 'Âm Thanh';
@@ -672,19 +672,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get startGame => 'Bắt Đầu Trò Chơi';
 
   @override
-  String get gameSettings => 'Game Settings';
+  String get gameSettings => 'Cài Đặt Trò Chơi';
 
   @override
-  String get aiDifficulty => 'AI Difficulty';
+  String get aiDifficulty => 'Độ Khó AI';
 
   @override
-  String get setTheAIDifficultyLevel => 'Set the AI difficulty level';
+  String get setTheAIDifficultyLevel => 'Đặt mức độ khó của AI';
 
   @override
-  String get onlineMultiplayer => 'Online Multiplayer';
+  String get onlineMultiplayer => 'Nhiều Người Chơi Trực Tuyến';
 
   @override
-  String get cancel => 'Cancel';
+  String get cancel => 'Hủy';
 
   @override
   String joinedDate(Object date) {
@@ -698,21 +698,69 @@ class AppLocalizationsVi extends AppLocalizations {
   String get logOut => 'Đăng Xuất';
 
   @override
-  String get deleteProfile => 'Delete Profile';
+  String get deleteProfile => 'Xóa Hồ Sơ';
 
   @override
-  String get deleteProfileSubtitle => 'Delete all stats and start fresh';
+  String get deleteProfileSubtitle => 'Xóa tất cả thống kê và bắt đầu lại';
 
   @override
   String get deleteProfileConfirmation =>
-      'Are you sure you want to delete your profile? This will permanently delete all your stats, game history, and progress. You will start fresh with a new profile on your next login.';
+      'Bạn có chắc chắn muốn xóa hồ sơ của mình không? Điều này sẽ xóa vĩnh viễn tất cả thống kê, lịch sử trò chơi và tiến trình của bạn. Bạn sẽ bắt đầu lại với hồ sơ mới khi đăng nhập lần sau.';
 
   @override
-  String get matchmaking => 'Matchmaking';
+  String get matchmaking => 'Ghép Cặp';
 
   @override
-  String get cancelSearch => 'Cancel Search';
+  String get cancelSearch => 'Hủy Tìm Kiếm';
 
   @override
-  String get findMatch => 'Find Match';
+  String get findMatch => 'Tìm Trận Đấu';
+
+  @override
+  String get rank => 'Hạng';
+
+  @override
+  String get eloRating => 'Điểm ELO';
+
+  @override
+  String get rankSoldier => 'Lính';
+
+  @override
+  String get rankApprentice => 'Cố Vấn';
+
+  @override
+  String get rankScholar => 'Tượng';
+
+  @override
+  String get rankKnight => 'Mã';
+
+  @override
+  String get rankChariot => 'Xe';
+
+  @override
+  String get rankCannon => 'Pháo';
+
+  @override
+  String get rankGeneral => 'Tướng';
+
+  @override
+  String get rankSoldierDesc => 'Người chơi mới bắt đầu học trò chơi';
+
+  @override
+  String get rankApprenticeDesc => 'Người chơi hiểu biết cơ bản về luật chơi';
+
+  @override
+  String get rankScholarDesc => 'Người chơi trung cấp có kỹ năng chiến thuật';
+
+  @override
+  String get rankKnightDesc => 'Người chơi thành thạo các chiến thuật';
+
+  @override
+  String get rankChariotDesc => 'Người chơi cao cấp có cảm giác trò chơi mạnh';
+
+  @override
+  String get rankCannonDesc => 'Người chơi chuyên gia áp đảo đối thủ';
+
+  @override
+  String get rankGeneralDesc => 'Người chơi ưu tú, bậc thầy Cờ Tướng';
 }

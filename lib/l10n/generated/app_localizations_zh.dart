@@ -261,7 +261,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get quitGame => '退出游戏';
 
   @override
-  String get inviteFriend => 'Invite Friend';
+  String get inviteFriend => '邀请朋友';
 
   @override
   String get scanQRCode => '扫描二维码';
@@ -270,33 +270,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get scanQRCodeInstructions => '将相机对准二维码进行扫描';
 
   @override
-  String get scanQRCodeToJoinMatch => 'Scan this QR code to join the match';
+  String get scanQRCodeToJoinMatch => '扫描二维码加入比赛';
 
   @override
-  String get qrCodeValidFor24Hours => 'This QR code is valid for 24 hours';
+  String get qrCodeValidFor24Hours => '二维码24小时内有效';
 
   @override
-  String get shareQRCode => 'Share QR Code';
+  String get shareQRCode => '分享二维码';
 
   @override
-  String get sharing => 'Sharing...';
+  String get sharing => '分享中';
 
   @override
-  String get joinMyChineseChessMatch => 'Join my Chinese Chess match!';
+  String get joinMyChineseChessMatch => '加入我的象棋比赛！';
 
   @override
-  String get joinMatch => 'Join Match';
+  String get joinMatch => '加入比赛';
 
   @override
-  String joinMatchConfirmation(Object name) {
-    return 'Do you want to join $name\'s match?';
+  String joinMatchConfirmation(String creatorName) {
+    return '您要加入$creatorName的比赛吗？';
   }
 
   @override
-  String get matchJoinedSuccessfully => 'Match joined successfully!';
+  String get matchJoinedSuccessfully => '成功加入比赛';
 
   @override
-  String get success => 'Success';
+  String get success => '成功';
 
   @override
   String get error => '错误';
@@ -314,23 +314,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get errorProcessingQRCode => '处理二维码时出错';
 
   @override
-  String get errorGeneratingQRCode => 'Error generating QR code';
+  String get errorGeneratingQRCode => '生成二维码错误';
 
   @override
-  String get errorSharingQRCode => 'Error sharing QR code';
+  String get errorSharingQRCode => '分享二维码错误';
 
   @override
-  String get errorShowingQRScanner => 'Error showing QR scanner';
+  String get errorShowingQRScanner => '显示二维码扫描器错误';
 
   @override
-  String get errorShowingQRGenerator => 'Error showing QR generator';
+  String get errorShowingQRGenerator => '显示二维码生成器错误';
 
   @override
-  String get cannotJoinYourOwnInvitation =>
-      'You cannot join your own invitation';
+  String get cannotJoinYourOwnInvitation => '不能加入自己的邀请';
 
   @override
-  String get errorJoiningMatch => 'Error joining match';
+  String get errorJoiningMatch => '加入比赛错误';
 
   @override
   String get emailVerification => '邮箱验证';
@@ -702,4 +701,52 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get findMatch => '寻找匹配';
+
+  @override
+  String get rank => '等级';
+
+  @override
+  String get eloRating => 'ELO等级分';
+
+  @override
+  String get rankSoldier => '兵';
+
+  @override
+  String get rankApprentice => '士';
+
+  @override
+  String get rankScholar => '象';
+
+  @override
+  String get rankKnight => '马';
+
+  @override
+  String get rankChariot => '车';
+
+  @override
+  String get rankCannon => '炮';
+
+  @override
+  String get rankGeneral => '将';
+
+  @override
+  String get rankSoldierDesc => '学习游戏的初学者';
+
+  @override
+  String get rankApprenticeDesc => '具有基本规则理解的玩家';
+
+  @override
+  String get rankScholarDesc => '具有战略技能的中级玩家';
+
+  @override
+  String get rankKnightDesc => '掌握战术的熟练玩家';
+
+  @override
+  String get rankChariotDesc => '具有强大游戏感的高级玩家';
+
+  @override
+  String get rankCannonDesc => '主导对手的专家玩家';
+
+  @override
+  String get rankGeneralDesc => '精英玩家，象棋大师';
 }

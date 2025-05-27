@@ -625,13 +625,13 @@ abstract class AppLocalizations {
   /// No description provided for @scanQRCodeToJoinMatch.
   ///
   /// In en, this message translates to:
-  /// **'Scan this QR code to join the match'**
+  /// **'Scan QR Code to Join Match'**
   String get scanQRCodeToJoinMatch;
 
   /// No description provided for @qrCodeValidFor24Hours.
   ///
   /// In en, this message translates to:
-  /// **'This QR code is valid for 24 hours'**
+  /// **'QR code valid for 24 hours'**
   String get qrCodeValidFor24Hours;
 
   /// No description provided for @shareQRCode.
@@ -643,7 +643,7 @@ abstract class AppLocalizations {
   /// No description provided for @sharing.
   ///
   /// In en, this message translates to:
-  /// **'Sharing...'**
+  /// **'Sharing'**
   String get sharing;
 
   /// No description provided for @joinMyChineseChessMatch.
@@ -661,13 +661,13 @@ abstract class AppLocalizations {
   /// No description provided for @joinMatchConfirmation.
   ///
   /// In en, this message translates to:
-  /// **'Do you want to join {name}\'s match?'**
-  String joinMatchConfirmation(Object name);
+  /// **'Do you want to join {creatorName}\'s match?'**
+  String joinMatchConfirmation(String creatorName);
 
   /// No description provided for @matchJoinedSuccessfully.
   ///
   /// In en, this message translates to:
-  /// **'Match joined successfully!'**
+  /// **'Match joined successfully'**
   String get matchJoinedSuccessfully;
 
   /// No description provided for @success.
@@ -733,7 +733,7 @@ abstract class AppLocalizations {
   /// No description provided for @cannotJoinYourOwnInvitation.
   ///
   /// In en, this message translates to:
-  /// **'You cannot join your own invitation'**
+  /// **'Cannot join your own invitation'**
   String get cannotJoinYourOwnInvitation;
 
   /// No description provided for @errorJoiningMatch.
@@ -1473,6 +1473,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Find Match'**
   String get findMatch;
+
+  /// No description provided for @rank.
+  ///
+  /// In en, this message translates to:
+  /// **'Rank'**
+  String get rank;
+
+  /// No description provided for @eloRating.
+  ///
+  /// In en, this message translates to:
+  /// **'ELO Rating'**
+  String get eloRating;
+
+  /// No description provided for @rankSoldier.
+  ///
+  /// In en, this message translates to:
+  /// **'Soldier'**
+  String get rankSoldier;
+
+  /// No description provided for @rankApprentice.
+  ///
+  /// In en, this message translates to:
+  /// **'Apprentice'**
+  String get rankApprentice;
+
+  /// No description provided for @rankScholar.
+  ///
+  /// In en, this message translates to:
+  /// **'Scholar'**
+  String get rankScholar;
+
+  /// No description provided for @rankKnight.
+  ///
+  /// In en, this message translates to:
+  /// **'Knight'**
+  String get rankKnight;
+
+  /// No description provided for @rankChariot.
+  ///
+  /// In en, this message translates to:
+  /// **'Chariot'**
+  String get rankChariot;
+
+  /// No description provided for @rankCannon.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannon'**
+  String get rankCannon;
+
+  /// No description provided for @rankGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get rankGeneral;
+
+  /// No description provided for @rankSoldierDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Beginner players learning the game'**
+  String get rankSoldierDesc;
+
+  /// No description provided for @rankApprenticeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Players with basic rule understanding'**
+  String get rankApprenticeDesc;
+
+  /// No description provided for @rankScholarDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Intermediate players with strategic skills'**
+  String get rankScholarDesc;
+
+  /// No description provided for @rankKnightDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Skilled players mastering tactics'**
+  String get rankKnightDesc;
+
+  /// No description provided for @rankChariotDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced players with strong game sense'**
+  String get rankChariotDesc;
+
+  /// No description provided for @rankCannonDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Expert players dominating opponents'**
+  String get rankCannonDesc;
+
+  /// No description provided for @rankGeneralDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Elite players, masters of Xiangqi'**
+  String get rankGeneralDesc;
 }
 
 class _AppLocalizationsDelegate

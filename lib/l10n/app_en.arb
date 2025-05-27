@@ -262,5 +262,46 @@
 
   "matchmaking": "Matchmaking",
   "cancelSearch": "Cancel Search",
-  "findMatch": "Find Match"
+  "findMatch": "Find Match",
+
+  "inviteFriend": "Invite Friend",
+  "scanQRCodeToJoinMatch": "Scan QR Code to Join Match",
+  "qrCodeValidFor24Hours": "QR code valid for 24 hours",
+  "shareQRCode": "Share QR Code",
+  "sharing": "Sharing",
+  "joinMyChineseChessMatch": "Join my Chinese Chess match!",
+  "joinMatch": "Join Match",
+  "joinMatchConfirmation": "Do you want to join {creatorName}'s match?",
+  "@joinMatchConfirmation": {
+    "placeholders": {
+      "creatorName": {
+        "type": "String"
+      }
+    }
+  },
+  "matchJoinedSuccessfully": "Match joined successfully",
+  "success": "Success",
+  "errorGeneratingQRCode": "Error generating QR code",
+  "errorSharingQRCode": "Error sharing QR code",
+  "errorShowingQRScanner": "Error showing QR scanner",
+  "errorShowingQRGenerator": "Error showing QR generator",
+  "cannotJoinYourOwnInvitation": "Cannot join your own invitation",
+  "errorJoiningMatch": "Error joining match",
+
+  "rank": "Rank",
+  "eloRating": "ELO Rating",
+  "rankSoldier": "Soldier",
+  "rankApprentice": "Apprentice",
+  "rankScholar": "Scholar",
+  "rankKnight": "Knight",
+  "rankChariot": "Chariot",
+  "rankCannon": "Cannon",
+  "rankGeneral": "General",
+  "rankSoldierDesc": "Beginner players learning the game",
+  "rankApprenticeDesc": "Players with basic rule understanding",
+  "rankScholarDesc": "Intermediate players with strategic skills",
+  "rankKnightDesc": "Skilled players mastering tactics",
+  "rankChariotDesc": "Advanced players with strong game sense",
+  "rankCannonDesc": "Expert players dominating opponents",
+  "rankGeneralDesc": "Elite players, masters of Xiangqi"
 }

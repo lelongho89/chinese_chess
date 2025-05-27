@@ -5,6 +5,8 @@ import 'package:shirne_dialog/shirne_dialog.dart';
 import '../global.dart';
 import '../models/supabase_auth_service.dart';
 import '../models/user_repository.dart';
+import '../models/user_model.dart';
+import '../widgets/rank_badge_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -22,6 +24,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   bool _showConvertForm = false;
+  UserModel? _userModel;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -44,15 +48,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (user != null) {
       try {
-        final userModel = await UserRepository.instance.getUser(user.id);
+        final userModel = await UserRepository.instance.get(user.id);
         if (userModel != null && mounted) {
           setState(() {
+            _userModel = userModel;
             _displayNameController.text = userModel.displayName;
+            _isLoading = false;
+          });
+        } else if (mounted) {
+          setState(() {
+            _isLoading = false;
           });
         }
       } catch (e) {
         logger.severe('Error loading user data: $e');
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
+    } else if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -169,52 +188,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Column(
-                    children: [
-                      // Avatar
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        child: Text(
-                          (_displayNameController.text.isNotEmpty
-                            ? _displayNameController.text[0].toUpperCase()
-                            : user.email?.isNotEmpty == true
-                              ? user.email![0].toUpperCase()
-                              : 'U'),
-                          style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                  child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : Column(
+                        children: [
+                          // Rank Badge
+                          if (_userModel != null)
+                            RankBadgeWidget(
+                              eloRating: _userModel!.eloRating,
+                              size: 140, // Increased size for better text fitting
+                              showStars: true,
+                              showElo: true,
+                            )
+                          else
+                            // Fallback avatar for users without data
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              child: Text(
+                                (_displayNameController.text.isNotEmpty
+                                  ? _displayNameController.text[0].toUpperCase()
+                                  : user.email?.isNotEmpty == true
+                                    ? user.email![0].toUpperCase()
+                                    : 'U'),
+                                style: const TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+
+                          const SizedBox(height: 16),
+
+                          // Name
+                          Text(
+                            _displayNameController.text.isNotEmpty
+                              ? _displayNameController.text
+                              : authService.isAnonymous
+                                ? context.l10n.guestUser
+                                : user.email ?? 'User',
+                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
+                          const SizedBox(height: 4),
 
-                      // Name
-                      Text(
-                        _displayNameController.text.isNotEmpty
-                          ? _displayNameController.text
-                          : authService.isAnonymous
-                            ? context.l10n.guestUser
-                            : user.email ?? 'User',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
+                          // Email or status
+                          Text(
+                            authService.isAnonymous
+                              ? context.l10n.joinedDate('2021')
+                              : user.email ?? '',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 4),
-
-                      // Email or status
-                      Text(
-                        authService.isAnonymous
-                          ? context.l10n.joinedDate('2021')
-                          : user.email ?? '',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
 
                 const SizedBox(height: 24),
@@ -225,21 +256,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Expanded(
                       child: _buildStatCard(
                         title: context.l10n.gamesPlayed,
-                        value: '120',
+                        value: _userModel?.gamesPlayed.toString() ?? '0',
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildStatCard(
                         title: context.l10n.gamesWon,
-                        value: '80',
+                        value: _userModel?.gamesWon.toString() ?? '0',
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildStatCard(
                         title: context.l10n.gamesLost,
-                        value: '40',
+                        value: _userModel?.gamesLost.toString() ?? '0',
                       ),
                     ),
                   ],

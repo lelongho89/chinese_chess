@@ -271,16 +271,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Point the camera at a QR code to scan it';
 
   @override
-  String get scanQRCodeToJoinMatch => 'Scan this QR code to join the match';
+  String get scanQRCodeToJoinMatch => 'Scan QR Code to Join Match';
 
   @override
-  String get qrCodeValidFor24Hours => 'This QR code is valid for 24 hours';
+  String get qrCodeValidFor24Hours => 'QR code valid for 24 hours';
 
   @override
   String get shareQRCode => 'Share QR Code';
 
   @override
-  String get sharing => 'Sharing...';
+  String get sharing => 'Sharing';
 
   @override
   String get joinMyChineseChessMatch => 'Join my Chinese Chess match!';
@@ -289,12 +289,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get joinMatch => 'Join Match';
 
   @override
-  String joinMatchConfirmation(Object name) {
-    return 'Do you want to join $name\'s match?';
+  String joinMatchConfirmation(String creatorName) {
+    return 'Do you want to join $creatorName\'s match?';
   }
 
   @override
-  String get matchJoinedSuccessfully => 'Match joined successfully!';
+  String get matchJoinedSuccessfully => 'Match joined successfully';
 
   @override
   String get success => 'Success';
@@ -327,8 +327,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorShowingQRGenerator => 'Error showing QR generator';
 
   @override
-  String get cannotJoinYourOwnInvitation =>
-      'You cannot join your own invitation';
+  String get cannotJoinYourOwnInvitation => 'Cannot join your own invitation';
 
   @override
   String get errorJoiningMatch => 'Error joining match';
@@ -717,4 +716,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get findMatch => 'Find Match';
+
+  @override
+  String get rank => 'Rank';
+
+  @override
+  String get eloRating => 'ELO Rating';
+
+  @override
+  String get rankSoldier => 'Soldier';
+
+  @override
+  String get rankApprentice => 'Apprentice';
+
+  @override
+  String get rankScholar => 'Scholar';
+
+  @override
+  String get rankKnight => 'Knight';
+
+  @override
+  String get rankChariot => 'Chariot';
+
+  @override
+  String get rankCannon => 'Cannon';
+
+  @override
+  String get rankGeneral => 'General';
+
+  @override
+  String get rankSoldierDesc => 'Beginner players learning the game';
+
+  @override
+  String get rankApprenticeDesc => 'Players with basic rule understanding';
+
+  @override
+  String get rankScholarDesc => 'Intermediate players with strategic skills';
+
+  @override
+  String get rankKnightDesc => 'Skilled players mastering tactics';
+
+  @override
+  String get rankChariotDesc => 'Advanced players with strong game sense';
+
+  @override
+  String get rankCannonDesc => 'Expert players dominating opponents';
+
+  @override
+  String get rankGeneralDesc => 'Elite players, masters of Xiangqi';
 }
