@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:shirne_dialog/shirne_dialog.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -7,6 +8,7 @@ import '../global.dart';
 import '../models/supabase_auth_service.dart';
 import '../models/user_repository.dart';
 import '../widgets/social_login_buttons.dart';
+import '../debug/guest_login_debug.dart';
 
 class LoginScreen extends StatefulWidget {
   final VoidCallback onRegisterPressed;
@@ -285,6 +287,25 @@ class _LoginScreenState extends State<LoginScreen> {
                   SocialLoginButtons(
                     onLoginSuccess: widget.onLoginSuccess,
                   ),
+
+                  // Debug button (only in debug mode)
+                  if (kDebugMode) ...[
+                    const SizedBox(height: 16),
+                    OutlinedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const GuestLoginDebugScreen(),
+                          ),
+                        );
+                      },
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.orange,
+                        side: const BorderSide(color: Colors.orange),
+                      ),
+                      child: const Text('🔧 Debug Guest Login'),
+                    ),
+                  ],
                 ],
               ),
             ),

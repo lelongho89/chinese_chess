@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Chinese Chess</string>
-    <string name="facebook_app_id">YOUR_FACEBOOK_APP_ID</string>
-    <string name="fb_login_protocol_scheme">fbYOUR_FACEBOOK_APP_ID</string>
-    <string name="facebook_client_token">YOUR_FACEBOOK_CLIENT_TOKEN</string>
+    <!-- Use dummy but valid format values to prevent Facebook SDK crashes -->
+    <!-- Replace with actual values when implementing Facebook login -->
+    <string name="facebook_app_id">000000000000000</string>
+    <string name="fb_login_protocol_scheme">fb000000000000000</string>
+    <string name="facebook_client_token">00000000000000000000000000000000</string>
 </resources>

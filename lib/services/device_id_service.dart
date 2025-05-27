@@ -9,16 +9,16 @@ import '../global.dart';
 class DeviceIdService {
   static const String _deviceIdKey = 'anonymous_device_id';
   static const String _deviceInfoKey = 'device_info';
-  
+
   static DeviceIdService? _instance;
   static DeviceIdService get instance => _instance ??= DeviceIdService._();
-  
+
   DeviceIdService._();
-  
+
   SharedPreferences? _prefs;
   String? _cachedDeviceId;
   Map<String, dynamic>? _cachedDeviceInfo;
-  
+
   /// Initialize the service
   Future<void> initialize() async {
     try {
@@ -29,13 +29,13 @@ class DeviceIdService {
       rethrow;
     }
   }
-  
+
   /// Get or generate a unique device identifier for anonymous users
   Future<String> getDeviceId() async {
     if (_cachedDeviceId != null) {
       return _cachedDeviceId!;
     }
-    
+
     try {
       // Try to get existing device ID from local storage
       final existingId = _prefs?.getString(_deviceIdKey);
@@ -44,14 +44,14 @@ class DeviceIdService {
         logger.info('Retrieved existing device ID: ${existingId.substring(0, 8)}...');
         return existingId;
       }
-      
+
       // Generate new device ID based on device info + UUID
       final deviceId = await _generateDeviceId();
-      
+
       // Store the device ID locally
       await _prefs?.setString(_deviceIdKey, deviceId);
       _cachedDeviceId = deviceId;
-      
+
       logger.info('Generated new device ID: ${deviceId.substring(0, 8)}...');
       return deviceId;
     } catch (e) {
@@ -63,18 +63,25 @@ class DeviceIdService {
       return fallbackId;
     }
   }
-  
+
   /// Generate a device-specific identifier
   Future<String> _generateDeviceId() async {
     final deviceInfoPlugin = DeviceInfoPlugin();
     String deviceIdentifier;
-    
+
     try {
       if (Platform.isAndroid) {
         final androidInfo = await deviceInfoPlugin.androidInfo;
         // Use Android ID as base (unique per device + app combination)
         deviceIdentifier = androidInfo.id ?? '';
-        
+
+        // If Android ID is null or empty, try alternative methods
+        if (deviceIdentifier.isEmpty) {
+          // Use a combination of device properties as fallback
+          deviceIdentifier = '${androidInfo.model}_${androidInfo.brand}_${androidInfo.device}';
+          logger.warning('Android ID not available, using device properties: ${deviceIdentifier.substring(0, 8)}...');
+        }
+
         // Store additional device info for debugging
         _cachedDeviceInfo = {
           'platform': 'android',
@@ -82,12 +89,13 @@ class DeviceIdService {
           'brand': androidInfo.brand,
           'device': androidInfo.device,
           'androidId': androidInfo.id,
+          'fallbackUsed': androidInfo.id?.isEmpty ?? true,
         };
       } else if (Platform.isIOS) {
         final iosInfo = await deviceInfoPlugin.iosInfo;
         // Use identifierForVendor as base (unique per vendor + device)
         deviceIdentifier = iosInfo.identifierForVendor ?? '';
-        
+
         // Store additional device info for debugging
         _cachedDeviceInfo = {
           'platform': 'ios',
@@ -104,12 +112,12 @@ class DeviceIdService {
           'platform': Platform.operatingSystem,
         };
       }
-      
+
       // Store device info locally for debugging
       if (_cachedDeviceInfo != null) {
         await _prefs?.setString(_deviceInfoKey, _cachedDeviceInfo.toString());
       }
-      
+
       // If we couldn't get a device identifier, generate a UUID
       if (deviceIdentifier.isEmpty) {
         deviceIdentifier = const Uuid().v4();
@@ -120,7 +128,7 @@ class DeviceIdService {
         final uuid = const Uuid().v4();
         deviceIdentifier = '${deviceIdentifier}_$uuid';
       }
-      
+
       return deviceIdentifier;
     } catch (e) {
       logger.severe('Error generating device ID: $e');
@@ -128,16 +136,16 @@ class DeviceIdService {
       return const Uuid().v4();
     }
   }
-  
+
   /// Get device information for debugging
   Future<Map<String, dynamic>?> getDeviceInfo() async {
     if (_cachedDeviceInfo != null) {
       return _cachedDeviceInfo;
     }
-    
+
     try {
       final deviceInfoPlugin = DeviceInfoPlugin();
-      
+
       if (Platform.isAndroid) {
         final androidInfo = await deviceInfoPlugin.androidInfo;
         _cachedDeviceInfo = {
@@ -163,14 +171,14 @@ class DeviceIdService {
           'platform': Platform.operatingSystem,
         };
       }
-      
+
       return _cachedDeviceInfo;
     } catch (e) {
       logger.severe('Error getting device info: $e');
       return null;
     }
   }
-  
+
   /// Clear stored device ID (for testing or profile deletion)
   Future<void> clearDeviceId() async {
     try {
@@ -184,7 +192,7 @@ class DeviceIdService {
       rethrow;
     }
   }
-  
+
   /// Check if device ID exists locally
   Future<bool> hasStoredDeviceId() async {
     try {

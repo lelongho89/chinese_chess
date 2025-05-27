@@ -194,8 +194,19 @@ class SupabaseAuthService extends ChangeNotifier {
       }
 
       return _user;
-    } catch (e) {
+    } catch (e, stackTrace) {
       logger.severe('Error signing in anonymously: $e');
+      logger.severe('Stack trace: $stackTrace');
+
+      // Provide more specific error information for debugging
+      if (e.toString().contains('network') || e.toString().contains('connection')) {
+        logger.severe('Network error during anonymous sign-in. Check internet connection and Supabase URL.');
+      } else if (e.toString().contains('device')) {
+        logger.severe('Device ID error during anonymous sign-in. Check device permissions.');
+      } else if (e.toString().contains('database') || e.toString().contains('table')) {
+        logger.severe('Database error during anonymous sign-in. Check Supabase configuration and RLS policies.');
+      }
+
       rethrow;
     } finally {
       _setLoading(false);
