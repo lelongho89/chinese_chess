@@ -144,15 +144,14 @@ class SocialLoginButtons extends StatelessWidget {
           const SizedBox(height: 16),
         ],
 
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Column(
           children: [
             // Google Sign In Button
             _SocialButton(
               icon: 'assets/images/google_logo.png',
               onPressed: () => _handleGoogleSignIn(context),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(height: 12),
 
             // Facebook Sign In Button
             _SocialButton(
@@ -181,21 +180,56 @@ class _SocialButton extends StatelessWidget {
       onTap: onPressed,
       borderRadius: BorderRadius.circular(8),
       child: Container(
-        width: 60,
-        height: 60,
+        constraints: const BoxConstraints(
+          minWidth: 200,
+          maxWidth: 320,
+        ),
+        height: 56,
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade300),
           borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
         ),
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Image.asset(
-            icon,
-            width: 24,
-            height: 24,
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                icon,
+                width: 24,
+                height: 24,
+                errorBuilder: (context, error, stackTrace) {
+                  logger.warning('Failed to load social login icon: $icon');
+                  return Icon(
+                    Icons.login,
+                    size: 24,
+                    color: Colors.grey.shade600,
+                  );
+                },
+              ),
+              const SizedBox(width: 12),
+              Text(
+                _getButtonText(icon),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey.shade800,
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
+  }
+
+  String _getButtonText(String iconPath) {
+    if (iconPath.contains('google')) {
+      return 'Continue with Google';
+    } else if (iconPath.contains('facebook')) {
+      return 'Continue with Facebook';
+    }
+    return 'Continue';
   }
 }
