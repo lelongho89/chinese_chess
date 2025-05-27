@@ -255,8 +255,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     Expanded(
                       child: _buildStatCard(
-                        title: context.l10n.gamesPlayed,
-                        value: _userModel?.gamesPlayed.toString() ?? '0',
+                        title: context.l10n.eloRating,
+                        value: _userModel?.eloRating.toString() ?? '1200',
                       ),
                     ),
                     const SizedBox(width: 12),
