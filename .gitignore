@@ -54,3 +54,5 @@ pubspec.lock
 
 # Environment variables
 .env
+
+.flutter-plugins-dependencies

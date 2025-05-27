@@ -326,7 +326,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get errorShowingQRGenerator => 'Error showing QR generator';
 
   @override
-  String get cannotJoinYourOwnInvitation => 'You cannot join your own invitation';
+  String get cannotJoinYourOwnInvitation =>
+      'You cannot join your own invitation';
 
   @override
   String get errorJoiningMatch => 'Error joining match';
@@ -341,7 +342,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get verificationEmailSent => '验证邮件已发送';
 
   @override
-  String get verificationEmailSentDescription => '我们已向您的邮箱发送了验证邮件。请检查您的收件箱并点击验证链接。';
+  String get verificationEmailSentDescription =>
+      '我们已向您的邮箱发送了验证邮件。请检查您的收件箱并点击验证链接。';
 
   @override
   String get resendVerificationEmail => '重新发送验证邮件';
@@ -380,7 +382,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get resetLinkSent => '重置链接已发送';
 
   @override
-  String get resetLinkSentDescription => '请检查您的电子邮件以获取重置密码的链接。如果几分钟内没有收到，请检查您的垃圾邮件文件夹。';
+  String get resetLinkSentDescription =>
+      '请检查您的电子邮件以获取重置密码的链接。如果几分钟内没有收到，请检查您的垃圾邮件文件夹。';
 
   @override
   String get resetPasswordFailed => '发送重置链接失败';
@@ -578,10 +581,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get soundEffects => 'Sound Effects';
 
   @override
-  String get enableSoundEffectsForMovesAndGames => 'Enable sound effects for moves and games';
+  String get enableSoundEffectsForMovesAndGames =>
+      'Enable sound effects for moves and games';
 
   @override
-  String get adjustTheVolumeOfSoundEffects => 'Adjust the volume of sound effects';
+  String get adjustTheVolumeOfSoundEffects =>
+      'Adjust the volume of sound effects';
 
   @override
   String get appearance => 'Appearance';
@@ -590,7 +595,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pieceStyle => 'Piece Style';
 
   @override
-  String get chooseTheVisualStyleOfTheChessPieces => 'Choose the visual style of the chess pieces';
+  String get chooseTheVisualStyleOfTheChessPieces =>
+      'Choose the visual style of the chess pieces';
 
   @override
   String get classic => 'Classic';
@@ -599,7 +605,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get boardStyle => 'Board Style';
 
   @override
-  String get selectTheAppearanceOfTheChessboard => 'Select the appearance of the chessboard';
+  String get selectTheAppearanceOfTheChessboard =>
+      'Select the appearance of the chessboard';
 
   @override
   String get wood => 'Wood';
@@ -611,7 +618,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get turnTimeLimit => 'Turn Time Limit';
 
   @override
-  String get setTheTimeLimitForEachPlayersMove => 'Set the time limit for each player\'s move';
+  String get setTheTimeLimitForEachPlayersMove =>
+      'Set the time limit for each player\'s move';
 
   @override
   String get tenMinutes => '10 min';
@@ -632,7 +640,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get localMultiplayer => 'Local Multiplayer';
 
   @override
-  String get playWithAFriendOnTheSameDevice => 'Play with a friend on the same device';
+  String get playWithAFriendOnTheSameDevice =>
+      'Play with a friend on the same device';
 
   @override
   String get gameMode => 'Game Mode';
