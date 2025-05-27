@@ -93,6 +93,23 @@ class _SettingPageState extends State<SettingPage> {
 
                     const SizedBox(height: 32),
 
+                    // Notifications Section
+                    _buildSectionTitle(context.l10n.notifications),
+                    const SizedBox(height: 16),
+
+                    _buildSettingItem(
+                      title: context.l10n.notifications,
+                      subtitle: context.l10n.enablePushNotifications,
+                      trailing: Switch(
+                        value: true, // You might want to add this to GameSetting
+                        onChanged: (value) {
+                          // Handle notifications toggle
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 32),
+
                     // Sound Section
                     _buildSectionTitle(context.l10n.sound),
                     const SizedBox(height: 16),

@@ -551,148 +551,155 @@ class AppLocalizationsZh extends AppLocalizations {
   String get resetTimer => '重置计时器';
 
   @override
-  String get account => 'Account';
+  String get account => '账户';
 
   @override
-  String get home => 'Home';
+  String get home => '主页';
 
   @override
-  String get play => 'Play';
+  String get play => '游戏';
 
   @override
-  String get settings => 'Settings';
+  String get settings => '设置';
 
   @override
-  String get gamesPlayed => 'Games Played';
+  String get gamesPlayed => '已玩游戏';
 
   @override
-  String get gamesWon => 'Games Won';
+  String get gamesWon => '获胜游戏';
 
   @override
-  String get gamesLost => 'Games Lost';
+  String get gamesLost => '失败游戏';
 
   @override
-  String get notifications => 'Notifications';
+  String get notifications => '通知';
 
   @override
-  String get sound => 'Sound';
+  String get enablePushNotifications => '启用游戏更新推送通知';
 
   @override
-  String get soundEffects => 'Sound Effects';
+  String get sound => '声音';
 
   @override
-  String get enableSoundEffectsForMovesAndGames =>
-      'Enable sound effects for moves and games';
+  String get soundEffects => '音效';
 
   @override
-  String get adjustTheVolumeOfSoundEffects =>
-      'Adjust the volume of sound effects';
+  String get enableSoundEffectsForMovesAndGames => '启用移动和游戏音效';
 
   @override
-  String get appearance => 'Appearance';
+  String get adjustTheVolumeOfSoundEffects => '调整音效音量';
 
   @override
-  String get pieceStyle => 'Piece Style';
+  String get appearance => '外观';
 
   @override
-  String get chooseTheVisualStyleOfTheChessPieces =>
-      'Choose the visual style of the chess pieces';
+  String get pieceStyle => '棋子样式';
 
   @override
-  String get classic => 'Classic';
+  String get chooseTheVisualStyleOfTheChessPieces => '选择棋子的视觉样式';
 
   @override
-  String get boardStyle => 'Board Style';
+  String get classic => '经典';
 
   @override
-  String get selectTheAppearanceOfTheChessboard =>
-      'Select the appearance of the chessboard';
+  String get boardStyle => '棋盘样式';
 
   @override
-  String get wood => 'Wood';
+  String get selectTheAppearanceOfTheChessboard => '选择棋盘的外观';
 
   @override
-  String get gameTimer => 'Game Timer';
+  String get wood => '木质';
 
   @override
-  String get turnTimeLimit => 'Turn Time Limit';
+  String get gameTimer => '游戏计时器';
 
   @override
-  String get setTheTimeLimitForEachPlayersMove =>
-      'Set the time limit for each player\'s move';
+  String get turnTimeLimit => '回合时间限制';
 
   @override
-  String get tenMinutes => '10 min';
+  String get setTheTimeLimitForEachPlayersMove => '设置每个玩家移动的时间限制';
 
   @override
-  String get enableTimer => 'Enable Timer';
+  String get tenMinutes => '10分钟';
 
   @override
-  String get enableOrDisableTheGameTimer => 'Enable or disable the game timer';
+  String get enableTimer => '启用计时器';
 
   @override
-  String get singlePlayer => 'Single Player';
+  String get enableOrDisableTheGameTimer => '启用或禁用游戏计时器';
 
   @override
-  String get playAgainstTheComputer => 'Play against the computer';
+  String get singlePlayer => '单人游戏';
 
   @override
-  String get localMultiplayer => 'Local Multiplayer';
+  String get playAgainstTheComputer => '与电脑对战';
 
   @override
-  String get playWithAFriendOnTheSameDevice =>
-      'Play with a friend on the same device';
+  String get localMultiplayer => '本地多人游戏';
 
   @override
-  String get gameMode => 'Game Mode';
+  String get playWithAFriendOnTheSameDevice => '与朋友在同一设备上游戏';
 
   @override
-  String get difficulty => 'Difficulty';
+  String get gameMode => '游戏模式';
 
   @override
-  String get easy => 'Easy';
+  String get difficulty => '难度';
 
   @override
-  String get medium => 'Medium';
+  String get easy => '简单';
 
   @override
-  String get hard => 'Hard';
+  String get medium => '中等';
 
   @override
-  String get startGame => 'Start Game';
+  String get hard => '困难';
 
   @override
-  String get gameSettings => 'Game Settings';
+  String get startGame => '开始游戏';
 
   @override
-  String get aiDifficulty => 'AI Difficulty';
+  String get gameSettings => '游戏设置';
 
   @override
-  String get setTheAIDifficultyLevel => 'Set the AI difficulty level';
+  String get aiDifficulty => 'AI难度';
 
   @override
-  String get onlineMultiplayer => 'Online Multiplayer';
+  String get setTheAIDifficultyLevel => '设置AI难度级别';
 
   @override
-  String get cancel => 'Cancel';
+  String get onlineMultiplayer => '在线多人游戏';
+
+  @override
+  String get cancel => '取消';
 
   @override
   String joinedDate(Object date) {
-    return 'Joined $date';
+    return '加入日期 $date';
   }
 
   @override
-  String get changePassword => 'Change Password';
+  String get changePassword => '更改密码';
 
   @override
-  String get logOut => 'Log Out';
+  String get logOut => '退出登录';
 
   @override
-  String get matchmaking => 'Matchmaking';
+  String get deleteProfile => '删除档案';
 
   @override
-  String get cancelSearch => 'Cancel Search';
+  String get deleteProfileSubtitle => '删除所有统计数据并重新开始';
 
   @override
-  String get findMatch => 'Find Match';
+  String get deleteProfileConfirmation =>
+      '您确定要删除您的档案吗？这将永久删除您的所有统计数据、游戏历史和进度。下次登录时您将重新开始。';
+
+  @override
+  String get matchmaking => '匹配';
+
+  @override
+  String get cancelSearch => '取消搜索';
+
+  @override
+  String get findMatch => '寻找匹配';
 }

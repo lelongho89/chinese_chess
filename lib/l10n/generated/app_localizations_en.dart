@@ -583,6 +583,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifications => 'Notifications';
 
   @override
+  String get enablePushNotifications =>
+      'Enable push notifications for game updates';
+
+  @override
   String get sound => 'Sound';
 
   @override
@@ -694,6 +698,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logOut => 'Log Out';
+
+  @override
+  String get deleteProfile => 'Delete Profile';
+
+  @override
+  String get deleteProfileSubtitle => 'Delete all stats and start fresh';
+
+  @override
+  String get deleteProfileConfirmation =>
+      'Are you sure you want to delete your profile? This will permanently delete all your stats, game history, and progress. You will start fresh with a new profile on your next login.';
 
   @override
   String get matchmaking => 'Matchmaking';

@@ -219,6 +219,7 @@
   "gamesWon": "Games Won",
   "gamesLost": "Games Lost",
   "notifications": "Notifications",
+  "enablePushNotifications": "Enable push notifications for game updates",
   "sound": "Sound",
   "soundEffects": "Sound Effects",
   "enableSoundEffectsForMovesAndGames": "Enable sound effects for moves and games",
@@ -255,6 +256,9 @@
   "joinedDate": "Joined {date}",
   "changePassword": "Change Password",
   "logOut": "Log Out",
+  "deleteProfile": "Delete Profile",
+  "deleteProfileSubtitle": "Delete all stats and start fresh",
+  "deleteProfileConfirmation": "Are you sure you want to delete your profile? This will permanently delete all your stats, game history, and progress. You will start fresh with a new profile on your next login.",
 
   "matchmaking": "Matchmaking",
   "cancelSearch": "Cancel Search",

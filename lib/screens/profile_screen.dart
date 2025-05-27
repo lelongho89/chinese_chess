@@ -247,43 +247,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 const SizedBox(height: 32),
 
-                // Settings Section
-                _buildSettingItem(
-                  title: context.l10n.notifications,
-                  trailing: Switch(
-                    value: true,
-                    onChanged: (value) {
-                      // Handle notifications toggle
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                _buildSettingItem(
-                  title: context.l10n.sound,
-                  trailing: Switch(
-                    value: true,
-                    onChanged: (value) {
-                      // Handle sound toggle
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                _buildSettingItem(
-                  title: context.l10n.language,
-                  trailing: Text(
-                    'English',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
+                // Account Actions Section
                 _buildSettingItem(
                   title: context.l10n.changePassword,
                   trailing: const Icon(Icons.chevron_right),
@@ -291,23 +255,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 const SizedBox(height: 16),
 
-                _buildSettingItem(
-                  title: context.l10n.logOut,
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: _signOut,
-                ),
-
-                // Show delete profile option for anonymous users
-                if (authService.isAnonymous) ...[
-                  const SizedBox(height: 16),
+                // Show delete profile for anonymous users, logout for authenticated users
+                if (authService.isAnonymous)
+                  _buildDeleteProfileButton()
+                else
                   _buildSettingItem(
-                    title: 'Delete Profile',
-                    subtitle: 'Delete all stats and start fresh',
-                    trailing: const Icon(Icons.delete_forever, color: Colors.red),
-                    onTap: _deleteProfile,
-                    textColor: Colors.red,
+                    title: context.l10n.logOut,
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: _signOut,
                   ),
-                ],
 
                 const Spacer(),
               ],
@@ -346,6 +302,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
             textAlign: TextAlign.center,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDeleteProfileButton() {
+    return GestureDetector(
+      onTap: _deleteProfile,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.green,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.delete_forever,
+              color: Colors.white,
+              size: 24,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                context.l10n.deleteProfile,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -415,10 +404,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _deleteProfile() async {
     // Show confirmation dialog
     final confirmed = await MyDialog.confirm(
-      'Are you sure you want to delete your profile? This will permanently delete all your stats, game history, and progress. You will start fresh with a new profile on your next login.',
-      title: 'Delete Profile',
-      buttonText: 'Delete',
-      cancelText: 'Cancel',
+      context.l10n.deleteProfileConfirmation,
+      title: context.l10n.deleteProfile,
+      buttonText: context.l10n.deleteProfile,
+      cancelText: context.l10n.cancel,
     );
 
     if (confirmed != true) return;

@@ -1222,6 +1222,12 @@ abstract class AppLocalizations {
   /// **'Notifications'**
   String get notifications;
 
+  /// No description provided for @enablePushNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable push notifications for game updates'**
+  String get enablePushNotifications;
+
   /// No description provided for @sound.
   ///
   /// In en, this message translates to:
@@ -1431,6 +1437,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Log Out'**
   String get logOut;
+
+  /// No description provided for @deleteProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Profile'**
+  String get deleteProfile;
+
+  /// No description provided for @deleteProfileSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all stats and start fresh'**
+  String get deleteProfileSubtitle;
+
+  /// No description provided for @deleteProfileConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete your profile? This will permanently delete all your stats, game history, and progress. You will start fresh with a new profile on your next login.'**
+  String get deleteProfileConfirmation;
 
   /// No description provided for @matchmaking.
   ///
