@@ -202,6 +202,97 @@ class MatchmakingQueueRepository extends SupabaseBaseRepository<MatchmakingQueue
     }
   }
 
+  /// Set queue entries to pending confirmation
+  Future<void> setPendingConfirmation({
+    required String queueId1,
+    String? queueId2,
+    required Duration confirmationTimeout,
+  }) async {
+    try {
+      final now = DateTime.now();
+      final confirmationExpires = now.add(confirmationTimeout);
+      final updates = {
+        'status': MatchmakingStatus.pending_confirmation.name,
+        'confirmation_expires_at': confirmationExpires.toIso8601String(),
+        'updated_at': now.toIso8601String(),
+      };
+
+      // Update first queue entry
+      await update(queueId1, updates);
+
+      // Update second queue entry if human vs human match
+      if (queueId2 != null) {
+        await update(queueId2, updates);
+        logger.info('Set both queue entries to pending confirmation: $queueId1, $queueId2');
+      } else {
+        logger.info('Set queue entry to pending confirmation (AI match): $queueId1');
+      }
+    } catch (e) {
+      logger.severe('Error setting pending confirmation: $e');
+      rethrow;
+    }
+  }
+
+  /// Confirm a match for a queue entry
+  Future<void> confirmMatch(String queueId) async {
+    try {
+      final now = DateTime.now();
+      await update(queueId, {
+        'is_confirmed': true,
+        'confirmation_time': now.toIso8601String(),
+        'updated_at': now.toIso8601String(),
+      });
+      logger.info('Match confirmed for queue entry: $queueId');
+    } catch (e) {
+      logger.severe('Error confirming match: $e');
+      rethrow;
+    }
+  }
+
+  /// Decline a match for a queue entry
+  Future<void> declineMatch(String queueId) async {
+    try {
+      await returnToQueue(queueId1: queueId);
+      logger.info('Match declined for queue entry: $queueId');
+    } catch (e) {
+      logger.severe('Error declining match: $e');
+      rethrow;
+    }
+  }
+
+  /// Return queue entries to waiting status
+  Future<void> returnToQueue({
+    required String queueId1,
+    String? queueId2,
+  }) async {
+    try {
+      final now = DateTime.now();
+      final updates = {
+        'status': MatchmakingStatus.waiting.name,
+        'matched_with_user_id': null,
+        'match_id': null,
+        'confirmation_expires_at': null,
+        'is_confirmed': false,
+        'confirmation_time': null,
+        'updated_at': now.toIso8601String(),
+      };
+
+      // Return first queue entry to waiting status
+      await update(queueId1, updates);
+
+      // Return second queue entry if it exists
+      if (queueId2 != null) {
+        await update(queueId2, updates);
+        logger.info('Returned both queue entries to waiting status: $queueId1, $queueId2');
+      } else {
+        logger.info('Returned queue entry to waiting status: $queueId1');
+      }
+    } catch (e) {
+      logger.severe('Error returning queue entries to waiting status: $e');
+      rethrow;
+    }
+  }
+
   /// Get active queue entry for a user
   Future<MatchmakingQueueModel?> getUserActiveQueue(String userId) async {
     try {

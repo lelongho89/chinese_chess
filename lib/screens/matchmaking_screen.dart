@@ -124,7 +124,12 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
         _currentQueue = queue;
       });
 
-      if (queue == null || queue.status != MatchmakingStatus.waiting) {
+      // Show confirmation dialog if match is found
+      if (queue?.status == MatchmakingStatus.pending_confirmation) {
+        await _showMatchFoundDialog(context);
+      }
+
+      if (queue == null || (queue.status != MatchmakingStatus.waiting && queue.status != MatchmakingStatus.pending_confirmation)) {
         _stopSearching();
       }
     } catch (e) {
@@ -193,6 +198,71 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
     final minutes = seconds ~/ 60;
     final remainingSeconds = seconds % 60;
     return '${minutes}:${remainingSeconds.toString().padLeft(2, '0')}';
+  }
+
+  /// Show match found dialog with 10 second confirmation timeout
+  Future<void> _showMatchFoundDialog(BuildContext context) async {
+    if (!mounted) return;
+
+    bool? confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        int countdown = 10;
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            Timer.periodic(const Duration(seconds: 1), (timer) {
+              if (!mounted) {
+                timer.cancel();
+                return;
+              }
+              setState(() {
+                countdown--;
+              });
+              if (countdown <= 0) {
+                timer.cancel();
+                Navigator.of(dialogContext).pop(false);
+              }
+            });
+
+            return AlertDialog(
+              title: Text(AppLocalizations.of(context)!.matchFound),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(AppLocalizations.of(context)!.confirmMatch),
+                  const SizedBox(height: 16),
+                  Text('${AppLocalizations.of(context)!.timeRemaining}: $countdown'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop(false);
+                  },
+                  child: Text(AppLocalizations.of(context)!.decline),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop(true);
+                  },
+                  child: Text(AppLocalizations.of(context)!.accept),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (_currentQueue == null) return;
+
+    // Handle user decision
+    if (confirmed == true) {
+      await MatchmakingService.instance.confirmMatch(_currentQueue!.id);
+    } else {
+      await MatchmakingService.instance.declineMatch(_currentQueue!.id);
+    }
   }
 
   @override

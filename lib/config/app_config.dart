@@ -13,44 +13,51 @@ class AppConfig {
   // MATCHMAKING CONFIGURATION
   // ============================================================================
 
-  /// Default time control for all matches in seconds
-  /// Can be configured via environment variable MATCH_TIME_CONTROL
-  /// Default: 300 seconds (5 minutes)
-  /// Alternative: 600 seconds (10 minutes)
-  static const int _defaultTimeControl = 300; // 5 minutes
-  static const int _alternativeTimeControl = 600; // 10 minutes
+  /// Default time control base time in seconds (5 minutes)
+  static const int _defaultBaseTime = 300; // 5 minutes
 
-  /// Get the configured time control for matches
+  /// Default time increment in seconds (+3 seconds)
+  static const int _defaultIncrement = 3; // +3 seconds
+
+  /// Standard time control (5+3)
+  static const String _defaultTimeControl = '5+3';
+
+  /// Match confirmation timeout in seconds
+  static const int _confirmationTimeout = 10;
+
+  /// Get the configured base time for matches
   int get matchTimeControl {
-    // Check for environment variable first
     const envTimeControl = String.fromEnvironment('MATCH_TIME_CONTROL');
-    
     if (envTimeControl.isNotEmpty) {
       final parsed = int.tryParse(envTimeControl);
       if (parsed != null && parsed > 0) {
         return parsed;
       }
     }
-    
-    // Check for debug/release mode defaults
-    if (kDebugMode) {
-      // In debug mode, use shorter time for faster testing
-      return _defaultTimeControl; // 5 minutes
-    } else {
-      // In release mode, use the configured time
-      return _defaultTimeControl; // 5 minutes (can be changed to _alternativeTimeControl)
-    }
+    return _defaultBaseTime;
   }
+
+  /// Get the configured increment time in seconds
+  int get incrementSeconds {
+    const envIncrement = String.fromEnvironment('INCREMENT_SECONDS');
+    if (envIncrement.isNotEmpty) {
+      final parsed = int.tryParse(envIncrement);
+      if (parsed != null && parsed >= 0) {
+        return parsed;
+      }
+    }
+    return _defaultIncrement;
+  }
+
+  /// Get confirmation timeout in seconds
+  int get confirmationTimeout => _confirmationTimeout;
 
   /// Get formatted time control string for display
   String get matchTimeControlFormatted {
     final minutes = matchTimeControl ~/ 60;
-    final seconds = matchTimeControl % 60;
-    if (seconds == 0) {
-      return '${minutes}min';
-    } else {
-      return '${minutes}:${seconds.toString().padLeft(2, '0')}';
-    }
+    final inc = incrementSeconds;
+    // Always show as "5+3" format for consistency
+    return '$minutes+$inc';
   }
 
   // ============================================================================
@@ -200,30 +207,23 @@ class AppConfig {
   // ENVIRONMENT SWITCHING HELPERS
   // ============================================================================
 
-  /// Switch to 10-minute time control (for production)
-  /// This is a helper method for easy configuration switching
+  /// We now use a single time control: 5+3
+  /// These constants are kept for backward compatibility but are deprecated
+  @Deprecated('Use AppConfig.instance.matchTimeControl instead')
   static const int timeControl10Minutes = 600;
-
-  /// Switch to 5-minute time control (for faster games)
-  /// This is a helper method for easy configuration switching
+  @Deprecated('Use AppConfig.instance.matchTimeControl instead')
   static const int timeControl5Minutes = 300;
-
-  /// Switch to 3-minute time control (for quick games)
-  /// This is a helper method for easy configuration switching
+  @Deprecated('Use AppConfig.instance.matchTimeControl instead')
   static const int timeControl3Minutes = 180;
 
   /// Get available time control options for admin configuration
-  static List<int> get availableTimeControls => [
-    timeControl3Minutes,
-    timeControl5Minutes,
-    timeControl10Minutes,
-  ];
+  @Deprecated('Single time control is now used')
+  static List<int> get availableTimeControls => [_defaultBaseTime];
 
   /// Get formatted names for time control options
+  @Deprecated('Single time control is now used')
   static Map<int, String> get timeControlNames => {
-    timeControl3Minutes: '3 minutes (Quick)',
-    timeControl5Minutes: '5 minutes (Standard)',
-    timeControl10Minutes: '10 minutes (Extended)',
+    _defaultBaseTime: _defaultTimeControl,
   };
 }
 
