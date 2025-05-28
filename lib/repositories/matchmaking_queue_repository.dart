@@ -59,13 +59,14 @@ class MatchmakingQueueRepository extends SupabaseBaseRepository<MatchmakingQueue
     required int eloRating,
     QueueType queueType = QueueType.ranked,
     required int timeControl,
+    required int timeIncrement, // Added from previous step
     int maxEloDifference = 200,
     Duration queueTimeout = const Duration(minutes: 10),
     Map<String, dynamic>? metadata,
   }) async {
     try {
-      // Cancel any existing queue entries for this user
-      await cancelUserQueue(userId);
+      // Cancel any existing queue entries for this user (that are in 'waiting' or 'pendingConfirmation')
+      await cancelUserQueue(userId, cancelPendingToo: true);
 
       final now = DateTime.now();
       final queueModel = MatchmakingQueueModel(
@@ -74,14 +75,21 @@ class MatchmakingQueueRepository extends SupabaseBaseRepository<MatchmakingQueue
         eloRating: eloRating,
         queueType: queueType,
         timeControl: timeControl,
-        // Removed preferredColor - side assignment handled by SideAlternationService
+        // timeIncrement: timeIncrement, // Model does not have this field directly
         maxEloDifference: maxEloDifference,
         status: MatchmakingStatus.waiting,
         joinedAt: now,
         expiresAt: now.add(queueTimeout),
+        // Initialize confirmation fields
+        confirmationExpiresAt: null,
+        player1Confirmed: false,
+        player2Confirmed: false,
         createdAt: now,
         updatedAt: now,
-        metadata: metadata,
+        metadata: {
+          ...(metadata ?? {}),
+          'time_increment': timeIncrement, // Store time_increment in metadata
+        },
       );
 
       final queueId = await add(queueModel);
@@ -99,6 +107,11 @@ class MatchmakingQueueRepository extends SupabaseBaseRepository<MatchmakingQueue
       await update(queueId, {
         'status': MatchmakingStatus.cancelled.name,
         'updated_at': DateTime.now().toIso8601String(),
+        'matched_with_user_id': null,
+        'match_id': null,
+        'confirmation_expires_at': null,
+        'player1_confirmed': false,
+        'player2_confirmed': false,
       });
       logger.info('Left matchmaking queue: $queueId');
     } catch (e) {
@@ -108,19 +121,33 @@ class MatchmakingQueueRepository extends SupabaseBaseRepository<MatchmakingQueue
   }
 
   /// Cancel all queue entries for a user
-  Future<void> cancelUserQueue(String userId) async {
+  Future<void> cancelUserQueue(String userId, {bool cancelPendingToo = false}) async {
     try {
-      final response = await table
+      var query = table
           .update({
             'status': MatchmakingStatus.cancelled.name,
             'updated_at': DateTime.now().toIso8601String(),
+            'matched_with_user_id': null,
+            'match_id': null,
+            'confirmation_expires_at': null,
+            'player1_confirmed': false,
+            'player2_confirmed': false,
           })
-          .eq('user_id', userId)
-          .eq('status', MatchmakingStatus.waiting.name);
+          .eq('user_id', userId);
 
-      logger.info('Cancelled queue entries for user: $userId');
+      if (cancelPendingToo) {
+        // Cancel 'waiting' OR 'pendingConfirmation' entries
+        query = query.filter('status', 'in', '("${MatchmakingStatus.waiting.name}","${MatchmakingStatus.pendingConfirmation.name}")');
+      } else {
+        // Only cancel 'waiting' entries
+        query = query.eq('status', MatchmakingStatus.waiting.name);
+      }
+      
+      await query;
+
+      logger.info('Cancelled queue entries for user: $userId (pendingCancelled: $cancelPendingToo)');
     } catch (e) {
-      logger.severe('Error cancelling user queue: $e');
+      logger.severe('Error cancelling user queue for $userId: $e');
       rethrow;
     }
   }
@@ -163,6 +190,10 @@ class MatchmakingQueueRepository extends SupabaseBaseRepository<MatchmakingQueue
         'match_id': matchId,
         'matched_at': now.toIso8601String(),
         'updated_at': now.toIso8601String(),
+        // Reset confirmation fields
+        'confirmation_expires_at': null,
+        'player1_confirmed': false,
+        'player2_confirmed': false,
       };
 
       if (queueId2 != null) {
@@ -171,7 +202,11 @@ class MatchmakingQueueRepository extends SupabaseBaseRepository<MatchmakingQueue
         final queue2 = await get(queueId2);
 
         if (queue1 == null || queue2 == null) {
-          throw Exception('Queue entries not found');
+          logger.warning('One or both queue entries not found for H-H match: $queueId1, $queueId2');
+          // Attempt to cancel them individually if they exist
+          if (queue1 != null) await update(queueId1, {'status': MatchmakingStatus.cancelled.name, 'updated_at': now.toIso8601String(), 'matched_with_user_id': null, 'match_id': null, 'confirmation_expires_at': null, 'player1_confirmed': false, 'player2_confirmed': false});
+          if (queue2 != null) await update(queueId2, {'status': MatchmakingStatus.cancelled.name, 'updated_at': now.toIso8601String(), 'matched_with_user_id': null, 'match_id': null, 'confirmation_expires_at': null, 'player1_confirmed': false, 'player2_confirmed': false});
+          throw Exception('Queue entries not found for H-H match.');
         }
 
         // Update first queue entry
@@ -191,7 +226,11 @@ class MatchmakingQueueRepository extends SupabaseBaseRepository<MatchmakingQueue
         // Human vs AI match
         await update(queueId1, {
           ...updates,
-          'matched_with_user_id': null, // AI doesn't have a user ID in the queue
+          // 'matched_with_user_id' might be null or AI's ID if stored, 
+          // but for 'matched' status, it's less critical if it's an AI.
+          // Let's ensure it's explicitly set based on how AI matches are identified.
+          // If AI ID was stored in matched_with_user_id during pending, it will persist unless cleared.
+          // For simplicity, we can leave it as is or clear it. The service stores AI details in metadata.
         });
 
         logger.info('Marked queue entry as matched with AI: $queueId1');
@@ -310,6 +349,46 @@ class MatchmakingQueueRepository extends SupabaseBaseRepository<MatchmakingQueue
       }).toList();
     } catch (e) {
       logger.severe('Error getting waiting players by Elo range: $e');
+      rethrow;
+    }
+  }
+
+  /// Get all entries currently in pendingConfirmation status
+  Future<List<MatchmakingQueueModel>> getPendingConfirmationEntries() async {
+    try {
+      final response = await table
+          .select()
+          .eq('status', MatchmakingStatus.pendingConfirmation.name)
+          .eq('is_deleted', false);
+      
+      return response.map((record) {
+        final id = record['id'] as String;
+        return fromSupabase(record, id);
+      }).toList();
+    } catch (e) {
+      logger.severe('Error getting pending confirmation entries: $e');
+      rethrow;
+    }
+  }
+
+  /// Find an opponent's queue entry based on their user ID and a shared match ID
+  Future<MatchmakingQueueModel?> findOpponentQueueEntry(String opponentUserId, String matchId) async {
+    try {
+      final response = await table
+          .select()
+          .eq('user_id', opponentUserId)
+          .eq('match_id', matchId) // Ensure it's the same potential match
+          .eq('status', MatchmakingStatus.pendingConfirmation.name)
+          .eq('is_deleted', false)
+          .limit(1);
+
+      if (response.isEmpty) return null;
+
+      final data = response.first;
+      final id = data['id'] as String;
+      return fromSupabase(data, id);
+    } catch (e) {
+      logger.severe('Error finding opponent queue entry for user $opponentUserId and match $matchId: $e');
       rethrow;
     }
   }

@@ -16,12 +16,15 @@ class AppConfig {
   /// Default time control for all matches in seconds
   /// Can be configured via environment variable MATCH_TIME_CONTROL
   /// Default: 300 seconds (5 minutes)
-  /// Alternative: 600 seconds (10 minutes)
-  static const int _defaultTimeControl = 300; // 5 minutes
-  static const int _alternativeTimeControl = 600; // 10 minutes
+  static const int matchTimeControlSeconds = 300; // 5 minutes
+
+  /// Default time increment for all matches in seconds
+  /// Can be configured via environment variable MATCH_TIME_INCREMENT
+  /// Default: 3 seconds
+  static const int matchTimeIncrementSeconds = 3; // 3 seconds
 
   /// Get the configured time control for matches
-  int get matchTimeControl {
+  int get getTimeBonusControl {
     // Check for environment variable first
     const envTimeControl = String.fromEnvironment('MATCH_TIME_CONTROL');
     
@@ -32,25 +35,31 @@ class AppConfig {
       }
     }
     
-    // Check for debug/release mode defaults
-    if (kDebugMode) {
-      // In debug mode, use shorter time for faster testing
-      return _defaultTimeControl; // 5 minutes
-    } else {
-      // In release mode, use the configured time
-      return _defaultTimeControl; // 5 minutes (can be changed to _alternativeTimeControl)
+    // Return the fixed value
+    return matchTimeControlSeconds;
+  }
+
+  /// Get the configured time increment for matches
+  int get timeIncrementControl {
+    // Check for environment variable first
+    const envTimeIncrement = String.fromEnvironment('MATCH_TIME_INCREMENT');
+
+    if (envTimeIncrement.isNotEmpty) {
+      final parsed = int.tryParse(envTimeIncrement);
+      if (parsed != null && parsed >= 0) { // Allow 0 increment
+        return parsed;
+      }
     }
+
+    // Return the fixed value
+    return matchTimeIncrementSeconds;
   }
 
   /// Get formatted time control string for display
   String get matchTimeControlFormatted {
-    final minutes = matchTimeControl ~/ 60;
-    final seconds = matchTimeControl % 60;
-    if (seconds == 0) {
-      return '${minutes}min';
-    } else {
-      return '${minutes}:${seconds.toString().padLeft(2, '0')}';
-    }
+    final minutes = matchTimeControlSeconds ~/ 60;
+    final increment = matchTimeIncrementSeconds;
+    return '${minutes} min + ${increment} sec';
   }
 
   // ============================================================================
@@ -129,11 +138,8 @@ class AppConfig {
   /// Can be configured via environment variable DEFAULT_RANKED_GAMES
   /// Default: true
   bool get defaultRankedGames {
-    const envValue = String.fromEnvironment('DEFAULT_RANKED_GAMES');
-    if (envValue.isNotEmpty) {
-      return envValue.toLowerCase() == 'true';
-    }
-    return true; // Default ranked
+    // Ensure this always returns true as per requirements
+    return true; 
   }
 
   // ============================================================================
@@ -172,7 +178,8 @@ class AppConfig {
   /// Get all configuration values as a map for debugging
   Map<String, dynamic> toMap() {
     return {
-      'matchTimeControl': matchTimeControl,
+      'matchTimeControlSeconds': matchTimeControlSeconds,
+      'matchTimeIncrementSeconds': matchTimeIncrementSeconds,
       'matchTimeControlFormatted': matchTimeControlFormatted,
       'enableAIMatching': enableAIMatching,
       'aiSpawnDelaySeconds': aiSpawnDelaySeconds,
@@ -200,38 +207,14 @@ class AppConfig {
   // ENVIRONMENT SWITCHING HELPERS
   // ============================================================================
 
-  /// Switch to 10-minute time control (for production)
-  /// This is a helper method for easy configuration switching
-  static const int timeControl10Minutes = 600;
-
-  /// Switch to 5-minute time control (for faster games)
-  /// This is a helper method for easy configuration switching
-  static const int timeControl5Minutes = 300;
-
-  /// Switch to 3-minute time control (for quick games)
-  /// This is a helper method for easy configuration switching
-  static const int timeControl3Minutes = 180;
-
-  /// Get available time control options for admin configuration
-  static List<int> get availableTimeControls => [
-    timeControl3Minutes,
-    timeControl5Minutes,
-    timeControl10Minutes,
-  ];
-
-  /// Get formatted names for time control options
-  static Map<int, String> get timeControlNames => {
-    timeControl3Minutes: '3 minutes (Quick)',
-    timeControl5Minutes: '5 minutes (Standard)',
-    timeControl10Minutes: '10 minutes (Extended)',
-  };
+  // Removed old time control options to enforce 5+3
 }
 
 /// Extension for easy access to app config
 extension AppConfigExtension on AppConfig {
   /// Quick access to formatted time control for UI display
   String get timeDisplayText => matchTimeControlFormatted;
-  
+
   /// Quick access to check if in simplified mode (single time control)
-  bool get isSimplifiedMode => true; // Always true in this simplified version
+  bool get isSimplifiedMode => true; // Always true as we only have one time control
 }

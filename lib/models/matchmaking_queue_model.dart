@@ -2,6 +2,7 @@
 enum MatchmakingStatus {
   waiting,
   matched,
+  pendingConfirmation, // New status for awaiting user confirmation
   cancelled,
   expired,
 }
@@ -25,14 +26,17 @@ class MatchmakingQueueModel {
   final int maxEloDifference;
   final MatchmakingStatus status;
   final String? matchedWithUserId;
-  final String? matchId;
+  final String? matchId; // Could be temporary ID during pendingConfirmation
   final DateTime joinedAt;
   final DateTime? matchedAt;
-  final DateTime expiresAt;
+  final DateTime expiresAt; // Original queue expiry
+  final DateTime? confirmationExpiresAt; // Deadline for pending confirmation
+  final bool player1Confirmed; // For H-H matches, user who initiated queue is P1
+  final bool player2Confirmed; // For H-H matches, user who was found is P2
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isDeleted;
-  final Map<String, dynamic>? metadata;
+  final Map<String, dynamic>? metadata; // Can store AI opponent details here
 
   MatchmakingQueueModel({
     required this.id,
@@ -47,6 +51,9 @@ class MatchmakingQueueModel {
     required this.joinedAt,
     this.matchedAt,
     required this.expiresAt,
+    this.confirmationExpiresAt,
+    this.player1Confirmed = false,
+    this.player2Confirmed = false,
     required this.createdAt,
     required this.updatedAt,
     this.isDeleted = false,
@@ -68,6 +75,9 @@ class MatchmakingQueueModel {
       joinedAt: DateTime.parse(data['joined_at']),
       matchedAt: data['matched_at'] != null ? DateTime.parse(data['matched_at']) : null,
       expiresAt: DateTime.parse(data['expires_at']),
+      confirmationExpiresAt: data['confirmation_expires_at'] != null ? DateTime.parse(data['confirmation_expires_at']) : null,
+      player1Confirmed: data['player1_confirmed'] ?? false,
+      player2Confirmed: data['player2_confirmed'] ?? false,
       createdAt: DateTime.parse(data['created_at']),
       updatedAt: DateTime.parse(data['updated_at']),
       isDeleted: data['is_deleted'] ?? false,
@@ -90,6 +100,9 @@ class MatchmakingQueueModel {
       'joined_at': joinedAt.toIso8601String(),
       'matched_at': matchedAt?.toIso8601String(),
       'expires_at': expiresAt.toIso8601String(),
+      'confirmation_expires_at': confirmationExpiresAt?.toIso8601String(),
+      'player1_confirmed': player1Confirmed,
+      'player2_confirmed': player2Confirmed,
       'updated_at': DateTime.now().toIso8601String(),
       'is_deleted': isDeleted,
       'metadata': metadata,
@@ -110,6 +123,9 @@ class MatchmakingQueueModel {
     DateTime? joinedAt,
     DateTime? matchedAt,
     DateTime? expiresAt,
+    DateTime? confirmationExpiresAt,
+    bool? player1Confirmed,
+    bool? player2Confirmed,
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isDeleted,
@@ -128,6 +144,9 @@ class MatchmakingQueueModel {
       joinedAt: joinedAt ?? this.joinedAt,
       matchedAt: matchedAt ?? this.matchedAt,
       expiresAt: expiresAt ?? this.expiresAt,
+      confirmationExpiresAt: confirmationExpiresAt ?? this.confirmationExpiresAt,
+      player1Confirmed: player1Confirmed ?? this.player1Confirmed,
+      player2Confirmed: player2Confirmed ?? this.player2Confirmed,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isDeleted: isDeleted ?? this.isDeleted,
@@ -152,7 +171,9 @@ class MatchmakingQueueModel {
       case MatchmakingStatus.waiting:
         return 'Searching for opponent...';
       case MatchmakingStatus.matched:
-        return 'Match found!';
+        return 'Match found! Game starting...';
+      case MatchmakingStatus.pendingConfirmation:
+        return 'Match found! Waiting for confirmation...';
       case MatchmakingStatus.cancelled:
         return 'Search cancelled';
       case MatchmakingStatus.expired:
@@ -183,6 +204,8 @@ class MatchmakingQueueModel {
         return MatchmakingStatus.waiting;
       case 'matched':
         return MatchmakingStatus.matched;
+      case 'pendingConfirmation':
+        return MatchmakingStatus.pendingConfirmation;
       case 'cancelled':
         return MatchmakingStatus.cancelled;
       case 'expired':

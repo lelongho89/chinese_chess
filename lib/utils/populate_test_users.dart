@@ -13,41 +13,41 @@ class PopulateTestUsers {
   static const _uuid = Uuid();
   static final _random = Random();
 
-  /// List of AI user names for testing
+  /// List of AI user names for testing - updated for more human/chess-like names
   static const List<String> _aiUserNames = [
-    'ChessBot Alpha',
-    'Dragon Master',
-    'Phoenix Player',
-    'Tiger Strategist',
-    'Eagle Eye',
-    'Lightning Strike',
-    'Thunder King',
-    'Storm Warrior',
-    'Fire General',
-    'Ice Commander',
-    'Wind Dancer',
-    'Earth Guardian',
-    'Golden Knight',
-    'Silver Sage',
-    'Bronze Fighter',
-    'Diamond Mind',
-    'Ruby Tactician',
-    'Emerald Scholar',
-    'Sapphire Genius',
-    'Pearl Wisdom',
+    // Creative & Themed Names
+    'TheGambitGuru', 'RookAndRoll', 'PawnProphet', 'EndgameEdison', 'ZugzwangZoe',
+    'SilentAssassin', 'DeepThinker', 'BoardWarden', 'CheckmateCharlie', 'StrategicSue',
+    'TacticalTom', 'CleverCatherine', 'KnightRider22', 'BishopOfBlitz', 'QueenOfSacrifice',
+    'KingSlayer', 'FortressBuilder', 'AttackVector', 'CounterGambit', 'PositionalPlay',
+
+    // More "Regular" Gamer Tags / Names
+    'EmmaChess', 'AlexP_88', 'DeepBlueJr', 'ChessFanatic', 'TheGrandmasterG',
+    'RookStar', 'PawnSlayerX', 'CheckmateMaster', 'StrategicMind', 'TacticalPlayer',
+    'CatalanFan', 'SicilianPlayer', 'NimzoWizard', 'CaroKannKid', 'RetiOpening',
+    'AlphaZeroFan', 'StockfishSim', 'LeelaLearner', 'NeuralNetNick', 'AI_Adversary',
+
+    // Simple First Name + Chess Term
+    'AnnaTheAnalyzer', 'BenTheBlockader', 'ChloeTheChecker', 'DavidTheDefender', 'EvaTheEvaluator',
+    'FrankTheForker', 'GraceTheGrandmaster', 'HenryTheHunter', 'IslaTheInitiator', 'JackTheJumper',
+    'KateTheKingpin', 'LeoTheLeverager', 'MiaTheManeuverer', 'NoahTheNeutralizer', 'OliviaTheOpener',
+
+    // Names with numbers/suffixes
+    'ChessNut_79', 'DeepMind_AI', 'Strategist_Pro', 'TacticMaster_X', 'GrandmasterBot_v2',
+    'PawnStormer_01', 'RookRoller_EZ', 'KnightMoves_GG', 'BishopPair_WIN', 'QueenBee_AI',
   ];
 
-  /// Generate a random Elo rating between 800-2400 (realistic chess rating range)
+
+  /// Generate a random Elo rating between 800-2000, biased towards 1000-1600.
   static int _generateRandomElo() {
-    // Weight towards middle ratings (1000-1600) for better matchmaking
+    // Weights adjusted for 800-2000 range with bias towards 1000-1600
     final weights = [
-      (800, 1000, 0.1),   // Beginner: 10%
-      (1000, 1200, 0.2),  // Novice: 20%
-      (1200, 1400, 0.3),  // Intermediate: 30%
-      (1400, 1600, 0.2),  // Advanced: 20%
-      (1600, 1800, 0.1),  // Expert: 10%
+      (800, 1000, 0.15),  // Beginner: 15%
+      (1000, 1200, 0.25), // Novice: 25%
+      (1200, 1400, 0.30), // Intermediate: 30%
+      (1400, 1600, 0.20), // Advanced: 20%
+      (1600, 1800, 0.05), // Expert: 5%
       (1800, 2000, 0.05), // Master: 5%
-      (2000, 2400, 0.05), // Grandmaster: 5%
     ];
 
     final rand = _random.nextDouble();
@@ -66,24 +66,31 @@ class PopulateTestUsers {
   /// Generate realistic game statistics based on Elo rating
   static Map<String, int> _generateGameStats(int eloRating) {
     // Higher rated players tend to have more games
-    final baseGames = (eloRating - 800) ~/ 50 + _random.nextInt(20);
-    final gamesPlayed = math.max(10, baseGames + _random.nextInt(50));
+    final gamesPlayed = math.max(5, (eloRating - 750) ~/ 10 + _random.nextInt(50)); // Min 5 games, more for higher Elo
 
     // Win rate correlates with rating (roughly)
-    final expectedWinRate = math.min(0.8, math.max(0.2, (eloRating - 800) / 1600 * 0.6 + 0.2));
-    final winRateVariation = 0.1 + _random.nextDouble() * 0.2; // ±10-20% variation
-    final actualWinRate = math.min(0.9, math.max(0.1, expectedWinRate + (_random.nextDouble() - 0.5) * winRateVariation));
+    // Simple model: Base 30% win rate, +1% for every 20 Elo points above 800
+    double expectedWinRate = 0.30 + (math.max(0, eloRating - 800) / 20.0) * 0.01;
+    expectedWinRate = math.min(0.85, math.max(0.15, expectedWinRate)); // Clamp between 15% and 85%
+
+    // Add some randomness
+    final actualWinRate = math.min(0.90, math.max(0.10, expectedWinRate + (_random.nextDouble() - 0.5) * 0.20)); // +/- 10% variation
 
     final gamesWon = (gamesPlayed * actualWinRate).round();
-    final drawRate = 0.05 + _random.nextDouble() * 0.15; // 5-20% draws
+    
+    // Draw rate: Higher for higher Elo, but generally less than wins/losses
+    double drawRate = 0.05 + (math.max(0, eloRating - 1000) / 100.0) * 0.005; // Base 5%, +0.5% per 100 Elo over 1000
+    drawRate = math.min(0.30, math.max(0.02, drawRate + (_random.nextDouble() - 0.5) * 0.10)); // Clamp 2%-30%, add variation
+    
     final gamesDraw = (gamesPlayed * drawRate).round();
-    final gamesLost = gamesPlayed - gamesWon - gamesDraw;
+    
+    final gamesLost = math.max(0, gamesPlayed - gamesWon - gamesDraw); // Ensure non-negative
 
     return {
       'gamesPlayed': gamesPlayed,
-      'gamesWon': math.max(0, gamesWon),
-      'gamesLost': math.max(0, gamesLost),
-      'gamesDraw': math.max(0, gamesDraw),
+      'gamesWon': gamesWon,
+      'gamesLost': gamesLost,
+      'gamesDraw': gamesDraw,
     };
   }
 
@@ -94,15 +101,21 @@ class PopulateTestUsers {
     final stats = _generateGameStats(eloRating);
     final now = DateTime.now();
 
-    // Randomize creation date (within last 6 months)
-    final createdAt = now.subtract(Duration(days: _random.nextInt(180)));
+    // Randomize creation date (within last year)
+    final createdAt = now.subtract(Duration(days: _random.nextInt(365)));
 
-    // Last login within last week for active users
-    final lastLoginAt = now.subtract(Duration(hours: _random.nextInt(168)));
+    // Last login within last month for active users
+    final lastLoginAt = now.subtract(Duration(days: _random.nextInt(30), hours: _random.nextInt(24)));
+    
+    // Determine a last played side randomly or based on game counts (if desired for more realism)
+    final lastPlayedSide = _random.nextBool() ? 'red' : 'black';
+    final redGames = (stats['gamesPlayed']! * (_random.nextDouble() * 0.4 + 0.3)).round(); // 30-70% red games
+    final blackGames = stats['gamesPlayed']! - redGames;
+
 
     return UserModel(
       uid: uid,
-      email: '${name.toLowerCase().replaceAll(' ', '.')}@aitest.com',
+      email: '${name.toLowerCase().replaceAll(' ', '_').replaceAll('.', '_')}@aitest.com', // Sanitize name for email
       displayName: name,
       eloRating: eloRating,
       gamesPlayed: stats['gamesPlayed']!,
@@ -111,7 +124,10 @@ class PopulateTestUsers {
       gamesDraw: stats['gamesDraw']!,
       createdAt: createdAt,
       lastLoginAt: lastLoginAt,
-      isAnonymous: false,
+      isAnonymous: false, // AI users are not anonymous in the sense of Supabase anonymous auth for this utility
+      lastPlayedSide: lastPlayedSide,
+      redGamesPlayed: redGames,
+      blackGamesPlayed: blackGames,
     );
   }
 
