@@ -303,5 +303,108 @@
   "rankKnightDesc": "Skilled players mastering tactics",
   "rankChariotDesc": "Advanced players with strong game sense",
   "rankCannonDesc": "Expert players dominating opponents",
-  "rankGeneralDesc": "Elite players, masters of Xiangqi"
+  "rankGeneralDesc": "Elite players, masters of Xiangqi",
+
+  "matchFound": "Match Found!",
+  "confirmMatch": "Would you like to accept this match?",
+  "timeRemaining": "Time remaining",
+  "accept": "Accept",
+  "decline": "Decline",
+
+  "searchingForOpponent": "Searching for opponent...",
+  "waitingForConfirmation": "Waiting for opponent confirmation...",
+  "matchFoundExclamation": "Match found!",
+  "searchCancelled": "Search cancelled",
+  "searchExpired": "Search expired",
+
+  "queueType": "Queue Type",
+  "ranked": "Ranked",
+  "casual": "Casual",
+  "rankedDescription": "Affects Elo rating",
+  "casualDescription": "Just for fun",
+
+  "timeControl": "Time Control",
+  "standardTimeControl": "Standard time control for all matches",
+  "fixed": "FIXED",
+  "waitTime": "Wait time",
+  "gameSettings": "Game Settings",
+
+  "sideAssignmentInfo": "Side assignment (Red/Black) is automatically balanced for fair play",
+  "playersWaiting": "Players waiting: {count}",
+  "@playersWaiting": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "averageWaitTime": "Avg wait: {time}",
+  "@averageWaitTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+
+  "queueStatistics": "Queue Statistics",
+  "testingTools": "Testing Tools",
+  "addAiUsers": "Add AI Users",
+  "clearAi": "Clear AI",
+  "testAiMatching": "Test AI Matching",
+  "creatingAiUsers": "Creating AI users...",
+  "clearingAiUsers": "Clearing AI users...",
+  "aiUsersCreated": "Successfully created {count} AI users!",
+  "@aiUsersCreated": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "confirmClearAi": "Are you sure you want to remove all AI test users?",
+  "settingUpAiTest": "Setting up AI matching test...",
+  "aiMatchStarted": "AI matching test started! You should be matched with an opponent within 15 seconds.",
+
+  "error": "Error",
+  "errorJoiningQueue": "Error joining queue: {message}",
+  "@errorJoiningQueue": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "errorLeavingQueue": "Error leaving queue: {message}",
+  "@errorLeavingQueue": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "errorCreatingAiUsers": "Error creating AI users: {message}",
+  "@errorCreatingAiUsers": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "errorClearingAiUsers": "Error clearing AI users: {message}",
+  "@errorClearingAiUsers": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "errorTestingAiMatch": "Error setting up AI matching test: {message}",
+  "@errorTestingAiMatch": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  }
 }

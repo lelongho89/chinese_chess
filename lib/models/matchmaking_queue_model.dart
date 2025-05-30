@@ -169,18 +169,18 @@ class MatchmakingQueueModel {
   }
 
   /// Get a human-readable status description
-  String get statusDescription {
+  String getStatusDescription(BuildContext context) {
     switch (status) {
       case MatchmakingStatus.waiting:
-        return 'Searching for opponent...';
+        return context.l10n.searchingForOpponent;
       case MatchmakingStatus.pending_confirmation:
-        return 'Waiting for opponent confirmation...';
+        return context.l10n.waitingForConfirmation;
       case MatchmakingStatus.matched:
-        return 'Match found!';
+        return context.l10n.matchFoundExclamation;
       case MatchmakingStatus.cancelled:
-        return 'Search cancelled';
+        return context.l10n.searchCancelled;
       case MatchmakingStatus.expired:
-        return 'Search expired';
+        return context.l10n.searchExpired;
     }
   }
 

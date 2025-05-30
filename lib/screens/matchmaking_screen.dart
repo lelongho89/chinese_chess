@@ -162,9 +162,8 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       setState(() {
         _isSearching = false;
       });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error joining queue: $e')),
+      if (mounted) {          ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.errorJoiningQueue(e.toString()))),
         );
       }
     }
@@ -180,7 +179,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error leaving queue: $e')),
+          SnackBar(content: Text(context.l10n.errorLeavingQueue(e.toString()))),
         );
       }
     }
@@ -226,13 +225,22 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
             });
 
             return AlertDialog(
-              title: Text(AppLocalizations.of(context)!.matchFound),
+              title: Text(
+                context.l10n.matchFound,
+                semanticsLabel: context.l10n.matchFound,
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(AppLocalizations.of(context)!.confirmMatch),
+                  Text(
+                    context.l10n.confirmMatch,
+                    semanticsLabel: context.l10n.confirmMatch,
+                  ),
                   const SizedBox(height: 16),
-                  Text('${AppLocalizations.of(context)!.timeRemaining}: $countdown'),
+                  Semantics(
+                    value: '${context.l10n.timeRemaining}: $countdown',
+                    child: Text('${context.l10n.timeRemaining}: $countdown'),
+                  ),
                 ],
               ),
               actions: [
@@ -240,13 +248,19 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                   onPressed: () {
                     Navigator.of(dialogContext).pop(false);
                   },
-                  child: Text(AppLocalizations.of(context)!.decline),
+                  child: Text(
+                    context.l10n.decline,
+                    semanticsLabel: context.l10n.decline,
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.of(dialogContext).pop(true);
                   },
-                  child: Text(AppLocalizations.of(context)!.accept),
+                  child: Text(
+                    context.l10n.accept,
+                    semanticsLabel: context.l10n.accept,
+                  ),
                 ),
               ],
             );
@@ -363,7 +377,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Wait time: ${_formatTime(_currentQueue!.waitTimeSeconds)}',
+                            context.l10n.waitTime + ': ' + _formatTime(_currentQueue!.waitTimeSeconds),
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           Text(
@@ -389,9 +403,8 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                 ),
               ),
             ] else ...[
-              // Simplified Queue Configuration
-              Text(
-                'Game Settings',
+              // Simplified Queue Configuration                Text(
+                context.l10n.gameSettings,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -441,7 +454,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '🤖 Testing Tools',
+                        context.l10n.testingTools,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -453,7 +466,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                             child: ElevatedButton.icon(
                               onPressed: _populateAIUsers,
                               icon: const Icon(Icons.smart_toy, size: 18),
-                              label: const Text('Add AI Users'),
+                              label: Text(context.l10n.addAiUsers),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green.shade600,
                                 foregroundColor: Colors.white,
@@ -465,7 +478,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                             child: ElevatedButton.icon(
                               onPressed: _clearAIUsers,
                               icon: const Icon(Icons.clear_all, size: 18),
-                              label: const Text('Clear AI'),
+                              label: Text(context.l10n.clearAi),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red.shade600,
                                 foregroundColor: Colors.white,
@@ -480,7 +493,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                         child: ElevatedButton.icon(
                           onPressed: _testAIMatching,
                           icon: const Icon(Icons.psychology, size: 18),
-                          label: const Text('Test AI Matching'),
+                          label: Text(context.l10n.testAiMatching),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.purple.shade600,
                             foregroundColor: Colors.white,
@@ -493,35 +506,8 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
               ),
             ],
 
-            const Spacer(),
-
             // Queue Statistics
-            if (_queueStats != null) ...[
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Queue Statistics',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Players waiting: ${_queueStats!['total_waiting']}'),
-                          Text('Avg wait: ${_formatTime(_queueStats!['average_wait_time_seconds'])}'),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+            _buildQueueStatistics(),
           ],
         ),
       ),
@@ -533,63 +519,50 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Queue Type',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          context.l10n.queueType,
+          style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 8),
         Row(
           children: [
             Expanded(
-              child: _buildQueueTypeOption(QueueType.ranked, 'Ranked', 'Affects Elo rating'),
+              child: Tooltip(
+                message: context.l10n.rankedDescription,
+                child: ElevatedButton(
+                  onPressed: !_isSearching ? () => _selectQueueType(QueueType.ranked) : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _selectedQueueType == QueueType.ranked
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.surface,
+                  ),
+                  child: Text(
+                    context.l10n.ranked,
+                    semanticsLabel: '${context.l10n.ranked} - ${context.l10n.rankedDescription}',
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 8),
             Expanded(
-              child: _buildQueueTypeOption(QueueType.casual, 'Casual', 'Just for fun'),
+              child: Tooltip(
+                message: context.l10n.casualDescription,
+                child: ElevatedButton(
+                  onPressed: !_isSearching ? () => _selectQueueType(QueueType.casual) : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _selectedQueueType == QueueType.casual
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.surface,
+                  ),
+                  child: Text(
+                    context.l10n.casual,
+                    semanticsLabel: '${context.l10n.casual} - ${context.l10n.casualDescription}',
+                  ),
+                ),
+              ),
             ),
           ],
         ),
       ],
-    );
-  }
-
-  Widget _buildQueueTypeOption(QueueType type, String title, String subtitle) {
-    final isSelected = _selectedQueueType == type;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedQueueType = type),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: isSelected
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.outline,
-            width: isSelected ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.circular(12),
-          color: isSelected
-              ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3)
-              : null,
-        ),
-        child: Column(
-          children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: isSelected ? Theme.of(context).colorScheme.primary : null,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              style: Theme.of(context).textTheme.bodySmall,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -598,85 +571,52 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Time Control',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          context.l10n.timeControl,
+          style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 8),
         Container(
-          width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
-            ),
-            borderRadius: BorderRadius.circular(12),
-            color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+            border: Border.all(color: Theme.of(context).colorScheme.outline),
+            borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                Icons.timer,
-                color: Theme.of(context).colorScheme.primary,
-                size: 20,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppConfig.instance.matchTimeControlFormatted,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    Text(
-                      'Standard time control for all matches',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  'FIXED',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.bold,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    AppConfig.instance.matchTimeControlFormatted,
+                    style: Theme.of(context).textTheme.titleLarge,
+                    semanticsLabel: '${AppConfig.instance.matchTimeControlFormatted} ${context.l10n.timeControl}',
                   ),
-                ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surfaceVariant,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      context.l10n.fixed,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                context.l10n.standardTimeControl,
+                style: Theme.of(context).textTheme.bodySmall,
+                semanticsLabel: context.l10n.standardTimeControl,
               ),
             ],
           ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Icon(
-              Icons.info_outline,
-              size: 16,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Side assignment (Red/Black) is automatically balanced for fair play',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
-          ],
         ),
       ],
     );
@@ -697,7 +637,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
                 SizedBox(width: 16),
-                Text('Creating AI users...'),
+                Text(context.l10n.creatingAiUsers),
               ],
             ),
             duration: Duration(seconds: 3),
@@ -710,7 +650,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('✅ Successfully created 15 AI users!'),
+            content: Text(context.l10n.aiUsersCreated(15)),
             backgroundColor: Colors.green,
           ),
         );
@@ -722,7 +662,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('❌ Error creating AI users: $e'),
+            content: Text(context.l10n.errorCreatingAiUsers(e.toString())),
             backgroundColor: Colors.red,
           ),
         );
@@ -737,12 +677,12 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Clear AI Users'),
-          content: const Text('Are you sure you want to remove all AI test users?'),
+          title: Text(context.l10n.clearAi),
+          content: Text(context.l10n.confirmClearAi),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
@@ -767,7 +707,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
                 SizedBox(width: 16),
-                Text('Clearing AI users...'),
+                Text(context.l10n.clearingAiUsers),
               ],
             ),
             duration: Duration(seconds: 2),
@@ -780,7 +720,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('✅ AI users cleared successfully!'),
+            content: Text(context.l10n.aiUsersCreated(0)),
             backgroundColor: Colors.orange,
           ),
         );
@@ -817,7 +757,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
                 SizedBox(width: 16),
-                Text('Setting up AI matching test...'),
+                Text(context.l10n.settingUpAiTest),
               ],
             ),
             duration: Duration(seconds: 5),
@@ -834,7 +774,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('🎮 AI matching test started! You should be matched with an AI opponent within 15 seconds.'),
+            content: Text(context.l10n.aiMatchStarted),
             backgroundColor: Colors.purple,
             duration: Duration(seconds: 4),
           ),
@@ -845,11 +785,119 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('❌ Error setting up AI matching test: $e'),
+            content: Text(context.l10n.errorTestingAiMatch(e.toString())),
             backgroundColor: Colors.red,
           ),
         );
       }
     }
+  }
+
+  Widget _buildQueueStatistics() {
+    if (_queueStats == null) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          child: Text(
+            context.l10n.queueStatistics,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Semantics(
+                  label: context.l10n.playersWaiting(_queueStats!['total_waiting'] as int),
+                  child: Row(
+                    children: [
+                      Icon(Icons.people, color: Theme.of(context).colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Text(context.l10n.playersWaiting(_queueStats!['total_waiting'] as int)),
+                    ],
+                  ),
+                ),
+                Semantics(
+                  label: context.l10n.averageWaitTime(_queueStats!['average_wait_time'] as String),
+                  child: Row(
+                    children: [
+                      Icon(Icons.timer, color: Theme.of(context).colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Text(context.l10n.averageWaitTime(_queueStats!['average_wait_time'] as String)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDebugTools() {
+    if (!AppConfig.instance.showDebugTools) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          child: Text(
+            context.l10n.testingTools,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Tooltip(
+                message: context.l10n.addAiUsers,
+                child: ElevatedButton(
+                  onPressed: _addAIUsers,
+                  child: Text(
+                    context.l10n.addAiUsers,
+                    semanticsLabel: context.l10n.addAiUsers,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Tooltip(
+                message: context.l10n.clearAi,
+                child: ElevatedButton(
+                  onPressed: _clearAIUsers,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                    foregroundColor: Theme.of(context).colorScheme.onError,
+                  ),
+                  child: Text(
+                    context.l10n.clearAi,
+                    semanticsLabel: context.l10n.clearAi,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Tooltip(
+          message: context.l10n.testAiMatching,
+          child: ElevatedButton(
+            onPressed: _testAIMatching,
+            child: Text(
+              context.l10n.testAiMatching,
+              semanticsLabel: context.l10n.testAiMatching,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
