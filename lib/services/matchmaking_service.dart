@@ -33,6 +33,8 @@ class MatchmakingService {
   Timer? _matchmakingTimer;
   bool _isMatchmakingActive = false;
 
+  // Public API methods
+  
   /// Start the matchmaking service
   void startMatchmaking() {
     if (_isMatchmakingActive) return;
@@ -134,6 +136,30 @@ class MatchmakingService {
     }
   }
 
+  /// Handle match confirmation for a player
+  Future<void> confirmMatch(String queueId) async {
+    try {
+      await MatchmakingQueueRepository.instance.confirmMatch(queueId);
+      logger.info('Player confirmed match: $queueId');
+    } catch (e) {
+      logger.severe('Error confirming match: $e');
+      rethrow;
+    }
+  }
+
+  /// Cancel match confirmation for a player
+  Future<void> declineMatch(String queueId) async {
+    try {
+      await MatchmakingQueueRepository.instance.declineMatch(queueId);
+      logger.info('Player declined match: $queueId');
+    } catch (e) {
+      logger.severe('Error declining match: $e');
+      rethrow;
+    }
+  }
+
+  // Private methods
+
   /// Process matchmaking (called periodically)
   Future<void> _processMatchmaking() async {
     if (!_isMatchmakingActive) return;
@@ -164,7 +190,7 @@ class MatchmakingService {
     }
   }
 
-  /// Process matches for a specific queue
+  /// Process queue matches for players in a specific queue type
   Future<void> _processQueueMatches(List<MatchmakingQueueModel> players) async {
     if (players.isEmpty) return;
 
@@ -396,232 +422,6 @@ class MatchmakingService {
       logger.info('Created match for player ${player.userId} (${player.eloRating})');
     } catch (e) {
       logger.severe('Error creating match: $e');
-    }
-  }
-
-  /// Handle match confirmation for a player
-  Future<void> confirmMatch(String queueId) async {
-    try {
-      await MatchmakingQueueRepository.instance.confirmMatch(queueId);
-      logger.info('Player confirmed match: $queueId');
-    } catch (e) {
-      logger.severe('Error confirming match: $e');
-      rethrow;
-    }
-  }
-
-  /// Cancel match confirmation for a player
-  Future<void> declineMatch(String queueId) async {
-    try {
-      await MatchmakingQueueRepository.instance.declineMatch(queueId);
-      logger.info('Player declined match: $queueId');
-    } catch (e) {
-      logger.severe('Error declining match: $e');
-      rethrow;
-    }
-  }
-
-  /// Get user's active queue entry
-  Future<MatchmakingQueueModel?> getUserActiveQueue(String userId) async {
-    try {
-      return await MatchmakingQueueRepository.instance.getUserActiveQueue(userId);
-    } catch (e) {
-      logger.severe('Error getting user active queue: $e');
-      rethrow;
-    }
-  }
-
-  /// Get queue statistics
-  Future<Map<String, dynamic>> getQueueStats() async {
-    try {
-      return await MatchmakingQueueRepository.instance.getQueueStats();
-    } catch (e) {
-      logger.severe('Error getting queue stats: $e');
-      rethrow;
-    }
-  }
-
-  /// Process matchmaking (called periodically)
-  Future<void> _processMatchmaking() async {
-    if (!_isMatchmakingActive) return;
-
-    try {
-      // Expire old entries first
-      await MatchmakingQueueRepository.instance.expireOldEntries();
-
-      // Get all waiting players grouped by queue type
-      final rankedPlayers = await MatchmakingQueueRepository.instance.getWaitingPlayersByEloRange(
-        minElo: 0,
-        maxElo: 5000,
-        queueType: QueueType.ranked,
-      );
-
-      final casualPlayers = await MatchmakingQueueRepository.instance.getWaitingPlayersByEloRange(
-        minElo: 0,
-        maxElo: 5000,
-        queueType: QueueType.casual,
-      );
-
-      // Process matches for each queue type
-      await _processQueueMatches(rankedPlayers);
-      await _processQueueMatches(casualPlayers);
-
-    } catch (e) {
-      logger.severe('Error processing matchmaking: $e');
-    }
-  }
-
-  /// Process matches for a specific queue
-  Future<void> _processQueueMatches(List<MatchmakingQueueModel> players) async {
-    if (players.isEmpty) return;
-
-    logger.info('Processing ${players.length} players in queue');
-
-    // Sort players by join time (FIFO for fairness)
-    players.sort((a, b) => a.joinedAt.compareTo(b.joinedAt));
-
-    final matched = <String>{};
-
-    for (int i = 0; i < players.length; i++) {
-      final player1 = players[i];
-      if (matched.contains(player1.id)) continue;
-
-      logger.info('Processing player ${player1.userId} (Elo: ${player1.eloRating})');
-
-      // Find the best match for this player among other human players
-      final bestMatch = await _findBestMatch(player1, players, matched);
-      if (bestMatch != null) {
-        logger.info('Found human match for ${player1.userId}: ${bestMatch.userId}');
-        await _createMatch(player1, bestMatch);
-        matched.add(player1.id);
-        matched.add(bestMatch.id);
-      } else if (_enableAIMatching) {
-        logger.info('No human match found for ${player1.userId}, trying AI match');
-        // No human opponent found, try to match with AI user
-        await _tryMatchWithAI(player1);
-        matched.add(player1.id);
-      } else {
-        logger.info('AI matching disabled, player ${player1.userId} remains in queue');
-      }
-    }
-  }
-
-  /// Find the best match for a player
-  Future<MatchmakingQueueModel?> _findBestMatch(
-    MatchmakingQueueModel player,
-    List<MatchmakingQueueModel> candidates,
-    Set<String> matched,
-  ) async {
-    final waitTime = DateTime.now().difference(player.joinedAt);
-    final expandedEloDifference = _calculateExpandedEloDifference(player.eloRating, waitTime);
-
-    MatchmakingQueueModel? bestMatch;
-    int bestEloDifference = expandedEloDifference + 1;
-
-    for (final candidate in candidates) {
-      if (candidate.id == player.id || matched.contains(candidate.id)) continue;
-
-      // Check if they can match based on Elo difference
-      final eloDifference = (player.eloRating - candidate.eloRating).abs();
-      final candidateWaitTime = DateTime.now().difference(candidate.joinedAt);
-      final candidateExpandedEloDifference = _calculateExpandedEloDifference(candidate.eloRating, candidateWaitTime);
-
-      // Both players must accept the Elo difference
-      if (eloDifference <= expandedEloDifference && eloDifference <= candidateExpandedEloDifference) {
-        // Check time control compatibility
-        if (player.timeControl == candidate.timeControl) {
-          // Prefer closer Elo ratings
-          if (eloDifference < bestEloDifference) {
-            bestMatch = candidate;
-            bestEloDifference = eloDifference;
-          }
-        }
-      }
-    }
-
-    return bestMatch;
-  }
-
-  /// Create a match between two players
-  Future<void> _createMatch(MatchmakingQueueModel player1, MatchmakingQueueModel player2) async {
-    try {
-      logger.info('Creating match between ${player1.userId} and ${player2.userId}');
-
-      // Move both players to pending confirmation status
-      await MatchmakingQueueRepository.instance.setPendingConfirmation(
-        queueId1: player1.id,
-        queueId2: player2.id,
-        confirmationTimeout: _confirmationTimeout,
-      );
-
-      // Wait for both players to confirm or timeout
-      await Future.delayed(_confirmationTimeout);
-
-      // Check if both players confirmed
-      final updatedPlayer1 = await MatchmakingQueueRepository.instance.get(player1.id);
-      final updatedPlayer2 = await MatchmakingQueueRepository.instance.get(player2.id);
-
-      if (updatedPlayer1?.isConfirmed != true || updatedPlayer2?.isConfirmed != true) {
-        // At least one player didn't confirm, return them to queue
-        await MatchmakingQueueRepository.instance.returnToQueue(
-          queueId1: player1.id,
-          queueId2: player2.id,
-        );
-        return;
-      }
-
-      // Both players confirmed, create the game
-      final colors = await SideAlternationService.instance.determineSideAssignment(
-        player1Id: player1.userId,
-        player2Id: player2.userId,
-      );
-      final redPlayerId = colors['red']!;
-      final blackPlayerId = colors['black']!;
-
-      // Create the game with the new 5+3 time control
-      final gameId = await GameService.instance.startGame(
-        redPlayerId: redPlayerId,
-        blackPlayerId: blackPlayerId,
-        isRanked: player1.queueType == QueueType.ranked,
-        timeControl: AppConfig.instance.matchTimeControl,
-        incrementSeconds: AppConfig.instance.incrementSeconds,
-        metadata: {
-          'matchmaking': true,
-          'queue_type': player1.queueType.name,
-          'time_control': player1.timeControl,
-          'increment_seconds': player1.incrementSeconds,
-          'player1_wait_time': player1.waitTimeSeconds,
-          'player2_wait_time': player2.waitTimeSeconds,
-          'elo_difference': (player1.eloRating - player2.eloRating).abs(),
-          'side_assignment': {
-            'red_player_id': redPlayerId,
-            'black_player_id': blackPlayerId,
-            'alternation_applied': true,
-          },
-        },
-      );
-
-      // Update side history for both players
-      await SideAlternationService.instance.updatePlayerSideHistory(
-        playerId: redPlayerId,
-        side: 'red',
-      );
-      await SideAlternationService.instance.updatePlayerSideHistory(
-        playerId: blackPlayerId,
-        side: 'black',
-      );
-
-      // Mark queue entries as matched
-      await MatchmakingQueueRepository.instance.markAsMatched(
-        queueId1: player1.id,
-        queueId2: player2.id,
-        matchId: gameId,
-      );
-
-      logger.info('Created match: ${player1.userId} (${player1.eloRating}) vs ${player2.userId} (${player2.eloRating})');
-    } catch (e) {
-      logger.severe('Error creating match: $e');
-      rethrow;
     }
   }
 
