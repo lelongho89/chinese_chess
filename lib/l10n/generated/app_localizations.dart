@@ -1569,6 +1569,234 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Elite players, masters of Xiangqi'**
   String get rankGeneralDesc;
+
+  /// No description provided for @matchFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Match Found!'**
+  String get matchFound;
+
+  /// No description provided for @confirmMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to accept this match?'**
+  String get confirmMatch;
+
+  /// No description provided for @timeRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Time remaining'**
+  String get timeRemaining;
+
+  /// No description provided for @accept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get accept;
+
+  /// No description provided for @decline.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get decline;
+
+  /// No description provided for @searchingForOpponent.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching for opponent...'**
+  String get searchingForOpponent;
+
+  /// No description provided for @waitingForConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for opponent confirmation...'**
+  String get waitingForConfirmation;
+
+  /// No description provided for @matchFoundExclamation.
+  ///
+  /// In en, this message translates to:
+  /// **'Match found!'**
+  String get matchFoundExclamation;
+
+  /// No description provided for @searchCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Search cancelled'**
+  String get searchCancelled;
+
+  /// No description provided for @searchExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Search expired'**
+  String get searchExpired;
+
+  /// No description provided for @queueType.
+  ///
+  /// In en, this message translates to:
+  /// **'Queue Type'**
+  String get queueType;
+
+  /// No description provided for @ranked.
+  ///
+  /// In en, this message translates to:
+  /// **'Ranked'**
+  String get ranked;
+
+  /// No description provided for @casual.
+  ///
+  /// In en, this message translates to:
+  /// **'Casual'**
+  String get casual;
+
+  /// No description provided for @rankedDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Affects Elo rating'**
+  String get rankedDescription;
+
+  /// No description provided for @casualDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Just for fun'**
+  String get casualDescription;
+
+  /// No description provided for @timeControl.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Control'**
+  String get timeControl;
+
+  /// No description provided for @standardTimeControl.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard time control for all matches'**
+  String get standardTimeControl;
+
+  /// No description provided for @fixed.
+  ///
+  /// In en, this message translates to:
+  /// **'FIXED'**
+  String get fixed;
+
+  /// No description provided for @waitTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait time'**
+  String get waitTime;
+
+  /// No description provided for @sideAssignmentInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Side assignment (Red/Black) is automatically balanced for fair play'**
+  String get sideAssignmentInfo;
+
+  /// No description provided for @playersWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Players waiting: {count}'**
+  String playersWaiting(int count);
+
+  /// No description provided for @averageWaitTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg wait: {time}'**
+  String averageWaitTime(String time);
+
+  /// No description provided for @queueStatistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Queue Statistics'**
+  String get queueStatistics;
+
+  /// No description provided for @testingTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Testing Tools'**
+  String get testingTools;
+
+  /// No description provided for @addAiUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Add AI Users'**
+  String get addAiUsers;
+
+  /// No description provided for @clearAi.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear AI'**
+  String get clearAi;
+
+  /// No description provided for @testAiMatching.
+  ///
+  /// In en, this message translates to:
+  /// **'Test AI Matching'**
+  String get testAiMatching;
+
+  /// No description provided for @creatingAiUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating AI users...'**
+  String get creatingAiUsers;
+
+  /// No description provided for @clearingAiUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Clearing AI users...'**
+  String get clearingAiUsers;
+
+  /// No description provided for @aiUsersCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully created {count} AI users!'**
+  String aiUsersCreated(int count);
+
+  /// No description provided for @confirmClearAi.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to remove all AI test users?'**
+  String get confirmClearAi;
+
+  /// No description provided for @settingUpAiTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Setting up AI matching test...'**
+  String get settingUpAiTest;
+
+  /// No description provided for @aiMatchStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'AI matching test started! You should be matched with an opponent within 15 seconds.'**
+  String get aiMatchStarted;
+
+  /// No description provided for @errorJoiningQueue.
+  ///
+  /// In en, this message translates to:
+  /// **'Error joining queue: {message}'**
+  String errorJoiningQueue(String message);
+
+  /// No description provided for @errorLeavingQueue.
+  ///
+  /// In en, this message translates to:
+  /// **'Error leaving queue: {message}'**
+  String errorLeavingQueue(String message);
+
+  /// No description provided for @errorCreatingAiUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Error creating AI users: {message}'**
+  String errorCreatingAiUsers(String message);
+
+  /// No description provided for @errorClearingAiUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Error clearing AI users: {message}'**
+  String errorClearingAiUsers(String message);
+
+  /// No description provided for @errorTestingAiMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Error setting up AI matching test: {message}'**
+  String errorTestingAiMatch(String message);
 }
 
 class _AppLocalizationsDelegate

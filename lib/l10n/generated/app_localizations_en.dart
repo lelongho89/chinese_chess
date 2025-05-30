@@ -764,4 +764,137 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rankGeneralDesc => 'Elite players, masters of Xiangqi';
+
+  @override
+  String get matchFound => 'Match Found!';
+
+  @override
+  String get confirmMatch => 'Would you like to accept this match?';
+
+  @override
+  String get timeRemaining => 'Time remaining';
+
+  @override
+  String get accept => 'Accept';
+
+  @override
+  String get decline => 'Decline';
+
+  @override
+  String get searchingForOpponent => 'Searching for opponent...';
+
+  @override
+  String get waitingForConfirmation => 'Waiting for opponent confirmation...';
+
+  @override
+  String get matchFoundExclamation => 'Match found!';
+
+  @override
+  String get searchCancelled => 'Search cancelled';
+
+  @override
+  String get searchExpired => 'Search expired';
+
+  @override
+  String get queueType => 'Queue Type';
+
+  @override
+  String get ranked => 'Ranked';
+
+  @override
+  String get casual => 'Casual';
+
+  @override
+  String get rankedDescription => 'Affects Elo rating';
+
+  @override
+  String get casualDescription => 'Just for fun';
+
+  @override
+  String get timeControl => 'Time Control';
+
+  @override
+  String get standardTimeControl => 'Standard time control for all matches';
+
+  @override
+  String get fixed => 'FIXED';
+
+  @override
+  String get waitTime => 'Wait time';
+
+  @override
+  String get sideAssignmentInfo =>
+      'Side assignment (Red/Black) is automatically balanced for fair play';
+
+  @override
+  String playersWaiting(int count) {
+    return 'Players waiting: $count';
+  }
+
+  @override
+  String averageWaitTime(String time) {
+    return 'Avg wait: $time';
+  }
+
+  @override
+  String get queueStatistics => 'Queue Statistics';
+
+  @override
+  String get testingTools => 'Testing Tools';
+
+  @override
+  String get addAiUsers => 'Add AI Users';
+
+  @override
+  String get clearAi => 'Clear AI';
+
+  @override
+  String get testAiMatching => 'Test AI Matching';
+
+  @override
+  String get creatingAiUsers => 'Creating AI users...';
+
+  @override
+  String get clearingAiUsers => 'Clearing AI users...';
+
+  @override
+  String aiUsersCreated(int count) {
+    return 'Successfully created $count AI users!';
+  }
+
+  @override
+  String get confirmClearAi =>
+      'Are you sure you want to remove all AI test users?';
+
+  @override
+  String get settingUpAiTest => 'Setting up AI matching test...';
+
+  @override
+  String get aiMatchStarted =>
+      'AI matching test started! You should be matched with an opponent within 15 seconds.';
+
+  @override
+  String errorJoiningQueue(String message) {
+    return 'Error joining queue: $message';
+  }
+
+  @override
+  String errorLeavingQueue(String message) {
+    return 'Error leaving queue: $message';
+  }
+
+  @override
+  String errorCreatingAiUsers(String message) {
+    return 'Error creating AI users: $message';
+  }
+
+  @override
+  String errorClearingAiUsers(String message) {
+    return 'Error clearing AI users: $message';
+  }
+
+  @override
+  String errorTestingAiMatch(String message) {
+    return 'Error setting up AI matching test: $message';
+  }
 }

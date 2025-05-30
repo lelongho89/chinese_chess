@@ -162,8 +162,14 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       setState(() {
         _isSearching = false;
       });
-      if (mounted) {          ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.errorJoiningQueue(e.toString()))),
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              context.l10n.errorJoiningQueue(e.toString()),
+              semanticsLabel: context.l10n.errorJoiningQueue(e.toString()),
+            ),
+          ),
         );
       }
     }
@@ -179,7 +185,12 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.errorLeavingQueue(e.toString()))),
+          SnackBar(
+            content: Text(
+              context.l10n.errorLeavingQueue(e.toString()),
+              semanticsLabel: context.l10n.errorLeavingQueue(e.toString()),
+            ),
+          ),
         );
       }
     }
@@ -277,6 +288,12 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
     } else {
       await MatchmakingService.instance.declineMatch(_currentQueue!.id);
     }
+  }
+
+  void _selectQueueType(QueueType queueType) {
+    setState(() {
+      _selectedQueueType = queueType;
+    });
   }
 
   @override
@@ -403,7 +420,8 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                 ),
               ),
             ] else ...[
-              // Simplified Queue Configuration                Text(
+              // Simplified Queue Configuration
+              Text(
                 context.l10n.gameSettings,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
@@ -628,19 +646,12 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       // Show loading indicator
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Row(
-              children: [
-                SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-                SizedBox(width: 16),
-                Text(context.l10n.creatingAiUsers),
-              ],
+          SnackBar(
+            content: Text(
+              context.l10n.creatingAiUsers,
+              semanticsLabel: context.l10n.creatingAiUsers,
             ),
-            duration: Duration(seconds: 3),
+            duration: const Duration(seconds: 3),
           ),
         );
       }
@@ -649,8 +660,11 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(context.l10n.aiUsersCreated(15)),
+          SnackBar(
+            content: Text(
+              context.l10n.aiUsersCreated(15),
+              semanticsLabel: context.l10n.aiUsersCreated(15),
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -698,7 +712,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       // Show loading indicator
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Row(
               children: [
                 SizedBox(
@@ -707,10 +721,13 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
                 SizedBox(width: 16),
-                Text(context.l10n.clearingAiUsers),
+                Text(
+                  context.l10n.clearingAiUsers,
+                  semanticsLabel: context.l10n.clearingAiUsers,
+                ),
               ],
             ),
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -719,8 +736,11 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(context.l10n.aiUsersCreated(0)),
+          SnackBar(
+            content: Text(
+              context.l10n.aiUsersCreated(0),
+              semanticsLabel: context.l10n.aiUsersCreated(0),
+            ),
             backgroundColor: Colors.orange,
           ),
         );
@@ -748,7 +768,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
       // Show loading indicator
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Row(
               children: [
                 SizedBox(
@@ -773,7 +793,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(context.l10n.aiMatchStarted),
             backgroundColor: Colors.purple,
             duration: Duration(seconds: 4),
@@ -859,7 +879,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
               child: Tooltip(
                 message: context.l10n.addAiUsers,
                 child: ElevatedButton(
-                  onPressed: _addAIUsers,
+                  onPressed: _populateAIUsers,
                   child: Text(
                     context.l10n.addAiUsers,
                     semanticsLabel: context.l10n.addAiUsers,

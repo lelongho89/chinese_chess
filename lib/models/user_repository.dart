@@ -327,5 +327,36 @@ class UserRepository extends SupabaseBaseRepository<UserModel> {
       logger.severe('Error searching users by display name: $e');
       rethrow;
     }
+  
+    /// Get all AI users (display name contains 'AI', case-insensitive)
+    Future<List<UserModel>> getAIUsers() async {
+      try {
+        final response = await table
+            .select()
+            .ilike('display_name', '%ai%');
+        return response.map((record) {
+          final id = record['id'] as String;
+          return fromSupabase(record, id);
+        }).toList();
+      } catch (e) {
+        logger.severe('Error getting AI users: $e');
+        return [];
+      }
+    }
+  }
+/// Get all AI users (display name contains 'AI', case-insensitive)
+  Future<List<UserModel>> getAIUsers() async {
+    try {
+      final response = await table
+          .select()
+          .ilike('display_name', '%ai%');
+      return response.map((record) {
+        final id = record['id'] as String;
+        return fromSupabase(record, id);
+      }).toList();
+    } catch (e) {
+      logger.severe('Error getting AI users: $e');
+      return [];
+    }
   }
 }
