@@ -302,8 +302,6 @@ class MatchmakingService {
         redPlayerId: redPlayerId,
         blackPlayerId: blackPlayerId,
         isRanked: player1.queueType == QueueType.ranked,
-        timeControl: AppConfig.instance.matchTimeControl,
-        incrementSeconds: AppConfig.instance.incrementSeconds,
         metadata: {
           'matchmaking': true,
           'queue_type': player1.queueType.name,
@@ -394,8 +392,6 @@ class MatchmakingService {
         redPlayerId: redPlayerId,
         blackPlayerId: blackPlayerId,
         isRanked: player.queueType == QueueType.ranked,
-        timeControl: AppConfig.instance.matchTimeControl,
-        incrementSeconds: AppConfig.instance.incrementSeconds,
         metadata: {
           'matchmaking': true,
           'queue_type': player.queueType.name,
@@ -483,3 +479,27 @@ class MatchmakingService {
     }
   }
 }
+
+/// Find a suitable AI opponent for a player based on Elo rating.
+  Future<UserModel?> _findSuitableAIOpponent(MatchmakingQueueModel player) async {
+    try {
+      // Fetch all AI users from the user repository
+      final aiUsers = await UserRepository.instance.getAIUsers();
+
+      if (aiUsers.isEmpty) return null;
+
+      // Find the AI user with the closest Elo rating to the player
+      aiUsers.sort((a, b) =>
+          (a.eloRating - player.eloRating).abs().compareTo((b.eloRating - player.eloRating).abs()));
+
+      // Optionally, limit to top N candidates and pick randomly for variety
+      const maxCandidates = 3;
+      final candidates = aiUsers.take(maxCandidates).toList();
+      candidates.shuffle();
+
+      return candidates.first;
+    } catch (e) {
+      logger.severe('Error finding suitable AI opponent: $e');
+      return null;
+    }
+  }
