@@ -347,10 +347,12 @@ class MatchmakingService {
   /// Create a match with an AI opponent
   Future<void> _createAIMatch(MatchmakingQueueModel player) async {
     try {
+      logger.info('[AI Fallback] Entered _createAIMatch for user: ${player.userId}, Elo: ${player.eloRating}');
       // Find suitable AI opponent
       final aiOpponent = await _findSuitableAIOpponent(player);
+      logger.info('[AI Fallback] _findSuitableAIOpponent result for user: ${player.userId} is: ${aiOpponent?.uid ?? "null"}');
       if (aiOpponent == null) {
-        logger.warning('No suitable opponent found for player ${player.userId} (Elo: ${player.eloRating})');
+        logger.warning('[AI Fallback] No suitable opponent found for player ${player.userId} (Elo: ${player.eloRating})');
         return;
       }
 
@@ -360,18 +362,21 @@ class MatchmakingService {
         queueId2: null,
         confirmationTimeout: _confirmationTimeout,
       );
+      logger.info('[AI Fallback] Set pending confirmation for user: ${player.userId}');
 
       // Wait for player confirmation
       await Future.delayed(_confirmationTimeout);
 
       // Check if player confirmed
       final updatedPlayer = await MatchmakingQueueRepository.instance.get(player.id);
+      logger.info('[AI Fallback] Confirmation status for user: ${player.userId} is: ${updatedPlayer?.isConfirmed}');
       if (updatedPlayer?.isConfirmed != true) {
         // Player didn't confirm, return to queue
         await MatchmakingQueueRepository.instance.returnToQueue(
           queueId1: player.id,
           queueId2: null,
         );
+        logger.info('[AI Fallback] Player ${player.userId} did not confirm, returned to queue');
         return;
       }
 
@@ -382,6 +387,7 @@ class MatchmakingService {
       );
       final redPlayerId = colors['red']!;
       final blackPlayerId = colors['black']!;
+      logger.info('[AI Fallback] Side assignment for user: ${player.userId} - red: $redPlayerId, black: $blackPlayerId');
 
       // Create the game with AI opponent disguised as a regular match
       final gameId = await GameService.instance.startGame(
@@ -404,6 +410,7 @@ class MatchmakingService {
           },
         },
       );
+      logger.info('[AI Fallback] Game created for user: ${player.userId}, gameId: $gameId');
 
       // Update side history for human player
       final humanSide = redPlayerId == player.userId ? 'red' : 'black';
@@ -411,6 +418,7 @@ class MatchmakingService {
         playerId: player.userId,
         side: humanSide,
       );
+      logger.info('[AI Fallback] Updated side history for user: ${player.userId}, side: $humanSide');
 
       // Mark queue entry as matched
       await MatchmakingQueueRepository.instance.markAsMatched(
@@ -418,10 +426,11 @@ class MatchmakingService {
         queueId2: null,
         matchId: gameId,
       );
+      logger.info('[AI Fallback] Marked queue as matched for user: ${player.userId}, matchId: $gameId');
 
-      logger.info('Created match for player ${player.userId} (${player.eloRating})');
+      logger.info('[AI Fallback] Successfully created AI match for player ${player.userId} (${player.eloRating})');
     } catch (e) {
-      logger.severe('Error creating match: $e');
+      logger.severe('[AI Fallback] Error creating match: $e');
     }
   }
 
@@ -429,16 +438,19 @@ class MatchmakingService {
   Future<void> _tryMatchWithAI(MatchmakingQueueModel player) async {
     try {
       final waitTime = DateTime.now().difference(player.joinedAt);
+      logger.info('[AI Fallback] Entered _tryMatchWithAI for user: ${player.userId}, waitTime: ${waitTime.inSeconds}s');
 
       if (waitTime < _minWaitTimeForAI) {
-        logger.info('Player ${player.userId} not yet eligible for AI match (${waitTime.inSeconds}s < ${_minWaitTimeForAI.inSeconds}s)');
+        logger.info('[AI Fallback] Player ${player.userId} not yet eligible for AI match (${waitTime.inSeconds}s < ${_minWaitTimeForAI.inSeconds}s)');
         return;
       }
 
+      logger.info('[AI Fallback] Player ${player.userId} eligible for AI match, proceeding to _createAIMatch');
       // Create AI match
       await _createAIMatch(player);
+      logger.info('[AI Fallback] Finished _tryMatchWithAI for user: ${player.userId}');
     } catch (e) {
-      logger.severe('Error in AI matching: $e');
+      logger.severe('[AI Fallback] Error in AI matching: $e');
     }
   }
 
